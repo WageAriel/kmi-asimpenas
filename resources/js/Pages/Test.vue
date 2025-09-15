@@ -30,7 +30,7 @@
         this.loading = true;
         this.error = null;
         try {
-          const response = await axios.get('http://localhost:8000/data-mitra');
+          const response = await axios.get('/data-mitra');
           this.mitras = response.data;
         } catch (err) {
           this.error = 'Gagal mengambil data mitra';
