@@ -14,6 +14,15 @@ Route::get('/', function () {
     ]);
 });
 
+
+Route::get('/test', function () {
+    return Inertia::render('Test');
+})->name('test');
+
+Route::get('/test-input', function () {
+    return Inertia::render('TestInputMitra');
+})->name('test-input');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -25,3 +34,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/api.php';
