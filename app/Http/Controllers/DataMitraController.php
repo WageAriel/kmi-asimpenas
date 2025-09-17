@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\DataMitra;
 use Illuminate\Http\Request;
-
+use Inertia\Inertia;
 class DataMitraController extends Controller
 {
+    
     public function index()
     {
         $mitras = DataMitra::all();
@@ -44,6 +45,8 @@ class DataMitraController extends Controller
             'no_vms' => 'nullable|string|max:50',
             'kode_mitra' => 'nullable|string|unique:data_mitra,kode_mitra|max:50',
         ]);
+
+        $validated['user_id'] = auth()->id();
 
         $mitra = DataMitra::create($validated);
         return response()->json($mitra, 201);

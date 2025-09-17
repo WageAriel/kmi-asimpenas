@@ -54,4 +54,9 @@ class DataMitra extends Model
     {
         return $this->hasMany(DataSeleksiMitra::class, 'id_mitra', 'id_mitra');
     }
+
+    public function user()
+{
+    return $this->belongsTo(User::class, 'user_id', 'id');
+}
 }

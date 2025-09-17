@@ -1,45 +1,51 @@
 <template>
+  <form @submit.prevent="submitForm">
     <div>
-      <h2>Daftar Data Mitra</h2>
-      <ul>
-        <li v-for="mitra in mitras" :key="mitra.id_mitra">
-          {{ mitra.nama_perusahaan }} - {{ mitra.email }} - {{ mitra.no_telp_cp }} - {{ mitra.badan_hukum_usaha }}
-        </li>
-      </ul>
-      <div v-if="loading">Loading...</div>
-      <div v-if="error">{{ error }}</div>
+      <label>Nama Perusahaan</label>
+      <input type="text" v-model="form.nama_perusahaan" />
     </div>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    data() {
-      return {
-        mitras: [],
-        loading: false,
-        error: null,
-      };
-    },
-    mounted() {
-      this.fetchDataMitra();
-    },
-    methods: {
-      async fetchDataMitra() {
-        this.loading = true;
-        this.error = null;
-        try {
-          const response = await axios.get('/data-mitra');
-          this.mitras = response.data;
-        } catch (err) {
-          this.error = 'Gagal mengambil data mitra';
-          console.error(err);
-        } finally {
-          this.loading = false;
-        }
+    <div>
+      <label>Email</label>
+      <input type="email" v-model="form.email" />
+    </div>
+    <button type="submit">Simpan</button>
+  </form>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      form: {
+        nama_perusahaan: '',
+        email: '',
+        // properti lain sesuai kebutuhan
       },
-    },
-  };
-  </script>
-  
+      user: null,
+    };
+  },
+  mounted() {
+    // Contoh mengambil user login dari API /api/user (Laravel default)
+    axios.get('/user').then(response => {
+      this.user = response.data;
+      this.form.nama_perusahaan = this.user.name; // Bisa disesuaikan fieldnya dari user
+      this.form.email = this.user.email;
+    });
+  },
+  methods: {
+    submitForm() {
+      axios.post('/data-mitra', this.form)
+        .then(response => {
+          alert('Data mitra berhasil disimpan');
+          // reset form atau aksi lain
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Gagal menyimpan data mitra');
+        });
+    }
+  }
+}
+</script>
