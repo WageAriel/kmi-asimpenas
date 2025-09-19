@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('nib', ['ada', 'tidak ada'])->nullable();
             $table->date('mb_nib')->nullable();
             $table->enum('ktp', ['ada', 'tidak ada'])->nullable();
-            $table->date('mb_ktp')->nullable();
+            $table->string('mb_ktp')->nullable()->default('seumur hidup');
             $table->enum('no_rekening', ['ada', 'tidak ada'])->nullable();
             $table->date('mb_no_rekening')->nullable();
             $table->enum('npwp', ['ada', 'tidak ada'])->nullable();

@@ -24,7 +24,6 @@ class DataSeleksiMitraController extends Controller
             'nib' => 'nullable|in:ada,tidak ada',
             'mb_nib' => 'nullable|date',
             'ktp' => 'nullable|in:ada,tidak ada',
-            'mb_ktp' => 'nullable|date',
             'no_rekening' => 'nullable|in:ada,tidak ada',
             'mb_no_rekening' => 'nullable|date',
             'npwp' => 'nullable|in:ada,tidak ada',

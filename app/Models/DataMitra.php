@@ -10,6 +10,7 @@ class DataMitra extends Model
     protected $primaryKey = 'id_mitra';
 
     protected $fillable = [
+        'user_id',
         'nama_perusahaan',
         'badan_hukum_usaha',
         'alamat_perusahaan',

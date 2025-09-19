@@ -14,6 +14,19 @@ class DataMitraController extends Controller
         return response()->json($mitras);
     }
 
+    public function myMitra()
+{
+    $userId = auth()->id();
+    $mitra = DataMitra::where('user_id', $userId)->first();
+
+    if (!$mitra) {
+        return response()->json(['message' => 'Data mitra tidak ditemukan'], 404);
+    }
+
+    return response()->json($mitra);
+}
+
+
     public function store(Request $request)
     {
         $validated = $request->validate([

@@ -2,6 +2,15 @@
 use App\Http\Controllers\DataMitraController;
 use App\Http\Controllers\DataSeleksiMitraController;
 use App\Http\Controllers\HasilSeleksiMitraController;
+use App\Http\Controllers\KlasifikasiMitraController;
+use Illuminate\Http\Request;
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+Route::middleware('auth:sanctum')->get('/data-mitra/my', [DataMitraController::class, 'myMitra']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/data-mitra', [DataMitraController::class, 'index'])->name('data-mitra.index');
@@ -24,3 +33,9 @@ Route::post('/hasil-seleksi-mitra', [HasilSeleksiMitraController::class, 'store'
 Route::get('/hasil-seleksi-mitra/{id}', [HasilSeleksiMitraController::class, 'show'])->name('hasil-seleksi-mitra.show');
 Route::put('/hasil-seleksi-mitra/{id}', [HasilSeleksiMitraController::class, 'update'])->name('hasil-seleksi-mitra.update');
 Route::delete('/hasil-seleksi-mitra/{id}', [HasilSeleksiMitraController::class, 'destroy'])->name('hasil-seleksi-mitra.destroy');
+
+Route::get('/klasifikasi-mitra', [KlasifikasiMitraController::class, 'index'])->name('klasifikasi-mitra.index');
+Route::post('/klasifikasi-mitra', [KlasifikasiMitraController::class, 'store'])->name('klasifikasi-mitra.store');
+Route::get('/klasifikasi-mitra/{id}', [KlasifikasiMitraController::class, 'show'])->name('klasifikasi-mitra.show');
+Route::put('/klasifikasi-mitra/{id}', [KlasifikasiMitraController::class, 'update'])->name('klasifikasi-mitra.update');
+Route::delete('/klasifikasi-mitra/{id}', [KlasifikasiMitraController::class, 'destroy'])->name('klasifikasi-mitra.destroy');
