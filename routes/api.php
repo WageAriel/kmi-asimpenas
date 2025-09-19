@@ -3,11 +3,15 @@ use App\Http\Controllers\DataMitraController;
 use App\Http\Controllers\DataSeleksiMitraController;
 use App\Http\Controllers\HasilSeleksiMitraController;
 
-Route::get('/data-mitra', [DataMitraController::class, 'index'])->name('data-mitra.index');
-Route::post('/data-mitra', [DataMitraController::class, 'store'])->name('data-mitra.store');
-Route::get('/data-mitra/{id}', [DataMitraController::class, 'show'])->name('data-mitra.show');
-Route::put('/data-mitra/{id}', [DataMitraController::class, 'update'])->name('data-mitra.update');
-Route::delete('/data-mitra/{id}', [DataMitraController::class, 'destroy'])->name('data-mitra.destroy');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/data-mitra', [DataMitraController::class, 'index'])->name('data-mitra.index');
+    Route::post('/data-mitra', [DataMitraController::class, 'store'])->name('data-mitra.store');
+    Route::get('/data-mitra/{id}', [DataMitraController::class, 'show'])->name('data-mitra.show');
+    Route::put('/data-mitra/{id}', [DataMitraController::class, 'update'])->name('data-mitra.update');
+    Route::delete('/data-mitra/{id}', [DataMitraController::class, 'destroy'])->name('data-mitra.destroy');
+    
+    // Route lain yang juga perlu auth bisa dimasukkan di sini
+});
 
 Route::get('/data-seleksi-mitra', [DataSeleksiMitraController::class, 'index'])->name('data-seleksi-mitra.index');
 Route::post('/data-seleksi-mitra', [DataSeleksiMitraController::class, 'store'])->name('data-seleksi-mitra.store');

@@ -10,6 +10,10 @@ return new class extends Migration
     {
         Schema::create('data_mitra', function (Blueprint $table) {
             $table->bigIncrements('id_mitra');
+
+            // Tambahkan kolom user_id dulu
+            $table->unsignedBigInteger('user_id')->nullable(); 
+
             $table->string('nama_perusahaan');
             $table->string('badan_hukum_usaha')->nullable();
             $table->string('alamat_perusahaan')->nullable();
@@ -38,6 +42,9 @@ return new class extends Migration
             $table->string('no_vms', 50)->nullable();
             $table->string('kode_mitra', 50)->unique()->nullable();
             $table->timestamps();
+
+            // Setelah kolom ada, baru set foreign key
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 
