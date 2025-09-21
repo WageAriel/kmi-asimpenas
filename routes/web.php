@@ -41,15 +41,29 @@ Route::prefix('mitra')->name('mitra.')->group(function () {
         ]);
     })->name('dashboard');
 
+    //untuk mengakses tabel pengajuan seleksi
     Route::get('/pengajuan-seleksi', function () {
-        return Inertia::render('Mitra/PengajuanSeleksi');
-    })->name('pengajuan-seleksi');
+        return Inertia::render('Mitra/PengajuanSeleksi/Index');
+    })->name('pengajuan-seleksi.index');
 
+    //untuk mengakses form pengajuan seleksi
+    Route::get('/pengajuan-seleksi/form', function () {
+        return Inertia::render('Mitra/PengajuanSeleksi/Form');
+    })->name('pengajuan-seleksi.form');
+
+    //untuk mengakses tabel klasifikasi mitra
     Route::get('/klasifikasi-mitra', function () {
-        return Inertia::render('Mitra/KlasifikasiMitra', [
+        return Inertia::render('Mitra/KlasifikasiMitra/Index', [
             'title' => 'Klasifikasi Mitra'
         ]);
-    })->name('klasifikasi-mitra');
+    })->name('klasifikasi-mitra.index');
+    
+    //untuk mengakses form klasifikasi mitra
+    Route::get('/klasifikasi-mitra/form', function () {
+        return Inertia::render('Mitra/KlasifikasiMitra/Form', [
+            'title' => 'Klasifikasi Mitra'
+        ]);
+    })->name('klasifikasi-mitra.form');
 
     Route::post('/klasifikasi-mitra', function () {
         // Untuk testing, hanya return success response
