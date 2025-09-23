@@ -22,9 +22,9 @@ Route::get('/test', function () {
     return Inertia::render('Test');
 })->name('test');
 
-Route::get('/test-input', function () {
-    return Inertia::render('TestInputMitra');
-})->name('test-input');
+Route::get('/input-data-mitra', function () {
+    return Inertia::render('Mitra/InputDataMitra');
+})->name('input-data-mitra');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

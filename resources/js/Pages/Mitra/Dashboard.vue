@@ -125,7 +125,7 @@ const quickActions = ref([
         description: 'Perbarui informasi dan dokumen perusahaan',
         icon: 'edit',
         color: 'green',
-        route: 'test-input',
+        route: 'input-data-mitra',
         params: { type: 'update' }
     }
 ]);

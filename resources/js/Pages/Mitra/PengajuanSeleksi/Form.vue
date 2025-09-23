@@ -246,7 +246,7 @@ onMounted(async () => {
                 {
                     text: 'Lengkapi Data',
                     action: () => {
-                        window.location.href = route('test-input');
+                        window.location.href = route('input-data-mitra');
                     }
                 }
             );
@@ -257,7 +257,7 @@ onMounted(async () => {
         
         // Case 2: Cek jenis error berdasarkan message atau status
         if (errorMessage.toLowerCase().includes('data mitra tidak ditemukan')) {
-            window.location.href = route('test-input');
+            window.location.href = route('input-data-mitra');
             
         } else if (error.response?.status === 401 || error.response?.status === 403 || errorMessage.toLowerCase().includes('unauthenticated') || errorMessage.toLowerCase().includes('unauthorized')) {
             // Error: Authentication/Authorization (perlu login ulang)
