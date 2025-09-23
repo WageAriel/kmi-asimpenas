@@ -34,6 +34,7 @@ return new class extends Migration
             $table->enum('mesin_pemisah_gabah', ['ada', 'tidak ada'])->nullable();
             $table->enum('mesin_penyosoh', ['ada', 'tidak ada'])->nullable();
             $table->enum('alat_pemisah_beras', ['ada', 'tidak ada'])->nullable();
+            $table->enum('status_seleksi', ['pending', 'lolos', 'tidak lolos'])->nullable()->default('pending');
             $table->timestamps();
 
             $table->foreign('id_mitra')

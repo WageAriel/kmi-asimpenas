@@ -2,7 +2,18 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import MitraLayout from '@/Layouts/MitraLayout.vue';
-import { ref, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
+
+const submissions = ref([]);
+
+onMounted(async () => {
+    const response = await axios.get('/data-seleksi-mitra/my'); // Pastikan route ini tersedia di api.php
+    submissions.value = response.data.map(item => ({
+        ...item,
+        nama_perusahaan: item.mitra?.nama_perusahaan ?? '-'
+    }));
+});
 
 const props = defineProps({
     submissions: {
@@ -16,7 +27,7 @@ const currentYear = new Date().getFullYear();
 // Computed untuk menentukan apakah bisa renewal
 const canRenew = computed(() => {
     const lastApproved = props.submissions
-        .filter(s => s.status === 'approved')
+        .filter(s => s.status === 'lolos')
         .sort((a, b) => (b.year || 2024) - (a.year || 2024))[0];
     
     return lastApproved && (currentYear - (lastApproved.year || 2024)) >= 1;
@@ -30,8 +41,8 @@ const hasCurrentYearSubmission = computed(() => {
 const getStatusClass = (status) => {
     switch(status) {
         case 'pending': return 'bg-yellow-100 text-yellow-800';
-        case 'approved': return 'bg-green-100 text-green-800';
-        case 'rejected': return 'bg-red-100 text-red-800';
+        case 'lolos': return 'bg-green-100 text-green-800';
+        case 'tidak lolos': return 'bg-red-100 text-red-800';
         case 'draft': return 'bg-gray-100 text-gray-800';
         default: return 'bg-gray-100 text-gray-800';
     }
@@ -40,10 +51,10 @@ const getStatusClass = (status) => {
 const getStatusText = (status) => {
     switch(status) {
         case 'pending': return 'Menunggu Review';
-        case 'approved': return 'Disetujui';
-        case 'rejected': return 'Ditolak';
+        case 'lolos': return 'Disetujui';
+        case 'tidak lolos': return 'Ditolak';
         case 'draft': return 'Draft';
-        default: return 'Belum Submit';
+        default: return 'Pending';
     }
 };
 
@@ -144,6 +155,7 @@ const editSubmission = (submission) => {
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Mitra</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tahun</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -154,6 +166,9 @@ const editSubmission = (submission) => {
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr v-for="submission in submissions" :key="submission.id" class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-gray-900">{{ submission.nama_perusahaan }}</span>
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="text-sm font-medium text-gray-900">{{ submission.year || currentYear }}</span>
                                 </td>
@@ -170,9 +185,8 @@ const editSubmission = (submission) => {
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span :class="[
                                         'px-2 py-1 text-xs font-medium rounded-full',
-                                        getStatusClass(submission.status)
                                     ]">
-                                        {{ getStatusText(submission.status) }}
+                                        {{ submission.status_seleksi }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">

@@ -16,6 +16,8 @@ Route::get('/', function () {
 });
 
 
+
+
 Route::get('/test', function () {
     return Inertia::render('Test');
 })->name('test');
@@ -29,7 +31,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Routes Dashboard Mitra tanpa middleware (untuk testing)
-Route::prefix('mitra')->name('mitra.')->group(function () {
+Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Mitra/Dashboard', [
             'statistik' => [

@@ -31,6 +31,7 @@ class DataSeleksiMitra extends Model
         'mesin_pemisah_gabah',
         'mesin_penyosoh',
         'alat_pemisah_beras',
+        'status_seleksi',
     ];
 
     protected $dates = [

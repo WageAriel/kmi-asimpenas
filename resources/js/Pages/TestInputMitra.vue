@@ -1,44 +1,54 @@
-<script>
-  import axios from "axios";
-  
-  export default {
-    data() {
-      return {
-        form: {
-          nama_perusahaan: "",
-          badan_hukum_usaha: "",
-          alamat_perusahaan: "",
-          email: "",
-          kode_mitra: "",
-        },
-        successMessage: "",
-        errorMessage: "",
-      };
-    },
-    methods: {
-      async submitForm() {
-        try {
-          const response = await axios.post("/data-mitra", this.form);
-          this.successMessage = "Data mitra berhasil ditambahkan!";
-          this.errorMessage = "";
-          this.form = {
-            nama_perusahaan: "",
-            badan_hukum_usaha: "",
-            alamat_perusahaan: "",
-            email: "",
-            kode_mitra: "",
-          };
-        } catch (error) {
-          this.successMessage = "";
-          this.errorMessage =
-            error.response?.data?.message || "Terjadi kesalahan saat menambah data.";
-        }
-      },
-    },
-  };
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+// Reactive states untuk form dan pesan
+const form = ref({
+  nama_perusahaan: "",
+  badan_hukum_usaha: "",
+  alamat_perusahaan: "",
+  email: "",
+  kode_mitra: "",
+});
+
+const user = ref(null)
+const successMessage = ref("");
+const errorMessage = ref("");
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('/user')
+    user.value = response.data
+    form.value.nama_perusahaan = user.value.name // sesuaikan field dari user
+    form.value.email = user.value.email
+  } catch (error) {
+    console.error('Gagal mengambil data user:', error)
+  }
+})
+
+// Function untuk submit form
+const submitForm = async () => {
+  try {
+    const response = await axios.post("/data-mitra", form.value);
+    successMessage.value = "Data mitra berhasil ditambahkan!";
+    errorMessage.value = "";
+    form.value = {
+      nama_perusahaan: "",
+      badan_hukum_usaha: "",
+      alamat_perusahaan: "",
+      email: "",
+      kode_mitra: "",
+    };  
+  } catch (error) {
+    successMessage.value = "";
+    errorMessage.value = error.response?.data?.message || "Terjadi kesalahan saat menambah data.";
+  }
+};
 </script>
 
+
 <template>
+  <MitraLayout>
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 max-w-2xl mx-auto p-8">
       <div class="mb-8">
         <h1 class="text-lg font-semibold mb-2">Tambah Data Mitra</h1>
@@ -107,6 +117,7 @@
         {{ errorMessage }}
       </div>
     </div>
+  </MitraLayout>
   </template>
   
   <style>

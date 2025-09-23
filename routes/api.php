@@ -10,6 +10,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->get('/data-mitra/my', [DataMitraController::class, 'myMitra']);
+Route::middleware('auth:sanctum')->get('/data-seleksi-mitra/my', [DataSeleksiMitraController::class, 'mySeleksi']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -22,7 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route lain yang juga perlu auth bisa dimasukkan di sini
 });
 
-Route::get('/data-seleksi-mitra', [DataSeleksiMitraController::class, 'index'])->name('data-seleksi-mitra.index');
+Route::get('/data-seleksi-mitra', [DataSeleksiMitraController::class, 'indexByMitra'])->name('data-seleksi-mitra.index');
 Route::post('/data-seleksi-mitra', [DataSeleksiMitraController::class, 'store'])->name('data-seleksi-mitra.store');
 Route::get('/data-seleksi-mitra/{id}', [DataSeleksiMitraController::class, 'show'])->name('data-seleksi-mitra.show');
 Route::put('/data-seleksi-mitra/{id}', [DataSeleksiMitraController::class, 'update'])->name('data-seleksi-mitra.update');

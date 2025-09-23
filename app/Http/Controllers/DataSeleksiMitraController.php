@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DataSeleksiMitra;
+use App\Models\DataMitra;
 use Illuminate\Http\Request;
 
 class DataSeleksiMitraController extends Controller
@@ -12,6 +13,34 @@ class DataSeleksiMitraController extends Controller
         $seleksimitras = DataSeleksiMitra::all();
         return response()->json($seleksimitras);
     }
+    public function indexByMitra()
+{
+    $seleksimitras = DataSeleksiMitra::with('mitra')->get();
+    return response()->json($seleksimitras);
+}
+
+public function mySeleksi()
+{
+    // Ambil user yang sedang login
+    $userId = auth()->id();
+
+    // Ambil satu baris DataMitra milik user (asumsi satu user = satu mitra)
+    $mitra = DataMitra::where('user_id', $userId)->first();
+
+    // Jika tidak ada mitra
+    if (!$mitra) {
+        return response()->json(['message' => 'Data mitra tidak ditemukan'], 404);
+    }
+
+    // Ambil semua seleksi milik mitra ini, beserta detail mitra
+    $seleksi = DataSeleksiMitra::with('mitra')
+        ->where('id_mitra', $mitra->id_mitra)
+        ->get();
+
+    return response()->json($seleksi);
+}
+
+
 
     public function store(Request $request)
     {
@@ -73,6 +102,7 @@ class DataSeleksiMitraController extends Controller
             'mesin_pemisah_gabah' => 'nullable|in:ada,tidak ada',
             'mesin_penyosoh' => 'nullable|in:ada,tidak ada',
             'alat_pemisah_beras' => 'nullable|in:ada,tidak ada',
+            'status_seleksi' => 'nullable|in:pending,lolos,tidak lolos',
         ]);
 
         $seleksimitra->update($validated);

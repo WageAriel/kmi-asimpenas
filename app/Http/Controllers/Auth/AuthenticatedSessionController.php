@@ -28,13 +28,26 @@
          * Handle an incoming authentication request.
          */
         public function store(LoginRequest $request): RedirectResponse
-        {
-            $request->authenticate();
+{
+    $request->authenticate();
 
-            $request->session()->regenerate();
+    $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard', absolute: false));
-        }
+    $user = Auth::user();
+
+    // Redirect sesuai role
+    if ($user->role === 'mitra') {
+        return redirect()->intended(route('mitra.dashboard', absolute: false));
+    }
+
+    if ($user->role === 'admin') {
+        return redirect()->intended(route('dashboard', absolute: false));
+    }
+
+    // Default ke landing page
+    return redirect()->intended('/');
+}
+
 
         /**
          * Destroy an authenticated session.
