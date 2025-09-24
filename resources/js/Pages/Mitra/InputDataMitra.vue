@@ -35,6 +35,7 @@ const user = ref(null)
 const successMessage = ref("");
 const errorMessage = ref("");
 const isSubmitting = ref(false);
+const mitraId = ref(null);
 
 // Notification states
 const notification = ref({
@@ -148,6 +149,14 @@ onMounted(async () => {
     user.value = response.data
     form.value.nama_perusahaan = user.value.name // sesuaikan field dari user
     form.value.email = user.value.email
+
+    const mitraRes = await axios.get('/data-mitra/my');
+    if (mitraRes.data && mitraRes.data.id_mitra) {
+      mitraId.value = mitraRes.data.id_mitra;
+      Object.keys(form.value).forEach(key => {
+        if (mitraRes.data[key] !== undefined) form.value[key] = mitraRes.data[key] ?? "";
+      });
+    }
   } catch (error) {
     console.error('Gagal mengambil data user:', error)
   }
@@ -170,7 +179,14 @@ const submitForm = async () => {
   errorMessage.value = "";
 
   try {
-    const response = await axios.post("/data-mitra", form.value);
+    let response;
+    if (mitraId.value) {
+      // update (PUT)
+      response = await axios.put(`/data-mitra/${mitraId.value}`, form.value);
+    } else {
+      // create (POST)
+      response = await axios.post('/data-mitra', form.value);
+    }
     successMessage.value = "Data mitra berhasil ditambahkan!";
     errorMessage.value = "";
     
@@ -767,7 +783,7 @@ const submitForm = async () => {
           >
             <span v-if="isSubmitting">Mengirim...</span>
             <span v-else-if="!isFormValid">Lengkapi Data</span>
-            <span v-else>Tambah Mitra</span>
+            <span v-else>Simpan Data</span>
           </button>
         </div>
       </form>

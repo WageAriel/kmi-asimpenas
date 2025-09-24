@@ -48,6 +48,10 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
         return Inertia::render('Mitra/PengajuanSeleksi/Index');
     })->name('pengajuan-seleksi.index');
 
+    Route::get('/input-data-mitra', function () {
+        return Inertia::render('Mitra/InputDataMitra');
+    })->name('input-data-mitra');
+
     //untuk mengakses form pengajuan seleksi
     Route::get('/pengajuan-seleksi/form', function () {
         return Inertia::render('Mitra/PengajuanSeleksi/Form');

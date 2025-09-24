@@ -4,53 +4,172 @@ import MitraLayout from '@/Layouts/MitraLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
+import { Inertia } from '@inertiajs/inertia';
 import TextInput from '@/Components/TextInput.vue';
-import { ref } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
+import { router } from '@inertiajs/vue3'
 
-const form = useForm({
+
+const isSubmitting = ref(false);
+const errors = ref({});
+
+const form = reactive({
     // Informasi Umum
-    nama_mitra: '',
-    badan_hukum: '',
-    alamat_perusahaan: '',
-    status: '',
+    // nama_mitra: '',
+    // badan_hukum: '',
+    // alamat_perusahaan: '',
+    // status: '',
     
     // Fasilitas & Mesin Produksi (Step 2)
-    mesin_pembersih_gabah: 'tidak_ada',
-    lantai_jemur: 'tidak_ada',
-    mesin_pengering: 'tidak_ada',
-    alat_pengering_lainnya: 'ada_kurang_1',
+    id_mitra: '3',
+    mesin_pembersih_gabah: '3',
+    lantai_jemur: '3',
+    mesin_pengering: '3',
+    alat_pengering_lainnya: '3',
     
     // Mesin Penggilingan (Step 3)
-    mesin_pembersih_awal: 'tidak_ada',
-    mesin_pemecah_kulit: 'tidak_ada',
-    mesin_pembersih_sekam: 'tidak_ada',
-    mesin_pemisah_gabah_beras: 'tidak_ada',
-    mesin_pemisah_batu: 'tidak_ada',
-    mesin_penyosoh: 'tidak_ada',
-    mesin_pengkabut: 'tidak_ada',
-    mesin_pemisah_menir: 'tidak_ada',
-    mesin_pemisah_katul: 'tidak_ada',
-    mesin_pemisah_ukuran: 'tidak_ada',
-    mesin_pemisah_warna: 'tidak_ada',
-    tangki_penyimpanan: 'tidak_ada',
-    mesin_pengemas: 'tidak_ada',
-    mesin_jahit: 'tidak_ada',
+    mesin_pembersih_awal: '3',
+    mesin_pemecah_kulit: '3',
+    mesin_pembersih_sekam: '3',
+    mesin_pemisah_gabah_pecah_kulit: '3',
+    mesin_pemisah_batu: '3',
+    mesin_penyosoh: '3',
+    mesin_pengkabut: '3',
+    mesin_pemesah_menir: '3',
+    mesin_pemisah_katul: '3',
+    mesin_pemisah_berdasarkan_ukuran: '3',
+    mesin_pemisah_berdasarkan_warna: '3',
+    tangki_penyimpanan: '3',
+    mesin_pengemas: '3',
+    mesin_jahit: '3',
     
     // Penyimpanan (Step 4)
-    gudang_konvensional: 'tidak_ada',
-    silo_gkg_hopper: 'tidak_ada',
+    gudang_konvensional: '3',
+    silo_gkg_hopper: '3',
 
     // Transportasi (Step 5)
-    truk: 'tidak_ada',
+    truk: '3',
 
     // Kelengkapan Pemeriksaan (Step 6)
-    mini_lab: 'tidak_ada',
-    moisture_tester: 'tidak_ada',
-    pembanding_derajat_sosoh: 'tidak_ada',
+    mini_lab: '3',
+    moisture_tester: '3',
+    pembanding_derajat_sosoh: '3',
 
     // Organisasi (Step 7)
-    bagian_quality_control: 'tidak_ada',
+    bagian_quality_control: '3',
 });
+
+const notification = ref({
+    show: false,
+    type: 'error', // 'success', 'error', 'warning', 'info'
+    title: '',
+    message: '',
+    showButton: false,
+    buttonText: '',
+    buttonAction: null
+});
+
+// Function to show notification
+const showNotification = (type, title, message, buttonConfig = null) => {
+    notification.value = {
+        show: true,
+        type,
+        title,
+        message,
+        showButton: buttonConfig ? true : false,
+        buttonText: buttonConfig?.text || '',
+        buttonAction: buttonConfig?.action || null
+    };
+};
+
+// Function to hide notification
+const hideNotification = () => {
+    notification.value.show = false;
+};
+
+// Function to handle button click in notification
+const handleNotificationButton = () => {
+    if (notification.value.buttonAction) {
+        notification.value.buttonAction();
+    }
+    hideNotification();
+};
+
+// Get notification classes based on type
+const getNotificationClasses = (type) => {
+    switch(type) {
+        case 'success':
+            return 'bg-green-50';
+        case 'error':
+            return 'bg-red-50';
+        case 'warning':
+            return 'bg-yellow-50';
+        case 'info':
+            return 'bg-blue-50';
+        default:
+            return 'bg-gray-50';
+    }
+};
+
+// Get notification icon based on type
+const getNotificationIcon = (type) => {
+    switch(type) {
+        case 'success':
+            return 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z';
+        case 'error':
+            return 'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z';
+        case 'warning':
+            return 'M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z';
+        case 'info':
+            return 'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z';
+        default:
+            return 'M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z';
+    }
+};
+
+// Get icon color based on type
+const getIconColor = (type) => {
+    switch(type) {
+        case 'success': return 'text-green-400';
+        case 'error': return 'text-red-400';
+        case 'warning': return 'text-yellow-400';
+        case 'info': return 'text-blue-400';
+        default: return 'text-gray-400';
+    }
+};
+
+// Get text colors based on type
+const getTextColors = (type) => {
+    switch(type) {
+        case 'success': return { title: 'text-green-800', message: 'text-green-700' };
+        case 'error': return { title: 'text-red-800', message: 'text-red-700' };
+        case 'warning': return { title: 'text-yellow-800', message: 'text-yellow-700' };
+        case 'info': return { title: 'text-blue-800', message: 'text-blue-700' };
+        default: return { title: 'text-gray-800', message: 'text-gray-700' };
+    }
+};
+
+// Get button colors based on type
+const getButtonColors = (type) => {
+    switch(type) {
+        case 'success': return 'bg-green-600 hover:bg-green-700 focus:ring-green-500';
+        case 'error': return 'bg-red-600 hover:bg-red-700 focus:ring-red-500';
+        case 'warning': return 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500';
+        case 'info': return 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500';
+        default: return 'bg-gray-600 hover:bg-gray-700 focus:ring-gray-500';
+    }
+};
+
+// Get close button colors based on type
+const getCloseButtonColors = (type) => {
+    switch(type) {
+        case 'success': return 'text-green-500 hover:bg-green-100 focus:ring-green-600';
+        case 'error': return 'text-red-500 hover:bg-red-100 focus:ring-red-600';
+        case 'warning': return 'text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-600';
+        case 'info': return 'text-blue-500 hover:bg-blue-100 focus:ring-blue-600';
+        default: return 'text-gray-500 hover:bg-gray-100 focus:ring-gray-600';
+    }
+};
 
 const jenisUsahaOptions = [
     { value: 'pt', label: 'PT (Perseroan Terbatas)' },
@@ -78,7 +197,7 @@ const targetPasarOptions = [
 ];
 
 const currentStep = ref(1);
-const totalSteps = 7;
+const totalSteps = 6;
 const currentYear = new Date().getFullYear();
 
 // Navigation functions
@@ -94,17 +213,127 @@ const prevStep = () => {
     }
 };
 
-// Submit function
-const submit = () => {
-    form.post(route('mitra.klasifikasi-mitra.store'), {
-        onSuccess: () => {
-            alert('Data klasifikasi mitra berhasil disimpan!');
-        },
-        onError: () => {
-            alert('Terjadi kesalahan. Silakan periksa kembali data Anda.');
+onMounted(async () => {
+    try {
+        // Panggil API untuk mendapatkan data mitra user login
+        const response = await axios.get('/data-mitra/my');
+        const mitra = response.data;
+        
+        if (mitra && mitra.id_mitra) {
+            form.id_mitra = mitra.id_mitra;
+            showNotification('success', 'Berhasil', 'Data mitra berhasil dimuat');
+        } else {
+            // Case 1: Data mitra tidak ditemukan (response sukses tapi data kosong)
+            showNotification(
+                'warning', 
+                'Data Mitra Tidak Ditemukan', 
+                'Anda belum terdaftar sebagai mitra. Silakan lengkapi data mitra terlebih dahulu.',
+                {
+                    text: 'Lengkapi Data',
+                    action: () => {
+                        window.location.href = route('input-data-mitra');
+                    }
+                }
+            );
+        } 
+
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || error.message;
+        
+        // Case 2: Cek jenis error berdasarkan message atau status
+        if (errorMessage.toLowerCase().includes('data mitra tidak ditemukan')) {
+            window.location.href = route('input-data-mitra');
+            
+        } else if (error.response?.status === 401 || error.response?.status === 403 || errorMessage.toLowerCase().includes('unauthenticated') || errorMessage.toLowerCase().includes('unauthorized')) {
+            // Error: Authentication/Authorization (perlu login ulang)
+            showNotification(
+                'error', 
+                'Login Terlebih Dahulu', 
+                'Silakan melakukan login untuk mengakses halaman ini dan melanjutkan proses pengajuan.',
+                {
+                    text: 'Login Sekarang',
+                    action: () => {
+                        window.location.href = route('login');
+                    }
+                }
+            );
+        } else if (error.response?.status === 500 || errorMessage.toLowerCase().includes('server error')) {
+            // Error: Server Error
+            showNotification(
+                'error', 
+                'Kesalahan Server', 
+                'Terjadi kesalahan pada server. Silakan coba lagi atau hubungi administrator.',
+                {
+                    text: 'Coba Lagi',
+                    action: () => {
+                        window.location.reload();
+                    }
+                }
+            );
+        } else if (error.code === 'NETWORK_ERROR' || !navigator.onLine) {
+            // Error: Network/Connection
+            showNotification(
+                'error', 
+                'Koneksi Bermasalah', 
+                'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+                {
+                    text: 'Coba Lagi',
+                    action: () => {
+                        window.location.reload();
+                    }
+                }
+            );
+        } else {
+            // Error: General/Unknown (fallback ke login)
+            showNotification(
+                'error', 
+                'Terjadi Kesalahan', 
+                `Gagal mengambil data mitra: ${errorMessage}. Silakan login ulang.`,
+                {
+                    text: 'Login Ulang',
+                    action: () => {
+                        window.location.href = route('login');
+                    }
+                }
+            );
         }
-    });
+    }
+});
+
+// Submit function
+
+
+const submit = async () => {
+    isSubmitting.value = true;
+    try {
+        const response = await axios.post('/klasifikasi-mitra', form);
+        responseData.value = response.data;
+
+        showNotification('success', 'Berhasil', 'Pengajuan Klasifikasi Mitra berhasil dikirim!');
+ 
+        // Redirect ke halaman klasifikasi mitra
+        router.visit('/mitra/dashboard');
+
+        // Reset form jika tetap ingin direset sebelum redirect (opsional)
+        Object.keys(form).forEach(key => {
+            if (key === 'id_mitra') return;
+            form[key] = '';
+        });
+        currentStep.value = 1;
+
+    } catch (error) {
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors || {};
+            showNotification('error', 'Validasi Gagal', 'Terdapat kesalahan pada data yang diisi. Silakan periksa kembali.');
+        } else {
+            const errorMessage = error.response?.data?.message || error.message;
+            showNotification('error', 'Terjadi Kesalahan', `Gagal mengirim data: ${errorMessage}`);
+        }
+    } finally {
+        isSubmitting.value = false;
+    }
 };
+
 </script>
 
 <template>
@@ -135,7 +364,6 @@ const submit = () => {
                     </div>
                 </div>
                 <div class="flex justify-between mt-2">
-                    <span class="text-xs text-gray-500">Info Umum</span>
                     <span class="text-xs text-gray-500">Pengeringan</span>
                     <span class="text-xs text-gray-500">Penggilingan</span>
                     <span class="text-xs text-gray-500">Sarana Penyimpanan</span>
@@ -149,7 +377,7 @@ const submit = () => {
             <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                 <form @submit.prevent="submit">
                     <!-- Step 1: Informasi Umum -->
-                    <div v-show="currentStep === 1" class="p-6 space-y-6">
+                    <!-- <div v-show="currentStep === 1" class="p-6 space-y-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Informasi Umum Mitra</h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -211,48 +439,48 @@ const submit = () => {
                             </div>
                         </div>
 
-                    </div>
+                    </div> -->
 
                     <!-- Step 2: Kapasitas Produksi -->
-                    <div v-show="currentStep === 2" class="p-6 space-y-6">
+                    <div v-show="currentStep === 1" class="p-6 space-y-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Pengeringan</h3>
                         
                         <div class="space-y-6">
                             <!-- Mesin Pembersih Gabah -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pembersih Gabah</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pembersih Gabah (ton/hari)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_gabah"
-                                            value="ada_lebih_20"
+                                            value="1"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 20 unit</span>
+                                            <span class="text-gray-600"> | > 20 </span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_gabah"
-                                            value="ada_kurang_20"
+                                            value="2"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| ≤ 20 unit</span>
+                                            <span class="text-gray-600"> | ≤ 20 unit</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_gabah"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -260,44 +488,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pembersih_gabah" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pembersih_gabah" /> -->
                             </div>
 
                             <!-- Lantai Jemur -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Lantai Jemur</h4>
+                                    <h4 class="font-medium text-gray-900">Lantai Jemur (ton/hari)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.lantai_jemur"
-                                            value="ada_lebih_10"
+                                            value="1"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 10</span>
+                                            <span class="text-gray-600"> | > 10</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.lantai_jemur"
-                                            value="ada_1_sampai_10"
+                                            value="2"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 10</span>
+                                            <span class="text-gray-600"> | 1 s/d 10</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.lantai_jemur"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -305,44 +533,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.lantai_jemur" />
+                                <!-- <InputError class="mt-2" :message="form.errors.lantai_jemur" /> -->
                             </div>
 
                             <!-- Mesin Pengering -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pengering</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pengering (ton/hari)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengering"
-                                            value="ada_lebih_20"
+                                            value="1"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 20</span>
+                                            <span class="text-gray-600"> | > 20</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengering"
-                                            value="ada_kurang_20"
+                                            value="2"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| ≤ 20</span>
+                                            <span class="text-gray-600"> | ≤ 20</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengering"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -350,20 +578,20 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pengering" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pengering" /> -->
                             </div>
 
                             <!-- Alat Pengering Lainnya -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Alat Pengering Lainnya</h4>
+                                    <h4 class="font-medium text-gray-900">Alat Pengering Lainnya (ton/hari)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.alat_pengering_lainnya"
-                                            value="tidak_disyaratkan"
+                                            value="1"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -374,7 +602,7 @@ const submit = () => {
                                         <input
                                             type="radio"
                                             v-model="form.alat_pengering_lainnya"
-                                            value="tidak_disyaratkan"
+                                            value="2"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -385,61 +613,61 @@ const submit = () => {
                                         <input
                                             type="radio"
                                             v-model="form.alat_pengering_lainnya"
-                                            value="ada_kurang_1"
+                                            value="3"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">C. Ada</span>
-                                            <span class="text-gray-600">| ≤ 1</span>
+                                            <span class="text-gray-600"> | ≤ 1</span>
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.alat_pengering_lainnya" />
+                                <!-- <InputError class="mt-2" :message="form.errors.alat_pengering_lainnya" /> -->
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Step 3: Sertifikasi & Standar -->
-                    <div v-show="currentStep === 3" class="p-6 space-y-6">
+                    <div v-show="currentStep === 2" class="p-6 space-y-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Mesin Penggilingan</h3>
                         
                         <div class="space-y-6">
                             <!-- Mesin Pembersih Awal -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pembersih Awal</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pembersihan Awal (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_awal"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_awal"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_awal"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -447,44 +675,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pembersih_awal" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pembersih_awal" /> -->
                             </div>
 
                             <!-- Mesin Pemecah Kulit -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pemecah Kulit</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pemecah Kulit (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemecah_kulit"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemecah_kulit"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemecah_kulit"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -492,44 +720,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pemecah_kulit" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pemecah_kulit" /> -->
                             </div>
 
                             <!-- Mesin Pembersih Sekam -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pembersih Sekam</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pembersih Sekam (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_sekam"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_sekam"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_sekam"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -537,44 +765,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pembersih_sekam" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pembersih_sekam" /> -->
                             </div>
 
                             <!-- Mesin Pemisah Gabah dengan Beras Pecah Kulit -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pemisah Gabah dengan Beras Pecah Kulit</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pemisah Gabah dengan Beras Pecah Kulit (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_gabah_beras"
-                                            value="ada_lebih_3"
+                                            v-model="form.mesin_pemisah_gabah_pecah_kulit"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_gabah_beras"
-                                            value="ada_1_sampai_3"
+                                            v-model="form.mesin_pemisah_gabah_pecah_kulit"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_gabah_beras"
-                                            value="tidak_ada"
+                                            v-model="form.mesin_pemisah_gabah_pecah_kulit"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -582,44 +810,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pemisah_gabah_beras" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pemisah_gabah_pecah_kulit" /> -->
                             </div>
 
                             <!-- Mesin Pemisah Batu -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pemisah Batu</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pemisah Batu (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_batu"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_batu"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_batu"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -627,44 +855,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pemisah_batu" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pemisah_batu" /> -->
                             </div>
 
                             <!-- Mesin Penyosoh -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Penyosoh</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Penyosoh (ton/jam; pass)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_penyosoh"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3 | 2</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_penyosoh"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3 | 1</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_penyosoh"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -672,44 +900,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_penyosoh" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_penyosoh" /> -->
                             </div>
 
                             <!-- Mesin Pengkabut -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pengkabut</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pengkabut (ton/jam; pass)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengkabut"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3 | 2</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengkabut"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3 | 1</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengkabut"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -717,44 +945,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pengkabut" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pengkabut" /> -->
                             </div>
 
                             <!-- Mesin Pemisah Menir -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pemisah Menir</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pemisah Menir (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_menir"
-                                            value="ada_lebih_3"
+                                            v-model="form.mesin_pemesah_menir"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_menir"
-                                            value="ada_1_sampai_3"
+                                            v-model="form.mesin_pemesah_menir"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_menir"
-                                            value="tidak_ada"
+                                            v-model="form.mesin_pemesah_menir"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -762,44 +990,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pemisah_menir" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pemesah_menir" /> -->
                             </div>
 
                             <!-- Mesin Pemisah Katul -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pemisah Katul</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pemisah Katul (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_katul"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_katul"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_katul"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -807,44 +1035,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pemisah_katul" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pemisah_katul" /> -->
                             </div>
 
                             <!-- Mesin Pemisah berdasarkan Ukuran -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pemisah berdasarkan Ukuran</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pemisah berdasarkan Ukuran (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_ukuran"
-                                            value="ada_lebih_3"
+                                            v-model="form.mesin_pemisah_berdasarkan_ukuran"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_ukuran"
-                                            value="ada_1_sampai_3"
+                                            v-model="form.mesin_pemisah_berdasarkan_ukuran"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_ukuran"
-                                            value="tidak_ada"
+                                            v-model="form.mesin_pemisah_berdasarkan_ukuran"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -852,44 +1080,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pemisah_ukuran" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pemisah_berdasarkan_ukuran" /> -->
                             </div>
 
                             <!-- Mesin Pemisah berdasarkan Warna -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pemisah berdasarkan Warna</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pemisah berdasarkan Warna (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_warna"
-                                            value="ada_lebih_3"
+                                            v-model="form.mesin_pemisah_berdasarkan_warna"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_warna"
-                                            value="ada_1_sampai_3"
+                                            v-model="form.mesin_pemisah_berdasarkan_warna"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | 1 s/d 3</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
-                                            v-model="form.mesin_pemisah_warna"
-                                            value="tidak_ada"
+                                            v-model="form.mesin_pemisah_berdasarkan_warna"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -897,44 +1125,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pemisah_warna" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pemisah_berdasarkan_warna" /> -->
                             </div>
 
                             <!-- Tangki Penyimpanan -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Tangki Penyimpanan</h4>
+                                    <h4 class="font-medium text-gray-900">Tangki Penyimpanan (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.tangki_penyimpanan"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | > 10</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.tangki_penyimpanan"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | ≤ 10</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.tangki_penyimpanan"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -942,44 +1170,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.tangki_penyimpanan" />
+                                <!-- <InputError class="mt-2" :message="form.errors.tangki_penyimpanan" /> -->
                             </div>
 
                             <!-- Mesin Pengemas -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Pengemas</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Pengemas (ton/jam)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengemas"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | Full Otomatis</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengemas"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | Semi Otomatis</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengemas"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -987,44 +1215,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_pengemas" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_pengemas" /> -->
                             </div>
 
                             <!-- Mesin Jahit -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mesin Jahit</h4>
+                                    <h4 class="font-medium text-gray-900">Mesin Jahit (unit)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_jahit"
-                                            value="ada_lebih_3"
+                                            value="1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3</span>
+                                            <span class="text-gray-600"> | Full Otomatis</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_jahit"
-                                            value="ada_1_sampai_3"
+                                            value="2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 3</span>
+                                            <span class="text-gray-600"> | Semi Otomatis</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mesin_jahit"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1032,52 +1260,52 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mesin_jahit" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mesin_jahit" /> -->
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Step 4: Penyimpanan -->
-                    <div v-show="currentStep === 4" class="p-6 space-y-6">
+                    <div v-show="currentStep === 3" class="p-6 space-y-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Penyimpanan</h3>
                         
                         <div class="space-y-6">
                             <!-- Gudang Konvensional -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Gudang Konvensional</h4>
+                                    <h4 class="font-medium text-gray-900">Gudang Konvensional (ton)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.gudang_konvensional"
-                                            value="ada_lebih_3000"
+                                            value="1"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3000</span>
+                                            <span class="text-gray-600"> | > 3000</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.gudang_konvensional"
-                                            value="ada_kurang_3000"
+                                            value="2"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| &lt; 3000</span>
+                                            <span class="text-gray-600"> | &lt; 3000</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.gudang_konvensional"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1085,44 +1313,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.gudang_konvensional" />
+                                <!-- <InputError class="mt-2" :message="form.errors.gudang_konvensional" /> -->
                             </div>
 
                             <!-- Silo GKG/Hopper -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Silo GKG/Hopper</h4>
+                                    <h4 class="font-medium text-gray-900">Silo GKG/Hopper (ton)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.silo_gkg_hopper"
-                                            value="ada_lebih_3000"
+                                            value="1"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 3000</span>
+                                            <span class="text-gray-600"> | > 2000</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.silo_gkg_hopper"
-                                            value="ada_kurang_3000"
+                                            value="2"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| &lt; 3000</span>
+                                            <span class="text-gray-600"> | &lt; 2000</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.silo_gkg_hopper"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1130,20 +1358,20 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.silo_gkg_hopper" />
+                                <!-- <InputError class="mt-2" :message="form.errors.silo_gkg_hopper" /> -->
                             </div>
                         </div>
                     </div>
 
                     <!-- Step 5: Sarana Angkutan -->
-                    <div v-show="currentStep === 5" class="p-6 space-y-6">
+                    <div v-show="currentStep === 4" class="p-6 space-y-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Sarana Angkutan</h3>
                         
                         <div class="space-y-6">
                             <!-- Truk -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Truk</h4>
+                                    <h4 class="font-medium text-gray-900">Truk (unit)</h4>
                                     <p class="text-sm text-gray-500">Kendaraan transportasi untuk distribusi produk</p>
                                 </div>
                                 <div class="space-y-2">
@@ -1151,31 +1379,31 @@ const submit = () => {
                                         <input
                                             type="radio"
                                             v-model="form.truk"
-                                            value="ada_lebih_5"
+                                            value="1"
                                             class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
-                                            <span class="text-gray-600">| > 5 unit</span>
+                                            <span class="text-gray-600"> | > 5 unit</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.truk"
-                                            value="ada_1_sampai_5"
+                                            value="2"
                                             class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600">| 1 s/d 5 unit</span>
+                                            <span class="text-gray-600"> | 1 s/d 5 unit</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.truk"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1183,50 +1411,52 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.truk" />
+                                <!-- <InputError class="mt-2" :message="form.errors.truk" /> -->
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Step 6: Kelengkapan Pemeriksaan -->
-                    <div v-show="currentStep === 6" class="p-6 space-y-6">
+                    <div v-show="currentStep === 5" class="p-6 space-y-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Kelengkapan Pemeriksaan</h3>
                         
                         <div class="space-y-6">
                             <!-- Mini Lab -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Mini Lab</h4>
+                                    <h4 class="font-medium text-gray-900">Mini Lab (unit)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mini_lab"
-                                            value="ada_lengkap"
+                                            value="1"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
+                                            <span class="text-gray-600"> | Ruang Khusus</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mini_lab"
-                                            value="ada_sederhana"
+                                            value="2"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
+                                            <span class="text-gray-600"> | Tidak Khusus</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.mini_lab"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1234,42 +1464,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.mini_lab" />
+                                <!-- <InputError class="mt-2" :message="form.errors.mini_lab" /> -->
                             </div>
 
                             <!-- Moisture Tester -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Moisture Tester</h4>
+                                    <h4 class="font-medium text-gray-900">Moisture Tester (G-Won + KETT) (unit)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.moisture_tester"
-                                            value="ada_digital"
+                                            value="1"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
+                                            <span class="text-gray-600"> | Berfungsi</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.moisture_tester"
-                                            value="ada_manual"
+                                            value="2"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
+                                            <span class="text-gray-600"> | Tidak Berfungsi</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.moisture_tester"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1277,42 +1509,44 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.moisture_tester" />
+                                <!-- <InputError class="mt-2" :message="form.errors.moisture_tester" /> -->
                             </div>
 
                             <!-- Pembanding Derajat Sosoh -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Pembanding Derajat Sosoh</h4>
+                                    <h4 class="font-medium text-gray-900">Pembanding Derajat Sosoh (Monster) (unit)</h4>
                                 </div>
                                 <div class="space-y-2">
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.pembanding_derajat_sosoh"
-                                            value="ada_standar"
+                                            value="1"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
+                                            <span class="text-gray-600"> | Sesuai Standar</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.pembanding_derajat_sosoh"
-                                            value="ada_lokal"
+                                            value="2"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
+                                            <span class="text-gray-600"> | Tidak Sesuai</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.pembanding_derajat_sosoh"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1320,21 +1554,21 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.pembanding_derajat_sosoh" />
+                                <!-- <InputError class="mt-2" :message="form.errors.pembanding_derajat_sosoh" /> -->
                             </div>
                         </div>
 
                     </div>
 
                     <!-- Step 7: Organisasi -->
-                    <div v-show="currentStep === 7" class="p-6 space-y-6">
+                    <div v-show="currentStep === 6" class="p-6 space-y-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Organisasi</h3>
                         
                         <div class="space-y-6">
                             <!-- Bagian Quality Control -->
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <div class="mb-3">
-                                    <h4 class="font-medium text-gray-900">Bagian Quality Control</h4>
+                                    <h4 class="font-medium text-gray-900">Bagian Quality Control (orang)</h4>
                                     <p class="text-sm text-gray-500">Divisi khusus untuk pengendalian kualitas produk</p>
                                 </div>
                                 <div class="space-y-2">
@@ -1342,29 +1576,31 @@ const submit = () => {
                                         <input
                                             type="radio"
                                             v-model="form.bagian_quality_control"
-                                            value="ada_profesional"
+                                            value="1"
                                             class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
+                                            <span class="text-gray-600"> | Tidak Merangkap</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.bagian_quality_control"
-                                            value="ada_terbatas"
+                                            value="2"
                                             class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">B. Ada</span>
+                                            <span class="text-gray-600"> | Merangkap</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.bagian_quality_control"
-                                            value="tidak_ada"
+                                            value="3"
                                             class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1372,7 +1608,7 @@ const submit = () => {
                                         </span>
                                     </label>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.bagian_quality_control" />
+                                <!-- <InputError class="mt-2" :message="form.errors.bagian_quality_control" /> -->
                             </div>
                         </div>
 
@@ -1420,11 +1656,11 @@ const submit = () => {
 
                             <PrimaryButton
                                 v-if="currentStep === totalSteps"
-                                :disabled="form.processing"
+                                type="submit"
+                                :disabled="isSubmitting"
                                 class="px-6 py-2 bg-green-600 hover:bg-green-700 focus:ring-green-500"
                             >
-                                <span v-if="form.processing">Menyimpan...</span>
-                                <span v-else>Simpan Klasifikasi</span>
+                                <span>Simpan Klasifikasi</span>
                             </PrimaryButton>
                         </div>
                     </div>
