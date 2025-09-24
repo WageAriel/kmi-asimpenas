@@ -4,7 +4,6 @@ import MitraLayout from '@/Layouts/MitraLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import { Inertia } from '@inertiajs/inertia';
 import TextInput from '@/Components/TextInput.vue';
 import { ref, reactive, onMounted } from 'vue';
 import { router } from '@inertiajs/vue3'
@@ -304,34 +303,58 @@ onMounted(async () => {
 
 
 const submit = async () => {
-    isSubmitting.value = true;
-    try {
-        const response = await axios.post('/klasifikasi-mitra', form);
-        responseData.value = response.data;
+    isSubmitting.value = true;
+    try {
+        const response = await axios.post('/klasifikasi-mitra', form);
+        
+        // Tampilkan notifikasi modal success dengan single button
+        showNotification(
+            'success', 
+            'Pengajuan Berhasil!', 
+            'Klasifikasi mitra telah berhasil dikirim dan sedang dalam proses review. Anda akan diarahkan ke halaman klasifikasi.',
+            {
+                text: 'Lihat Status',
+                action: () => {
+                    router.visit('/mitra/klasifikasi-mitra');
+                }
+            }
+        );
 
-        showNotification('success', 'Berhasil', 'Pengajuan Klasifikasi Mitra berhasil dikirim!');
- 
-        // Redirect ke halaman klasifikasi mitra
-        router.visit('/mitra/dashboard');
+        // Auto redirect setelah 5 detik jika user tidak klik button
+        setTimeout(() => {
+            if (notification.value.show) {
+                router.visit('/mitra/klasifikasi-mitra');
+            }
+        }, 5000);
 
-        // Reset form jika tetap ingin direset sebelum redirect (opsional)
-        Object.keys(form).forEach(key => {
-            if (key === 'id_mitra') return;
-            form[key] = '';
-        });
-        currentStep.value = 1;
+        // Reset form setelah berhasil submit (opsional)
+        Object.keys(form).forEach(key => {
+            if (key === 'id_mitra') return;
+            form[key] = '';
+        });
+        currentStep.value = 1;
 
-    } catch (error) {
-        if (error.response && error.response.status === 422) {
-            errors.value = error.response.data.errors || {};
-            showNotification('error', 'Validasi Gagal', 'Terdapat kesalahan pada data yang diisi. Silakan periksa kembali.');
-        } else {
-            const errorMessage = error.response?.data?.message || error.message;
-            showNotification('error', 'Terjadi Kesalahan', `Gagal mengirim data: ${errorMessage}`);
-        }
-    } finally {
-        isSubmitting.value = false;
-    }
+    } catch (error) {
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors || {};
+            showNotification(
+                'error', 
+                'Validasi Gagal', 
+                'Terdapat kesalahan pada data yang diisi. Silakan periksa kembali semua pilihan dan pastikan sudah benar.'
+                // Tidak ada buttonConfig, jadi akan tampil button "OK" default
+            );
+        } else {
+            const errorMessage = error.response?.data?.message || error.message;
+            showNotification(
+                'error', 
+                'Terjadi Kesalahan', 
+                `Gagal mengirim data klasifikasi: ${errorMessage}. Silakan coba lagi atau hubungi administrator.`
+                // Tidak ada buttonConfig, jadi akan tampil button "OK" default
+            );
+        }
+    } finally {
+        isSubmitting.value = false;
+    }
 };
 
 </script>
@@ -340,6 +363,96 @@ const submit = async () => {
     <Head title="Klasifikasi Mitra - ASIMPENAS" />
 
     <MitraLayout>
+
+        <!-- Notification Modal -->
+        <div 
+            v-if="notification.show"
+            class="fixed inset-0 z-50 overflow-y-auto"
+        >
+            <!-- Backdrop -->
+            <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+            
+            <!-- Notification Modal -->
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div :class="[
+                    'relative w-full max-w-md transform rounded-xl border-2 p-3 shadow-2xl bg-white',
+                    getNotificationClasses(notification.type)
+                ]">
+                    <!-- Close Button (hanya untuk error) -->
+                    <button 
+                        v-if="notification.type === 'error'"
+                        @click="hideNotification"
+                        :class="[
+                            'absolute right-4 top-4 inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2',
+                            getCloseButtonColors(notification.type)
+                        ]"
+                    >
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+
+                    <!-- Icon -->
+                    <div class="flex items-center justify-center mx-auto w-12 h-12 mb-4">
+                        <svg 
+                            :class="[
+                                'h-8 w-8',
+                                getIconColor(notification.type)
+                            ]" 
+                            fill="currentColor" 
+                            viewBox="0 0 20 20"
+                        >
+                            <path 
+                                fill-rule="evenodd" 
+                                :d="getNotificationIcon(notification.type)" 
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="text-center">
+                        <h3 :class="[
+                            'text-base font-semibold mb-2',
+                            getTextColors(notification.type).title
+                        ]">
+                            {{ notification.title }}
+                        </h3>
+                        <p :class="[
+                            'text-xs mb-6',
+                            getTextColors(notification.type).message
+                        ]">
+                            {{ notification.message }}
+                        </p>
+
+                        <!-- Single Action Button -->
+                        <div class="flex justify-center">
+                            <!-- Primary Action Button (jika ada) -->
+                            <button
+                                v-if="notification.showButton"
+                                @click="handleNotificationButton"
+                                :class="[
+                                    'px-6 py-2 text-sm font-medium text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2',
+                                    getButtonColors(notification.type)
+                                ]"
+                            >
+                                {{ notification.buttonText }}
+                            </button>
+
+                            <!-- Default OK Button (jika tidak ada action button) -->
+                            <button
+                                v-else
+                                @click="hideNotification"
+                                class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                            >
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8">
