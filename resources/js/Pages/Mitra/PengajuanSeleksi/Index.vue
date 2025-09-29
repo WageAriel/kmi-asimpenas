@@ -82,8 +82,17 @@ const goToForm = (type = 'new') => {
     window.location.href = `/mitra/pengajuan-seleksi/form?type=${type}&year=${currentYear}`;
 };
 
+const showModal = ref(false);
+const selectedSubmission = ref(null);
+
 const viewDetails = (submission) => {
-    window.location.href = `/mitra/pengajuan-seleksi/${submission.id}`;
+    selectedSubmission.value = submission;
+    showModal.value = true;
+};
+
+const closeModal = () => {
+    showModal.value = false;
+    selectedSubmission.value = null;
 };
 
 const editSubmission = (submission) => {
@@ -162,6 +171,7 @@ const editSubmission = (submission) => {
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelengkapan</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Submit</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Download</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -227,6 +237,17 @@ const editSubmission = (submission) => {
                                         </button>
                                     </div>
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button
+                                        @click="window.location.href = `/mitra/pengajuan-seleksi/${submission.id}/download`"
+                                        class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                                    >
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v-8m0 8l-4-4m4 4l4-4M4 20h16" />
+                                        </svg>
+                                        Download PDF
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -253,5 +274,119 @@ const editSubmission = (submission) => {
                 </div>
             </div>
         </div>
+
+        <!-- Modal Detail Pengajuan -->
+        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="bg-white rounded-xl shadow-lg max-w-xl w-full h-auto p-6 relative max-h-[80vh] flex flex-col">
+                <button @click="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                <h2 class="text-xl font-bold mb-4 text-blue-700">Detail Pengajuan</h2>
+                <div v-if="selectedSubmission" class="overflow-y-auto flex-1 pr-2">
+                    <!-- Info Utama -->
+                    <div class="mb-4 grid grid-cols-2 gap-x-6 gap-y-2">
+                        <div>
+                            <span class="block text-sm text-gray-500">Nama Mitra</span>
+                            <span class="font-semibold text-gray-900">{{ selectedSubmission.nama_perusahaan }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">Tahun</span>
+                            <span class="font-semibold text-gray-900">{{ selectedSubmission.year || currentYear }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">Jenis Pengajuan</span>
+                            <span class="font-semibold text-gray-900">{{ selectedSubmission.type === 'renewal' ? 'Registrasi Ulang' : 'Pengajuan Baru' }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">Status</span>
+                            <span class="font-semibold text-gray-900">{{ getStatusText(selectedSubmission.status_seleksi) }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">Tanggal Submit</span>
+                            <span class="font-semibold text-gray-900">{{ formatDate(selectedSubmission.created_at) }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-sm text-gray-500">Kelengkapan</span>
+                            <span class="font-semibold text-gray-900">{{ calculateCompletionPercentage(selectedSubmission) }}%</span>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+
+                    <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+                        <!-- Kolom Kiri -->
+                        <div>
+                            <div class="mb-3 font-semibold text-blue-700 pb-1">Dokumen Perijinan</div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Surat Permohonan</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.surat_permohonan }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Akta Notaris</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.akta_notaris }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">NIB</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.nib }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">KTP</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.ktp }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">No Rekening</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.no_rekening }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">NPWP</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.npwp }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Surat Kuasa</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.surat_kuasa }}</span>
+                            </div>
+                        </div>
+                        <!-- Kolom Kanan -->
+                        <div>
+                            <div class="mb-3 font-semibold text-blue-700 pb-1">Sarana Pengeringan</div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Lantai Jemur</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.lantai_jemur }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Sarana Lainnya</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.sarana_lainnya }}</span>
+                            </div>
+                            <div class="mb-3 font-semibold text-blue-700 pb-1">Sarana Penggilingan</div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Mesin Pemecah Kulit</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_memecah_kulit }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Mesin Pemisah Gabah</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_pemisah_gabah }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Mesin Penyosoh</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_penyosoh }}</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-sm text-gray-500">Alat Pemisah Beras</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.alat_pemisah_beras }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2 justify-end">
+                        <button @click="closeModal" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Tutup</button>
+                        <button 
+                            @click="editSubmission(selectedSubmission)" 
+                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                        >Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </MitraLayout>
 </template>
