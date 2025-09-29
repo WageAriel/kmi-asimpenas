@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KlasifikasiMitra;
+use App\Models\DataMitra;
 use Illuminate\Http\Request;
 
 class KlasifikasiMitraController extends Controller
@@ -11,6 +12,20 @@ class KlasifikasiMitraController extends Controller
     {
         $klasifikasis = KlasifikasiMitra::all();
         return response()->json($klasifikasis);
+    }
+
+    public function myKlasifikasi(){
+        $userId = auth()->id();
+        $mitra = DataMitra::where('user_id', $userId)->first();
+
+        if (!$mitra) {
+            return response()->json(['message' => 'Data mitra tidak ditemukan'], 404);
+        }
+
+        $klasifikasi = KlasifikasiMitra::with('mitra')
+            ->where('id_mitra', $mitra->id_mitra)
+            ->get();
+        return response()->json($klasifikasi);
     }
 
     public function store(Request $request)

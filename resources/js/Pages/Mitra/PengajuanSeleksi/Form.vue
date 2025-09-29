@@ -236,7 +236,14 @@ onMounted(async () => {
         
         if (mitra && mitra.id_mitra) {
             form.id_mitra = mitra.id_mitra;
-            showNotification('success', 'Berhasil', 'Data mitra berhasil dimuat');
+            showNotification('success', 'Berhasil', 'Data mitra berhasil dimuat',
+                {
+                    text: 'Lanjutkan',
+                    action: () => {
+                        hideNotification();
+                    }
+                }
+            );
         } else {
             // Case 1: Data mitra tidak ditemukan (response sukses tapi data kosong)
             showNotification(
@@ -351,7 +358,17 @@ const submit = async () => {
         const response = await axios.post('/data-seleksi-mitra', form);
         responseData.value = response.data;
         
-        showNotification('success', 'Berhasil', 'Pengajuan seleksi berhasil dikirim!');
+        showNotification(
+            'success',
+            'Pengajuan Berhasil',
+            'Pengajuan seleksi Anda telah berhasil dikirim.',
+            {
+                text: 'Ok',
+                action: () => {
+                    window.location.href = '/mitra/pengajuan-seleksi';
+                }
+            }
+        );
         
         // Reset form
         Object.keys(form).forEach(key => {
@@ -454,12 +471,12 @@ const submit = async () => {
                             </button>
 
                             <!-- Close Button -->
-                            <button
+                            <!-- <button
                                 @click="hideNotification"
                                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                             >
                                 {{ notification.showButton ? 'Tutup' : 'OK' }}
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 </div>
