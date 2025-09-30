@@ -151,6 +151,27 @@ const form = reactive({
     alat_pemisah_beras: ''
 });
 
+const isEditMode = ref(false);
+const editId = ref(null);
+
+onMounted(async () => {
+    // Ambil id edit dari query string
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('edit')) {
+        editId.value = params.get('edit');
+        isEditMode.value = true;
+        // Fetch data yang ingin diedit
+        try {
+            const res = await axios.get(`/data-seleksi-mitra/${editId.value}`); // pastikan ada route GET buat detail data
+            Object.assign(form, res.data); // autoset ke state form, pastikan field sama
+        } catch (e) {
+            alert('Gagal mengambil data untuk edit!');
+        }
+    }
+
+    // (opsional) ambil data mitra juga jika tidak edit (untuk mode tambah)
+});
+
 const validateForm = () => {
     const errors = {};
     
@@ -324,6 +345,32 @@ onMounted(async () => {
 
 const errors = ref({});
 
+const prepareFormData = () => ({
+    ...form,
+    surat_permohonan: form.surat_permohonan || null,
+    mb_surat_permohonan: form.mb_surat_permohonan || null,
+    akta_notaris: form.akta_notaris || null,
+    mb_akta_notaris: form.mb_akta_notaris || null,
+    nib: form.nib || null,
+    mb_nib: form.mb_nib || null,
+    ktp: form.ktp || null,
+    mb_ktp: form.mb_ktp || null,
+    no_rekening: form.no_rekening || null,
+    mb_no_rekening: form.mb_no_rekening || null,
+    npwp: form.npwp || null,
+    mb_npwp: form.mb_npwp || null,
+    surat_kuasa: form.surat_kuasa || null,
+    mb_surat_kuasa: form.mb_surat_kuasa || null,
+    lantai_jemur: form.lantai_jemur || null,
+    sarana_lainnya: form.sarana_lainnya || null,
+    mesin_memecah_kulit: form.mesin_memecah_kulit || null,
+    mesin_pemisah_gabah: form.mesin_pemisah_gabah || null,
+    mesin_penyosoh: form.mesin_penyosoh || null,
+    alat_pemisah_beras: form.alat_pemisah_beras || null,
+    status_seleksi: form.status_seleksi || null,
+});
+
+
 const submit = async () => {
     // Validasi semua form sebelum submit
     const validationErrors = validateForm();
@@ -355,13 +402,18 @@ const submit = async () => {
     errors.value = {};
     
     try {
-        const response = await axios.post('/data-seleksi-mitra', form);
-        responseData.value = response.data;
-        
+        const dataToSend = prepareFormData();
+        let response;
+        if (isEditMode.value && editId.value) {
+            response = await axios.put(`/data-seleksi-mitra/${editId.value}`, dataToSend);
+        } else {
+            response = await axios.post('/data-seleksi-mitra', dataToSend);
+        }
+
         showNotification(
             'success',
-            'Pengajuan Berhasil',
-            'Pengajuan seleksi Anda telah berhasil dikirim.',
+            'Data Berhasil Disimpan',
+            `Data berhasil ${isEditMode.value ? 'diupdate' : 'ditambahkan'}`,
             {
                 text: 'Ok',
                 action: () => {
@@ -369,21 +421,14 @@ const submit = async () => {
                 }
             }
         );
-        
-        // Reset form
-        Object.keys(form).forEach(key => {
-            if (key === 'id_mitra') return;
-            form[key] = '';
-        });
-        currentStep.value = 1;
-        
+        // Redirect akan terjadi saat tombol Ok ditekan
     } catch (error) {
-        if (error.response && error.response.status === 422) {
+        if (error.response?.status === 422) {
             errors.value = error.response.data.errors || {};
-            showNotification('error', 'Validasi Gagal', 'Terdapat kesalahan pada data yang diisi. Silakan periksa kembali.');
+            console.error('Error validasi server:', errors.value);
+            showNotification('error', 'Validasi Gagal', 'Periksa kembali data yang anda isi.');
         } else {
-            const errorMessage = error.response?.data?.message || error.message;
-            showNotification('error', 'Terjadi Kesalahan', `Gagal mengirim data: ${errorMessage}`);
+            showNotification('error', 'Error', error.message || 'Terjadi kesalahan');
         }
     } finally {
         isSubmitting.value = false;

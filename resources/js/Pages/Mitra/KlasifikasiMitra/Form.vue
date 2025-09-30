@@ -212,6 +212,27 @@ const prevStep = () => {
     }
 };
 
+const isEditMode = ref(false);
+const editId = ref(null);
+
+onMounted(async () => {
+    // Ambil id edit dari query string
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('edit')) {
+        editId.value = params.get('edit');
+        isEditMode.value = true;
+        // Fetch data yang ingin diedit
+        try {
+            const res = await axios.get(`/klasifikasi-mitra/${editId.value}`); // pastikan ada route GET buat detail data
+            Object.assign(form, res.data); // autoset ke state form, pastikan field sama
+        } catch (e) {
+            alert('Gagal mengambil data untuk edit!');
+        }
+    }
+
+    // (opsional) ambil data mitra juga jika tidak edit (untuk mode tambah)
+});
+
 onMounted(async () => {
     try {
         // Panggil API untuk mendapatkan data mitra user login
@@ -301,56 +322,68 @@ onMounted(async () => {
 
 // Submit function
 
+const prepareFormData = () => ({
+    ...form,
+    mesin_pembersih_gabah: form.mesin_pembersih_gabah || null,
+    lantai_jemur: form.lantai_jemur || null,
+    mesin_pengering: form.mesin_pengering || null,
+    alat_pengering_lainnya: form.alat_pengering_lainnya || null,
+    mesin_pembersih_awal: form.mesin_pembersih_awal || null,
+    mesin_pemecah_kulit: form.mesin_pemecah_kulit || null,
+    mesin_pembersih_sekam: form.mesin_pembersih_sekam || null,
+    mesin_pemisah_gabah_pecah_kulit: form.mesin_pemisah_gabah_pecah_kulit || null,
+    mesin_pemisah_batu: form.mesin_pemisah_batu || null,
+    mesin_penyosoh: form.mesin_penyosoh || null,
+    mesin_pengkabut: form.mesin_pengkabut || null,
+    mesin_pemesah_menir: form.mesin_pemesah_menir || null,
+    mesin_pemisah_katul: form.mesin_pemisah_katul || null,
+    mesin_pemisah_berdasarkan_ukuran: form.mesin_pemisah_berdasarkan_ukuran || null,
+    mesin_pemisah_berdasarkan_warna: form.mesin_pemisah_berdasarkan_warna || null,
+    tangki_penyimpanan: form.tangki_penyimpanan || null,
+    mesin_pengemas: form.mesin_pengemas || null,
+    mesin_jahit: form.mesin_jahit || null,
+    gudang_konvensional: form.gudang_konvensional || null,
+    silo_gkg_hopper: form.silo_gkg_hopper || null,
+    truk: form.truk || null,
+    mini_lab: form.mini_lab || null,
+    moisture_tester: form.moisture_tester || null,
+    pembanding_derajat_sosoh: form.pembanding_derajat_sosoh || null,
+    bagian_quality_control: form.bagian_quality_control || null,
+
+});
+
 
 const submit = async () => {
     isSubmitting.value = true;
+    errors.value = {};
     try {
-        const response = await axios.post('/klasifikasi-mitra', form);
-        
-        // Tampilkan notifikasi modal success dengan single button
+        const dataToSend = prepareFormData();
+        let response;
+        if (isEditMode.value && editId.value) {
+            response = await axios.put(`/klasifikasi-mitra/${editId.value}`, dataToSend);
+        } else {
+            response = await axios.post('/klasifikasi-mitra', dataToSend);
+        }
+
         showNotification(
-            'success', 
-            'Pengajuan Berhasil!', 
-            'Klasifikasi mitra telah berhasil dikirim dan sedang dalam proses review. Anda akan diarahkan ke halaman klasifikasi.',
+            'success',
+            'Data Berhasil Disimpan',
+            `Data berhasil ${isEditMode.value ? 'diupdate' : 'ditambahkan'}`,
             {
-                text: 'Lihat Status',
+                text: 'Ok',
                 action: () => {
-                    router.visit('/mitra/klasifikasi-mitra');
+                    window.location.href = '/mitra/klasifikasi-mitra';
                 }
             }
         );
-
-        // Auto redirect setelah 5 detik jika user tidak klik button
-        setTimeout(() => {
-            if (notification.value.show) {
-                router.visit('/mitra/klasifikasi-mitra');
-            }
-        }, 5000);
-
-        // Reset form setelah berhasil submit (opsional)
-        Object.keys(form).forEach(key => {
-            if (key === 'id_mitra') return;
-            form[key] = '';
-        });
-        currentStep.value = 1;
-
+        // Redirect akan terjadi saat tombol Ok ditekan
     } catch (error) {
-        if (error.response && error.response.status === 422) {
+        if (error.response?.status === 422) {
             errors.value = error.response.data.errors || {};
-            showNotification(
-                'error', 
-                'Validasi Gagal', 
-                'Terdapat kesalahan pada data yang diisi. Silakan periksa kembali semua pilihan dan pastikan sudah benar.'
-                // Tidak ada buttonConfig, jadi akan tampil button "OK" default
-            );
+            console.error('Error validasi server:', errors.value);
+            showNotification('error', 'Validasi Gagal', 'Periksa kembali data yang anda isi.');
         } else {
-            const errorMessage = error.response?.data?.message || error.message;
-            showNotification(
-                'error', 
-                'Terjadi Kesalahan', 
-                `Gagal mengirim data klasifikasi: ${errorMessage}. Silakan coba lagi atau hubungi administrator.`
-                // Tidak ada buttonConfig, jadi akan tampil button "OK" default
-            );
+            showNotification('error', 'Error', error.message || 'Terjadi kesalahan');
         }
     } finally {
         isSubmitting.value = false;

@@ -19,6 +19,8 @@ class DataSeleksiMitraController extends Controller
     return response()->json($seleksimitras);
 }
 
+
+
 public function mySeleksi()
 {
     // Ambil user yang sedang login
@@ -89,7 +91,6 @@ public function mySeleksi()
             'nib' => 'nullable|in:ada,tidak ada',
             'mb_nib' => 'nullable|date',
             'ktp' => 'nullable|in:ada,tidak ada',
-            'mb_ktp' => 'nullable|date',
             'no_rekening' => 'nullable|in:ada,tidak ada',
             'mb_no_rekening' => 'nullable|date',
             'npwp' => 'nullable|in:ada,tidak ada',

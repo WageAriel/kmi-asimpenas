@@ -11,6 +11,7 @@ onMounted(async () => {
     const response = await axios.get('/klasifikasi-mitra/my');
     classifications.value = response.data.map(item => ({
         ...item,
+        id: item.id_klasifikasi_mitra,
         nama_perusahaan: item.mitra?.nama_perusahaan ?? '-'
     }));
 });
@@ -54,6 +55,141 @@ const formatDate = (dateString) => {
     });
 };
 
+const descriptionMap = {
+    mesin_pembersih_gabah: {
+        1: 'Ada | > 20',
+        2: 'Ada | ≤ 20 unit',
+        3: 'Tidak Ada',
+    },
+        lantai_jemur: {
+        1: 'Ada | > 10',
+        2: 'Ada | 1 s/d 10',
+        3: 'Tidak ada',
+    },    
+    mesin_pengering: {
+        1: 'Ada | > 20',
+        2: 'Ada | ≤ 20',
+        3: 'Tidak ada',
+    },
+    alat_pengering_lainnya: {
+        1: 'Tidak Disyaratkan',
+        2: 'Tidak Disyaratkan',
+        3: 'Ada | ≤ 1',
+    },
+    mesin_pembersih_awal: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemecah_kulit: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pembersih_sekam: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_gabah_pecah_kulit: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_batu: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_penyosoh: {
+        1: 'Ada | > 3 | 2',
+        2: 'Ada | 1 s/d 3 | 1',
+        3: 'Tidak ada',
+    },
+    mesin_pengkabut: {
+        1: 'Ada | > 3 | 2',
+        2: 'Ada | 1 s/d 3 | 1',
+        3: 'Tidak ada',
+    },
+    mesin_pemesah_menir: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_katul: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_berdasarkan_ukuran: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_berdasarkan_warna: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    tangki_penyimpanan: {
+        1: 'Ada | > 10',
+        2: 'Ada | ≤ 10',
+        3: 'Tidak ada',
+    },
+    mesin_pengemas: {
+        1: 'Ada | Full Otomatis',
+        2: 'Ada | Semi Otomatis',
+        3: 'Tidak ada',
+    },
+    mesin_jahit: {
+        1: 'Ada | Full Otomatis',
+        2: 'Ada | Semi Otomatis',
+        3: 'Tidak ada',
+    },
+    gudang_konvensional: {
+        1: 'Ada | > 3000',
+        2: 'Ada | < 3000',
+        3: 'Tidak ada',
+    },
+    silo_gkg_hopper: {
+        1: 'Ada | > 2000',
+        2: 'Ada | < 2000',
+        3: 'Tidak ada',
+    },
+    truk: {
+        1: 'Ada | > 5',
+        2: 'Ada | 1 s/d 5',
+        3: 'Tidak ada',
+    },
+    mini_lab: {
+        1: 'Ada | Ruang Khusus',
+        2: 'Ada | Tidak Khusus',
+        3: 'Tidak ada',
+    },
+    moisture_tester: {
+        1: 'Ada | Berfungsi',
+        2: 'Ada | Tidak Berfungsi',
+        3: 'Tidak ada',
+    },
+    pembanding_derajat_sosoh: {
+        1: 'Ada | Sesuai Standar',
+        2: 'Ada | Tidak Sesuai Standar',
+        3: 'Tidak ada',
+    },
+    bagian_quality_control: {
+        1: 'Ada | Tidak Merangkap',
+        2: 'Ada | Merangkap',
+        3: 'Tidak ada',
+    },
+};
+
+const interpretClassification = (field, value) => {
+  if (descriptionMap[field] && value in descriptionMap[field]) {
+    return descriptionMap[field][value];
+  }
+  return '-'; // default jika field atau value tidak ada
+};
+
 // Action functions
 const goToForm = () => {
     window.location.href = `/mitra/klasifikasi-mitra/form?year=${currentYear}`;
@@ -73,6 +209,11 @@ const closeModal = () => {
 };
 
 const editClassification = (classification) => {
+    console.log('Trying to edit:', classification); // Tambah log
+    if (!classification || !classification.id) {
+        console.error('Classification data is invalid or missing ID.');
+        return;
+    }
     window.location.href = `/mitra/klasifikasi-mitra/form?edit=${classification.id}`;
 };
 </script>
@@ -303,52 +444,52 @@ const editClassification = (classification) => {
                             <div class="mb-3 font-semibold text-green-700 pb-1">Pengeringan</div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Mesin Pembersih Gabah</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pembersih_gabah }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pembersih_gabah', selectedClassification.mesin_pembersih_gabah) }} (ton/hari)</span>
                             </div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Lantai Jemur</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.lantai_jemur }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('lantai_jemur', selectedClassification.lantai_jemur) }} (ton/hari)</span>
                             </div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Mesin Pengering</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pengering }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pengering', selectedClassification.mesin_pengering) }}</span>
                             </div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Tangki Penyimpanan</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.alat_pengering_lainnya }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('alat_pengering_lainnya', selectedClassification.alat_pengering_lainnya) }}</span>
                             </div>
 
                             <div class="mb-3 font-semibold text-green-700 pb-1">Sarana Penyimpanan</div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Gudang Konvensional</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.gudang_konvensional }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('gudang_konvensional', selectedClassification.gudang_konvensional) }}</span>
                             </div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Silo GKG/Hopper</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.silo_gkg_hopper }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('silo_gkg_hopper', selectedClassification.silo_gkg_hopper) }}</span>
                             </div>
                             <div class="mb-3 font-semibold text-green-700 pb-1">Sarana Angkut</div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Truk</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.truk }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('truk', selectedClassification.truk ) }}</span>
                             </div>
                             <div class="mb-3 font-semibold text-green-700 pb-1">Kelengkapan Pemeriksaan</div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Mini Lab</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mini_lab }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mini_lab', selectedClassification.mini_lab) }}</span>
                             </div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Moisture Tester</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.moisture_tester }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('moisture_tester', selectedClassification.moisture_tester) }}</span>
                             </div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Pembanding Derajat Sosoh</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.pembanding_derajat_sosoh }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('pembanding_derajat_sosoh', selectedClassification.pembanding_derajat_sosoh) }}</span>
                             </div>
                             <div class="mb-3 font-semibold text-green-700 pb-1">Organisasi</div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Bagian Quality Control</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.bagian_quality_control }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('bagian_quality_control', selectedClassification.bagian_quality_control) }}</span>
                             </div>
                         </div>
                         <!-- Kolom Kiri -->
@@ -356,60 +497,61 @@ const editClassification = (classification) => {
                             <div class="mb-3 font-semibold text-green-700 pb-1">Penggilingan</div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Mesin Pembersih Awal</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pembersih_awal }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pembersih_awal', selectedClassification.mesin_pembersih_awal) }}</span>
                             </div>
                             <div class="mb-2">
                                 <span class="text-sm text-gray-500">Mesin Pemecah Kulit</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pemecah_kulit }}</span>
+                                <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pemecah_kulit', selectedClassification.mesin_pemecah_kulit) }}</span>
                             </div>
                             <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pembersih Sekam</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pembersih_sekam }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pemisah Gabah Pecah Kulit</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pemisah_gabah_pecah_kulit }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pemisah Batu</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pemisah_batu }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Penyosoh</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_penyosoh }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pengkabut</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pengkabut }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pemesah Menir</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pemesah_menir }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pemisah Katul</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pemisah_katul }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pemisah Berdasarkan Ukuran</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pemisah_berdasarkan_ukuran }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pemisah Berdasarkan Warna</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pemisah_berdasarkan_warna }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Tangki Penyimpanan</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.tangki_penyimpanan }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Pengemas</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_pengemas }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-sm text-gray-500">Mesin Jahit</span>
-                                <span class="font-medium text-gray-900 block mt-1">{{ selectedClassification.mesin_jahit }}</span>
-                            </div>
+    <span class="text-sm text-gray-500">Mesin Pembersih Sekam</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pembersih_sekam', selectedClassification.mesin_pembersih_sekam) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Pemisah Gabah Pecah Kulit</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pemisah_gabah_pecah_kulit', selectedClassification.mesin_pemisah_gabah_pecah_kulit) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Pemisah Batu</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pemisah_batu', selectedClassification.mesin_pemisah_batu) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Penyosoh</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_penyosoh', selectedClassification.mesin_penyosoh) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Pengkabut</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pengkabut', selectedClassification.mesin_pengkabut) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Pemesah Menir</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pemesah_menir', selectedClassification.mesin_pemesah_menir) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Pemisah Katul</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pemisah_katul', selectedClassification.mesin_pemisah_katul) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Pemisah Berdasarkan Ukuran</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pemisah_berdasarkan_ukuran', selectedClassification.mesin_pemisah_berdasarkan_ukuran) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Pemisah Berdasarkan Warna</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pemisah_berdasarkan_warna', selectedClassification.mesin_pemisah_berdasarkan_warna) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Tangki Penyimpanan</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('tangki_penyimpanan', selectedClassification.tangki_penyimpanan) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Pengemas</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_pengemas', selectedClassification.mesin_pengemas) }}</span>
+</div>
+<div class="mb-2">
+    <span class="text-sm text-gray-500">Mesin Jahit</span>
+    <span class="font-medium text-gray-900 block mt-1">{{ interpretClassification('mesin_jahit', selectedClassification.mesin_jahit) }}</span>
+</div>
+
                         </div>
                     </div>
                     <div class="flex space-x-2 justify-end mt-6">
