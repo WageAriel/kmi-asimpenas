@@ -63,7 +63,7 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
             'title' => 'Klasifikasi Mitra'
         ]);
     })->name('klasifikasi-mitra.index');
-    
+
     //untuk mengakses form klasifikasi mitra
     Route::get('/klasifikasi-mitra/form', function () {
         return Inertia::render('Mitra/KlasifikasiMitra/Form', [

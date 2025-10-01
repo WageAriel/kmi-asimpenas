@@ -11,6 +11,7 @@ onMounted(async () => {
     const response = await axios.get('/data-seleksi-mitra/my'); // Pastikan route ini tersedia di api.php
     submissions.value = response.data.map(item => ({
         ...item,
+        id: item.id_seleksi_mitra,
         nama_perusahaan: item.mitra?.nama_perusahaan ?? '-'
     }));
 });
@@ -96,6 +97,11 @@ const closeModal = () => {
 };
 
 const editSubmission = (submission) => {
+    console.log('Trying to edit:', submission); // Tambah log
+    if (!submission || !submission.id) {
+        console.error('Submission data is invalid or missing ID.');
+        return;
+    }
     window.location.href = `/mitra/pengajuan-seleksi/form?edit=${submission.id}`;
 };
 </script>
