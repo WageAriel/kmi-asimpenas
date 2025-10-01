@@ -141,7 +141,7 @@ const menuItems = [
 
                                 <!-- Menu Items -->
                                 <Link 
-                                    :href="route('profile.edit')"
+                                    :href="route('input-data-mitra')"
                                     class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                                     @click="showingUserDropdown = false"
                                 >

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import MitraLayout from '@/Layouts/MitraLayout.vue';
 import axios from 'axios';
 
@@ -196,11 +196,10 @@ const submitForm = async () => {
       'Berhasil!',
       'Data mitra berhasil ditambahkan dan disimpan ke sistem.'
     );
+
+    router.reload();
     
     // Reset form setelah berhasil submit
-    Object.keys(form.value).forEach(key => {
-      form.value[key] = "";
-    });
     
     // Set ulang data user
     if (user.value) {
