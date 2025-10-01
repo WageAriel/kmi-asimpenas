@@ -1,6 +1,8 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { HomeIcon, DocumentTextIcon, Squares2X2Icon, CheckCircleIcon } from '@heroicons/vue/24/outline';
+import logoImg from '@/../../resources/assets/Images/bulog.png';
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
@@ -38,22 +40,22 @@ const menuItems = [
     {
         name: 'Dashboard',
         route: 'mitra.dashboard',
-        icon: 'M9.12 9.17V5.43C9.12 5.16 9.02 4.91 8.84 4.73C8.66 4.55 8.41 4.45 8.14 4.45H5.37C5.10 4.45 4.85 4.55 4.67 4.73C4.49 4.91 4.39 5.16 4.39 5.43V8.19C4.39 8.46 4.49 8.71 4.67 8.89C4.85 9.07 5.10 9.17 5.37 9.17H9.12ZM5.37 2.46H8.14C8.93 2.46 9.68 2.77 10.24 3.33C10.80 3.89 11.11 4.64 11.11 5.43V10.16C11.11 10.43 11.01 10.68 10.83 10.86C10.65 11.04 10.40 11.14 10.13 11.14H5.37C4.58 11.14 3.83 10.83 3.27 10.27C2.71 9.71 2.40 8.96 2.40 8.19V5.43C2.40 4.64 2.71 3.89 3.27 3.33C3.83 2.77 4.58 2.46 5.37 2.46ZM14.69 4.23V9.17H19.63C19.90 9.17 20.15 9.07 20.33 8.89C20.51 8.71 20.61 8.46 20.61 8.19V4.23C20.61 3.96 20.51 3.71 20.33 3.53C20.15 3.35 19.90 3.25 19.63 3.25H15.67C15.40 3.25 15.15 3.35 14.97 3.53C14.79 3.71 14.69 3.96 14.69 4.23ZM19.63 1.26C20.42 1.26 21.17 1.57 21.73 2.13C22.29 2.69 22.60 3.44 22.60 4.23V8.19C22.60 8.96 22.29 9.71 21.73 10.27C21.17 10.83 20.42 11.14 19.63 11.14H13.71C13.44 11.14 13.19 11.04 13.01 10.86C12.83 10.68 12.73 10.43 12.73 10.16V4.23C12.73 3.44 13.04 2.69 13.60 2.13C14.16 1.57 14.91 1.26 15.67 1.26H19.63ZM14.69 14.58V18.32C14.69 18.59 14.79 18.84 14.97 19.02C15.15 19.20 15.40 19.30 15.67 19.30H18.44C18.71 19.30 18.96 19.20 19.14 19.02C19.32 18.84 19.42 18.59 19.42 18.32V15.56C19.42 15.29 19.32 15.04 19.14 14.86C18.96 14.68 18.71 14.58 18.44 14.58H14.69ZM18.44 21.29H15.67C14.88 21.29 14.13 20.98 13.57 20.42C13.01 19.86 12.70 19.11 12.70 18.32V13.59C12.70 13.32 12.80 13.07 12.98 12.89C13.16 12.71 13.41 12.61 13.68 12.61H18.44C19.23 12.61 19.98 12.92 20.54 13.48C21.10 14.04 21.41 14.79 21.41 15.56V18.32C21.41 19.11 21.10 19.86 20.54 20.42C19.98 20.98 19.23 21.29 18.44 21.29ZM9.14 14.58H4.20C3.93 14.58 3.68 14.68 3.50 14.86C3.32 15.04 3.22 15.29 3.22 15.56V19.52C3.22 19.79 3.32 20.04 3.50 20.22C3.68 20.40 3.93 20.50 4.20 20.50H8.16C8.43 20.50 8.68 20.40 8.86 20.22C9.04 20.04 9.14 19.79 9.14 19.52V14.58ZM4.20 22.49C3.41 22.49 2.66 22.18 2.10 21.62C1.54 21.06 1.23 20.31 1.23 19.52V15.56C1.23 14.77 1.54 14.02 2.10 13.46C2.66 12.90 3.41 12.59 4.20 12.59H10.12C10.39 12.59 10.64 12.69 10.82 12.87C11.00 13.05 11.10 13.30 11.10 13.57V19.52C11.10 20.31 10.79 21.06 10.23 21.62C9.67 22.18 8.92 22.49 8.16 22.49H4.20Z'
+        icon: HomeIcon
     },
     {
         name: 'Pengajuan Seleksi',
         route: 'mitra.pengajuan-seleksi.index',
-        icon: 'M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z'
+        icon: DocumentTextIcon
     },
     {
         name: 'Klasifikasi Mitra',
         route: 'mitra.klasifikasi-mitra.index',
-        icon: 'M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z'
+        icon: Squares2X2Icon
     },
     {
         name: 'Hasil Seleksi',
         route: 'mitra.hasil-seleksi',
-        icon: 'M22.3 4.7L17.5 0.2C17.4 0.1 17.2 0 17 0H6.4C6.1 0 5.8 0.2 5.6 0.5C5.4 0.7 5.2 1.1 5.2 1.6V3.6H2.3C2 3.6 1.7 3.8 1.5 4.1C1.3 4.4 1.1 4.7 1.1 5.2V21.4C1.1 21.9 1.3 22.2 1.5 22.5C1.7 22.8 2 23 2.3 23H17C17.3 23 17.6 22.8 17.8 22.5C18 22.2 18.2 21.9 18.2 21.4V19.4H21.1C21.4 19.4 21.7 19.2 21.9 18.9C22.1 18.6 22.3 18.3 22.3 17.8V5.2C22.3 5 22.2 4.9 22.1 4.8L22.3 4.7ZM16.8 21.4C16.8 21.5 16.7 21.6 16.6 21.7C16.5 21.8 16.4 21.8 16.3 21.8H2.3C2.2 21.8 2.1 21.8 2 21.7C1.9 21.6 1.8 21.5 1.8 21.4V5.2C1.8 5.1 1.9 5 2 4.9C2.1 4.8 2.2 4.8 2.3 4.8H12.2L16.8 9V21.4ZM20.9 17.8C20.9 17.9 20.8 18 20.7 18.1C20.6 18.2 20.5 18.2 20.4 18.2H18.2V8.8C18.2 8.6 18.1 8.5 18 8.4L13.1 3.8C13 3.7 12.9 3.6 12.7 3.6H6.2V1.6C6.2 1.5 6.3 1.4 6.4 1.3C6.5 1.2 6.6 1.2 6.7 1.2H16.4L20.9 5.5V17.8ZM13.3 14.2C13.3 14.4 13.2 14.6 13.1 14.7C13 14.8 12.8 14.9 12.6 14.9H6.4C6.2 14.9 6 14.8 5.9 14.7C5.8 14.6 5.7 14.4 5.7 14.2C5.7 14 5.8 13.8 5.9 13.7C6 13.6 6.2 13.5 6.4 13.5H12.6C12.8 13.5 13 13.6 13.1 13.7C13.2 13.8 13.3 14 13.3 14.2ZM13.3 17.8C13.3 18 13.2 18.2 13.1 18.3C13 18.4 12.8 18.5 12.6 18.5H6.4C6.2 18.5 6 18.4 5.9 18.3C5.8 18.2 5.7 18 5.7 17.8C5.7 17.6 5.8 17.4 5.9 17.3C6 17.2 6.2 17.1 6.4 17.1H12.6C12.8 17.1 13 17.2 13.1 17.3C13.2 17.4 13.3 17.6 13.3 17.8Z'
+        icon: CheckCircleIcon
     },
 ];
 </script>
@@ -62,16 +64,14 @@ const menuItems = [
     <div class="flex h-screen bg-gray-100">
         <!-- Sidebar untuk Desktop -->
         <div class="hidden lg:flex lg:flex-shrink-0">
-            <div class="flex flex-col w-64">
+            <div class="flex flex-col w-66">
                 <!-- Sidebar -->
                 <div class="flex flex-col flex-grow bg-white border-r border-gray-200 pt-5 pb-4 overflow-y-auto">
                     <!-- Logo & Brand -->
-                    <div class="flex items-center flex-shrink-0 px-4 mb-8">
+                    <div class="flex items-center flex-shrink-0 px-4 py-2">
                         <Link href="/" class="flex items-center">
-                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2L1 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-11-5z"/>
-                                </svg>
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                                <img :src="logoImg" alt="Logo Bulog" class="w-7 h-7 object-contain" />
                             </div>
                             <div>
                                 <h1 class="text-lg font-bold text-gray-900">ASIMPENAS</h1>
@@ -93,17 +93,12 @@ const menuItems = [
                                     : 'text-black hover:bg-gray-50 hover:text-blue-500'
                             ]"
                         >
-                            <svg 
-                                :class="[
-                                    'mr-3 flex-shrink-0 h-6 w-6',
-                                    isActiveRoute(item.route) ? 'text-blue-600' : 'text-black group-hover:text-blue-500'
-                                ]" 
-                                fill="currentColor" 
-                                viewBox="0 0 24 24"
-                            >
-                                <path :d="item.icon"/>
-                            </svg>
-                            {{ item.name }}
+                            <component
+                                :is="item.icon"
+                                class="mr-3 flex-shrink-0 h-6 w-6"
+                                :class="isActiveRoute(item.route) ? 'text-blue-600' : 'text-black group-hover:text-blue-500'"
+                            />
+                            {{ item.name }}   
                         </Link>
                     </nav>
 
@@ -192,10 +187,10 @@ const menuItems = [
                     <!-- Logo -->
                     <div class="flex-shrink-0 flex items-center px-4 mb-8">
                         <Link href="/" class="flex items-center">
-                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2L1 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-11-5z"/>
-                                </svg>
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center mr-3">
+                                    <img :src="logoImg" alt="Logo Bulog" class="w-6 h-6 object-contain" />
+                                </div>
                             </div>
                             <div>
                                 <h1 class="text-lg font-bold text-gray-900">ASIMPENAS</h1>

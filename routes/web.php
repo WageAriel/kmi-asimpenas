@@ -30,6 +30,29 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+//Route Dashboard Admin
+Route::prefix('admin')->name('admin.')->group(function () {
+    // 1. Dashboard
+    Route::get('/dashboard', function () {
+        return Inertia::render('Admin/Dashboard');
+    })->name('dashboard');
+
+    // 2. Daftar Mitra
+    Route::get('/daftar-mitra', function () {
+        return Inertia::render('Admin/DaftarMitra/Index');
+    })->name('daftar-mitra.index');
+
+    // 3. Daftar Seleksi Mitra
+    Route::get('/seleksi-mitra', function () {
+        return Inertia::render('Admin/DaftarSeleksiMitra/Index');
+    })->name('seleksi-mitra.index');
+
+    // 4. Daftar Hasil Seleksi Mitra
+    Route::get('/hasil-seleksi-mitra', function () {
+        return Inertia::render('Admin/DaftarHasilSeleksiMitra/Index');
+    })->name('hasil-seleksi-mitra.index');
+});
+
 // Routes Dashboard Mitra tanpa middleware (untuk testing)
 Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->group(function () {
     Route::get('/dashboard', function () {
