@@ -106,6 +106,19 @@ class DataMitraController extends Controller
         ]);
 
         $mitra->update($validated);
+        if ($mitra->user) {
+            $userUpdateData = [];
+            if (isset($validated['email'])) {
+                $userUpdateData['email'] = $validated['email'];
+            }
+            if (isset($validated['nama_perusahaan'])) {
+                $userUpdateData['name'] = $validated['nama_perusahaan'];
+            }
+            if (!empty($userUpdateData)) {
+                $mitra->user->update($userUpdateData);
+            }
+        }
+    
         return response()->json($mitra);
     }
 
