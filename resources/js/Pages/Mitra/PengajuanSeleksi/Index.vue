@@ -115,7 +115,7 @@ const editSubmission = (submission) => {
             <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-sm p-6 mb-8">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div class="mb-4 md:mb-0">
-                        <h3 class="text-xl font-bold text-white mb-2">Pengajuan Tahun {{ currentYear }}</h3>
+                        <h3 class="text-xl font-bold text-white mb-2">Pengajuan Seleksi</h3>
                         <p class="text-blue-100">
                             <span v-if="hasCurrentYearSubmission">Anda sudah memiliki pengajuan untuk tahun ini</span>
                             <span v-else>Belum ada pengajuan untuk tahun ini</span>
@@ -130,7 +130,7 @@ const editSubmission = (submission) => {
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                             </svg>
-                            Pengajuan Baru {{ currentYear }}
+                            Pengajuan Baru 
                         </button>
                         
                         <button

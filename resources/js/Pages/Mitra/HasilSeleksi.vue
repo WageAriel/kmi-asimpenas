@@ -51,6 +51,38 @@ const timelineData = ref([
     }
 ]);
 
+const timelineKlasifikasi = ref([
+    {
+        title: 'Input Data Klasifikasi',
+        date: '18 Januari 2024',
+        time: '10:00',
+        status: 'completed',
+        description: 'Data klasifikasi mitra telah diinput dan disimpan.'
+    },
+    {
+        title: 'Verifikasi Klasifikasi',
+        date: '19 Januari 2024',
+        time: '13:00',
+        status: 'current',
+        description: 'Tim sedang melakukan verifikasi data klasifikasi mitra.'
+    },
+    {
+        title: 'Penilaian Klasifikasi',
+        date: '-',
+        time: '-',
+        status: 'pending',
+        description: 'Penilaian kelayakan klasifikasi mitra.'
+    },
+    {
+        title: 'Hasil Klasifikasi',
+        date: '-',
+        time: '-',
+        status: 'pending',
+        description: 'Pengumuman hasil klasifikasi mitra.'
+    }
+]);
+
+
 const dokumenReview = ref([
     { nama: 'Surat Permohonan', status: 'approved', catatan: 'Lengkap dan sesuai format' },
     { nama: 'Akta Notaris', status: 'approved', catatan: 'Valid dan terbaru' },
@@ -196,24 +228,53 @@ const getDocStatusText = (status) => {
                         </div>
                     </div>
 
-                    <!-- Review Dokumen -->
+                    <!-- Timeline Klasifikasi -->
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                         <div class="p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Review Dokumen</h3>
-                            
-                            <div class="space-y-4">
-                                <div v-for="dokumen in dokumenReview" :key="dokumen.nama" 
-                                     class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                                    <div class="flex-1">
-                                        <h4 class="text-sm font-medium text-gray-900">{{ dokumen.nama }}</h4>
-                                        <p class="text-sm text-gray-600">{{ dokumen.catatan }}</p>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Timeline Klasifikasi</h3>
+                            <div class="space-y-6">
+                                <div
+                                    v-for="(item, idx) in timelineKlasifikasi"
+                                    :key="idx"
+                                    class="relative flex items-start"
+                                >
+                                    <div class="flex-shrink-0">
+                                        <div :class="[
+                                            'w-10 h-10 rounded-full flex items-center justify-center border-2',
+                                            item.status === 'completed' ? 'bg-green-100 border-green-500' :
+                                            item.status === 'current' ? 'bg-blue-100 border-blue-500' :
+                                            'bg-gray-100 border-gray-300'
+                                        ]">
+                                            <svg :class="[
+                                                'w-5 h-5',
+                                                item.status === 'completed' ? 'text-green-600' :
+                                                item.status === 'current' ? 'text-blue-600' :
+                                                'text-gray-400'
+                                            ]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    :d="getStatusIcon(item.status)" />
+                                            </svg>
+                                        </div>
                                     </div>
-                                    <span :class="[
-                                        'px-2 py-1 text-xs font-medium rounded-full',
-                                        getDocStatusBadge(dokumen.status)
-                                    ]">
-                                        {{ getDocStatusText(dokumen.status) }}
-                                    </span>
+                                    <div class="ml-4 flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h4 :class="[
+                                                'text-sm font-medium',
+                                                item.status === 'current' ? 'text-blue-900' : 'text-gray-900'
+                                            ]">{{ item.title }}</h4>
+                                            <div class="text-right">
+                                                <p class="text-xs text-gray-500">{{ item.date }}</p>
+                                                <p class="text-xs text-gray-500">{{ item.time }}</p>
+                                            </div>
+                                        </div>
+                                        <p class="mt-1 text-sm text-gray-600">{{ item.description }}</p>
+                                    </div>
+                                    <!-- Connector line -->
+                                    <div v-if="idx < timelineKlasifikasi.length - 1"
+                                        :class="[
+                                            'absolute left-5 top-10 w-0.5 h-6',
+                                            item.status === 'completed' ? 'bg-green-300' : 'bg-gray-300'
+                                        ]"></div>
                                 </div>
                             </div>
                         </div>
@@ -294,7 +355,7 @@ const getDocStatusText = (status) => {
                                         <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
                                         </svg>
-                                        <span class="text-sm font-medium text-gray-900">Panduan Seleksi</span>
+                                        <span class="text-sm font-medium text-gray-900">Pengajuan Seleksi</span>
                                     </div>
                                     <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -306,7 +367,7 @@ const getDocStatusText = (status) => {
                                         <svg class="w-5 h-5 text-blue-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
                                         </svg>
-                                        <span class="text-sm font-medium text-gray-900">Formulir Revisi</span>
+                                        <span class="text-sm font-medium text-gray-900">Klasifikasi Mitra</span>
                                     </div>
                                     <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
