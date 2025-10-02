@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import logoImg from '@/../../resources/assets/Images/bulog.png'; 
 
 defineProps({
     canResetPassword: {
@@ -41,9 +42,7 @@ const submit = () => {
                 <div class="mb-16">
                     <div class="flex items-center mb-8">
                         <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-3">
-                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L1 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-11-5z"/>
-                            </svg>
+                            <img :src="logoImg" alt="Logo Bulog" class="w-7 h-7 object-contain" />
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold">ASIMPENAS</h1>
@@ -77,18 +76,16 @@ const submit = () => {
             <div class="w-full max-w-sm">
                 <!-- Mobile Logo -->
                 <div class="lg:hidden text-center mb-12">
-                    <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2L1 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-11-5z"/>
-                        </svg>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <img :src="logoImg" alt="Logo Bulog" class="w-7 h-7 object-contain" />
                     </div>
                     <h1 class="text-xl font-bold text-gray-900">ASIMPENAS</h1>
                 </div>
 
                 <!-- Header -->
                 <div class="text-center mb-10">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Welcome Back!</h2>
-                    <p class="text-gray-500">Please enter your credentials</p>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Selamat Datang Kembali!</h2>
+                    <p class="text-gray-500">Silakan masukkan kredensial Anda</p>
                 </div>
 
                 <!-- Status Message -->
@@ -101,7 +98,7 @@ const submit = () => {
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-                            Email Address
+                            Alamat Email
                         </label>
                         <input
                             id="email"
@@ -110,7 +107,7 @@ const submit = () => {
                             required
                             autofocus
                             autocomplete="username"
-                            placeholder="Enter your email"
+                            placeholder="Masukkan email"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             :class="{ 'border-red-300': form.errors.email }"
                         />
@@ -122,7 +119,7 @@ const submit = () => {
                     <!-- Password -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
-                            Password
+                            Kata Sandi
                         </label>
                         <div class="relative">
                             <input
@@ -131,7 +128,7 @@ const submit = () => {
                                 v-model="form.password"
                                 required
                                 autocomplete="current-password"
-                                placeholder="Masukkan password"
+                                placeholder="Masukkan kata sandi"
                                 class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                 :class="{ 'border-red-300': form.errors.password }"
                             />
@@ -165,7 +162,7 @@ const submit = () => {
                                 v-model="form.remember" 
                                 class="h-4 w-4 text-blue-600 border-gray-300 rounded"
                             />
-                            <span class="ml-2 text-gray-600">Remember me</span>
+                            <span class="ml-2 text-gray-600">Ingat saya</span>
                         </label>
 
                         <Link
@@ -183,20 +180,20 @@ const submit = () => {
                         :disabled="form.processing"
                         class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors"
                     >
-                        <span v-if="form.processing">Processing...</span>
-                        <span v-else>Login</span>
+                        <span v-if="form.processing">Memproses...</span>
+                        <span v-else>Masuk</span>
                     </button>
                 </form>
 
                 <!-- Register Link -->
                 <div class="mt-8 text-center">
                     <p class="text-sm text-gray-600 mb-3">
-                        Don't have an account? 
+                        Tidak punya akun? 
                         <Link 
                         :href="route('register')" 
                         class="text-blue-600 hover:text-blue-800 font-medium"
                     >
-                        Sign up
+                        Daftar
                     </Link>
                     </p>
                 </div>

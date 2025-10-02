@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import logoImg from '@/../../resources/assets/Images/bulog.png';
 
 const form = useForm({
     name: '',
@@ -26,9 +27,7 @@ const submit = () => {
                 <div class="mb-16">
                     <div class="flex items-center mb-8">
                         <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mr-3">
-                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L1 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-11-5z"/>
-                            </svg>
+                            <img :src="logoImg" alt="Logo Bulog" class="w-7 h-7 object-contain" />
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold">ASIMPENAS</h1>
@@ -62,18 +61,16 @@ const submit = () => {
             <div class="w-full max-w-sm">
                 <!-- Mobile Logo -->
                 <div class="lg:hidden text-center mb-12">
-                    <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2L1 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-11-5z"/>
-                        </svg>
+                    <div class="w-12 h-12rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <img :src="logoImg" alt="Logo Bulog" class="w-7 h-7 object-contain" />
                     </div>
                     <h1 class="text-xl font-bold text-gray-900">ASIMPENAS</h1>
                 </div>
 
                 <!-- Header -->
-                <div class="text-center mb-10">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Get Started Now</h2>
-                    <p class="text-gray-500">Please complete your company information</p>
+                <div class="text-center mt-4 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Bergabung Sebagai Mitra</h2>
+                    <p class="text-gray-500">Silakan lengkapi informasi perusahaan Anda</p>
                 </div>
 
                 <!-- Form -->
@@ -81,7 +78,7 @@ const submit = () => {
                     <!-- Name -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                            Company Name
+                            Nama Perusahaan
                         </label>
                         <input
                             id="name"
@@ -90,7 +87,7 @@ const submit = () => {
                             required
                             autofocus
                             autocomplete="name"
-                            placeholder="Enter company name"
+                            placeholder="Masukkan nama perusahaan"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             :class="{ 'border-red-300': form.errors.name }"
                         />
@@ -102,7 +99,7 @@ const submit = () => {
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-                            Company Email
+                            Alamat Email Perusahaan
                         </label>
                         <input
                             id="email"
@@ -110,7 +107,7 @@ const submit = () => {
                             v-model="form.email"
                             required
                             autocomplete="username"
-                            placeholder="Enter company email"
+                            placeholder="Masukkan email perusahaan"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             :class="{ 'border-red-300': form.errors.email }"
                         />
@@ -122,7 +119,7 @@ const submit = () => {
                     <!-- Password -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
-                            Password
+                            Kata Sandi
                         </label>
                         <input
                             id="password"
@@ -130,7 +127,7 @@ const submit = () => {
                             v-model="form.password"
                             required
                             autocomplete="new-password"
-                            placeholder="Enter your password"
+                            placeholder="Masukkan kata sandi"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             :class="{ 'border-red-300': form.errors.password }"
                         />
@@ -142,7 +139,7 @@ const submit = () => {
                     <!-- Confirm Password -->
                     <div>
                         <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">
-                            Confirm Password
+                            Konfirmasi Kata Sandi
                         </label>
                         <input
                             id="password_confirmation"
@@ -150,7 +147,7 @@ const submit = () => {
                             v-model="form.password_confirmation"
                             required
                             autocomplete="new-password"
-                            placeholder="Repeat your password"
+                            placeholder="Ulangi kata sandi Anda"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             :class="{ 'border-red-300': form.errors.password_confirmation }"
                         />
@@ -162,7 +159,7 @@ const submit = () => {
                     <!-- Terms Notice -->
                     <div class="p-3 bg-blue-50 border border-blue-200 rounded-md">
                         <p class="text-xs text-blue-700">
-                           By registering, you agree to follow the selection process according to the applicable provisions.
+                           Dengan mendaftar, Anda setuju untuk mengikuti proses seleksi sesuai dengan ketentuan yang berlaku.
                         </p>
                     </div>
 
@@ -172,20 +169,20 @@ const submit = () => {
                         :disabled="form.processing"
                         class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors"
                     >
-                        <span v-if="form.processing">Processing...</span>
-                        <span v-else>Register as Partner</span>
+                        <span v-if="form.processing">Memproses...</span>
+                        <span v-else>Daftar sebagai Mitra</span>
                     </button>
                 </form>
 
                 <!-- Login Link -->
                 <div class="mt-8 text-center">
                     <p class="text-sm text-gray-600 mb-3">
-                        Have an account?
+                        Sudah memiliki akun?
                         <Link 
                         :href="route('login')" 
                         class="text-blue-600 hover:text-blue-800 font-medium"
                     >
-                        Sign in
+                        Masuk
                     </Link>
                     </p>
                 </div>

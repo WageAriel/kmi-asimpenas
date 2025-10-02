@@ -1,5 +1,6 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import logoImg from '@/../../resources/assets/Images/bulog.png'; 
 </script>
 
 <template>
@@ -8,10 +9,8 @@ import { Link } from '@inertiajs/vue3';
         <div class="w-full px-4 py-6">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center">
-                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2L1 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-11-5z"/>
-                        </svg>
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+                        <img :src="logoImg" alt="Logo Bulog" class="w-7 h-7 object-contain" />
                     </div>
                     <div>
                         <span class="text-2xl font-bold text-gray-800">ASIMPENAS</span>
