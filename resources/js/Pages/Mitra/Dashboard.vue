@@ -1,7 +1,8 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import MitraLayout from '@/Layouts/MitraLayout.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
 
 // Props dari backend (route)
 const props = defineProps({
@@ -27,25 +28,53 @@ const mitraInfo = ref({
     registration_year: 2024
 });
 
-// Notifikasi urgent
-const urgentNotifications = ref([
-    {
-        id: 1,
-        type: 'warning',
-        title: 'Data Mitra Diperlukan',
-        message: 'Lengkapi data mitra terlebih dahulu sebelum mengajukan Puschase Order (PO)',
-        action: 'Lengkapi Data',
-        urgent: true
-    },
-    {
-        id: 2,
-        type: 'info',
-        title: 'Hasil Seleksi Tersedia',
-        message: 'Hasil seleksi mitra periode 2025 telah dipublikasikan. Cek status pengajuan Anda.',
-        action: 'Lihat Hasil',
-        urgent: false
+const urgentNotifications = ref([]);
+
+onMounted(async () => {
+    try {
+        const response = await axios.get('/data-mitra/my');
+        const mitraData = response.data;
+
+        // Kalau data mitra ada, simpan ke ref
+        if (mitraData && mitraData.id) {
+            mitraInfo.value = mitraData;
+        } 
+    } catch (error) {
+        // Kalau error 404 -> data mitra belum ada
+        if (error.response && error.response.status === 404) {
+            urgentNotifications.value.push({
+                id: 1,
+                type: 'warning',
+                title: 'Data Mitra Diperlukan',
+                message: 'Lengkapi data mitra terlebih dahulu sebelum mengajukan Puschase Order (PO)',
+                action: 'Lengkapi Data',
+                route: 'input-data-mitra',
+                urgent: true
+            });
+        }
     }
-]);
+});
+
+
+// Notifikasi urgent
+// const urgentNotifications = ref([
+//     {
+//         id: 1,
+//         type: 'warning',
+//         title: 'Data Mitra Diperlukan',
+//         message: 'Lengkapi data mitra terlebih dahulu sebelum mengajukan Puschase Order (PO)',
+//         action: 'Lengkapi Data',
+//         urgent: true
+//     },
+//     {
+//         id: 2,
+//         type: 'info',
+//         title: 'Hasil Seleksi Tersedia',
+//         message: 'Hasil seleksi mitra periode 2025 telah dipublikasikan. Cek status pengajuan Anda.',
+//         action: 'Lihat Hasil',
+//         urgent: false
+//     }
+// ]);
 
 // Data dummy untuk testing
 const statistik = ref({
@@ -162,12 +191,11 @@ const recentActivities = ref([
 ]);
 
 const goToAction = (action) => {
-    if (action.params) {
-        window.location.href = route(action.route, action.params);
-    } else {
-        window.location.href = route(action.route);
+    if (action.route) {
+        window.location.href = route(action.route, action.params ?? {});
     }
 };
+
 </script>
 
 <template>
