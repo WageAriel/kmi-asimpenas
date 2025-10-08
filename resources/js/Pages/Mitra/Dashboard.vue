@@ -29,18 +29,70 @@ const mitraInfo = ref({
 });
 
 const urgentNotifications = ref([]);
+const selections = ref([]);          // daftar pengajuan seleksi user
+const klasifikasis = ref([]);        // daftar klasifikasi user
+
+const pendingCount = computed(() =>
+    selections.value.filter(s => {
+        const st = (s.status_seleksi || s.status || '').toLowerCase();
+        return st === 'pending';
+    }).length
+);
+const approvedCount = computed(() =>
+    selections.value.filter(s => {
+        const st = (s.status_seleksi || s.status || '').toLowerCase();
+        return st === 'lolos' || st === 'approved';
+    }).length
+);
+
+// Ambil seleksi terbaru (berdasarkan created_at)
+const latestSelection = computed(() => {
+    if (!selections.value.length) return null;
+    return [...selections.value].sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    )[0];
+});
+
+// Normalisasi status seleksi untuk tampilan
+const latestSelectionStatusKey = computed(() => {
+    if (!latestSelection.value) return 'not_submitted';
+    const s = (latestSelection.value.status_seleksi || latestSelection.value.status || '').toLowerCase();
+    if (s === 'lolos' || s === 'approved') return 'approved';
+    if (s === 'tidak lolos' || s === 'rejected') return 'rejected';
+    if (s === 'pending') return 'pending';
+    return 'not_submitted';
+});
+const latestSelectionStatusText = computed(() => getStatusText(latestSelectionStatusKey.value));
+const latestStatusColorClass = computed(() => {
+    switch (latestSelectionStatusKey.value) {
+        case 'approved': return 'text-green-600';
+        case 'pending': return 'text-yellow-600';
+        case 'rejected': return 'text-red-600';
+        default: return 'text-gray-600';
+    }
+});
+
+// Ambil klasifikasi terbaru
+const latestKlasifikasi = computed(() => {
+    if (!klasifikasis.value.length) return null;
+    return [...klasifikasis.value].sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    )[0];
+});
+const latestKlasifikasiResult = computed(() => latestKlasifikasi.value?.hasil_klasifikasi || '-');
+const klasifikasiSubtitle = computed(() => latestKlasifikasi.value ? 'Terverifikasi' : 'Belum ada');
+
+
 
 onMounted(async () => {
     try {
         const response = await axios.get('/data-mitra/my');
         const mitraData = response.data;
 
-        // Kalau data mitra ada, simpan ke ref
         if (mitraData && mitraData.id) {
             mitraInfo.value = mitraData;
-        } 
+        }
     } catch (error) {
-        // Kalau error 404 -> data mitra belum ada
         if (error.response && error.response.status === 404) {
             urgentNotifications.value.push({
                 id: 1,
@@ -52,6 +104,24 @@ onMounted(async () => {
                 urgent: true
             });
         }
+    }
+
+    // Ambil data seleksi & klasifikasi milik user yang login
+    try {
+        const [seleksiRes, klasRes] = await Promise.all([
+            axios.get('/data-seleksi-mitra/my').catch(() => null),
+            axios.get('/klasifikasi-mitra/my').catch(() => null)
+        ]);
+
+        if (seleksiRes?.data) {
+            selections.value = Array.isArray(seleksiRes.data) ? seleksiRes.data : [];
+        }
+        if (klasRes?.data) {
+            klasifikasis.value = Array.isArray(klasRes.data) ? klasRes.data : [];
+        }
+    } catch (e) {
+        // Abaikan error lain agar dashboard tetap tampil
+        // Bisa ditambahkan logging jika diperlukan
     }
 });
 
@@ -75,6 +145,8 @@ onMounted(async () => {
 //         urgent: false
 //     }
 // ]);
+
+
 
 // Data dummy untuk testing
 const statistik = ref({
@@ -254,7 +326,7 @@ const goToAction = (action) => {
                                         notification.type === 'warning' ? 'text-red-700' : 'text-blue-700'
                                     ]">{{ notification.message }}</p>
                                     <div class="mt-4">
-                                        <button :class="[
+                                        <button  @click="goToAction(notification)" :class="[
                                             'text-sm font-medium px-4 py-2 rounded-lg transition-colors',
                                             notification.type === 'warning' 
                                                 ? 'bg-red-100 text-red-800 hover:bg-red-200' 
@@ -287,8 +359,8 @@ const goToAction = (action) => {
                                 </div>
                             </div>
                             <div class="ml-5">
-                                <h3 class="text-sm font-medium text-gray-900 mb-1">Total Pengajuan</h3>
-                                <p class="text-2xl font-semibold text-blue-600">{{ statistik.pengajuan_total }}</p>
+                                <h3 class="text-sm font-medium text-gray-900 mb-1">Total Pengajuan Seleksi</h3>
+                                <p class="text-2xl font-semibold text-blue-600">{{ selections.length }}</p>
                                 <p class="text-xs text-gray-500 mt-1">Seluruh periode</p>
                             </div>
                         </div>
@@ -305,9 +377,16 @@ const goToAction = (action) => {
                                 </div>
                             </div>
                             <div class="ml-5">
-                                <h3 class="text-sm font-medium text-gray-900 mb-1">Disetujui</h3>
-                                <p class="text-2xl font-semibold text-green-600">{{ statistik.pengajuan_approved }}</p>
-                                <p class="text-xs text-gray-500 mt-1">{{ statistik.pengajuan_pending }} pending</p>
+                                <h3 class="text-sm font-medium text-gray-900 mb-1">Status Seleksi Terbaru</h3>
+                                <p class="text-m font-semibold text-green-600">{{ latestSelectionStatusText }}</p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <template v-if="selections.length > 0">
+                                        {{ pendingCount }} pending
+                                    </template>
+                                    <template v-else>
+                                        Belum ada pengajuan
+                                    </template>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -324,8 +403,8 @@ const goToAction = (action) => {
                             </div>
                             <div class="ml-5">
                                 <h3 class="text-sm font-medium text-gray-900 mb-1">Hasil Klasifikasi</h3>
-                                <p class="text-2xl font-semibold text-orange-600">Lolos</p>
-                                <p class="text-xs text-gray-500 mt-1">Terverifikasi</p>
+                                <p class="text-2xl font-semibold text-orange-600">{{ latestKlasifikasiResult }}</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ klasifikasiSubtitle }}</p>
                             </div>
                         </div>
                     </div>

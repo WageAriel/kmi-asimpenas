@@ -35,6 +35,7 @@ return new class extends Migration {
             $table->enum('moisture_tester', ['1', '2', '3'])->nullable();
             $table->enum('pembanding_derajat_sosoh', ['1', '2', '3'])->nullable();
             $table->enum('bagian_quality_control', ['1', '2', '3'])->nullable();
+            $table->enum('hasil_klasifikasi', ['A', 'B', 'C'])->nullable();
 
             $table->timestamps();
 

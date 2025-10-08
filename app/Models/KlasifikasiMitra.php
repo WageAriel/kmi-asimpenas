@@ -36,6 +36,7 @@ class KlasifikasiMitra extends Model
         'moisture_tester',
         'pembanding_derajat_sosoh',
         'bagian_quality_control',
+        'hasil_klasifikasi'
     ];
 
     // Relasi ke DataMitra (banyak ke satu)

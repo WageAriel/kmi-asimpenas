@@ -57,6 +57,7 @@ class KlasifikasiMitraController extends Controller
             'moisture_tester' => 'nullable|in:1,2,3',
             'pembanding_derajat_sosoh' => 'nullable|in:1,2,3',
             'bagian_quality_control' => 'nullable|in:1,2,3',
+            'hasil_klasifikasi' => 'nullable|in:A,B,C'
         ]);
 
         $klasifikasi = KlasifikasiMitra::create($validated);
@@ -101,6 +102,7 @@ class KlasifikasiMitraController extends Controller
             'moisture_tester' => 'nullable|in:1,2,3',
             'pembanding_derajat_sosoh' => 'nullable|in:1,2,3',
             'bagian_quality_control' => 'nullable|in:1,2,3',
+            'hasil_klasifikasi' => 'nullable|in:A,B,C'
         ]);
 
         $klasifikasi->update($validated);
