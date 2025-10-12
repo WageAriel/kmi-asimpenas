@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MitraController;
+use App\Http\Controllers\PdfGeneratorController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -79,6 +80,10 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
     Route::get('/pengajuan-seleksi/form', function () {
         return Inertia::render('Mitra/PengajuanSeleksi/Form');
     })->name('pengajuan-seleksi.form');
+
+    //untuk  mengenerate tabel ke pdf
+    Route::get('/pengajuan-seleksi/{id}/download', [PdfGeneratorController::class, 'downloadSeleksiMitraPdf'])
+    ->name('pengajuan-seleksi.download');
 
     //untuk mengakses tabel klasifikasi mitra
     Route::get('/klasifikasi-mitra', function () {

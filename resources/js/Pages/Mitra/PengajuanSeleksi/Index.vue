@@ -1,6 +1,6 @@
 <!-- resources/js/Pages/Mitra/PengajuanSeleksi/Index.vue -->
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import MitraLayout from '@/Layouts/MitraLayout.vue';
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
@@ -109,6 +109,31 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('id-ID', {
     year: 'numeric', month: 'short', day: 'numeric'
   });
+};
+
+const downloadPdf = (submissionId) => {
+  if (!submissionId) {
+    console.error('Submission ID is undefined');
+    return;
+  }
+  
+  const downloadUrl = `/mitra/pengajuan-seleksi/${submissionId}/download`;
+  console.log('Attempting to download from:', downloadUrl);
+  
+  // Option 1: Using window.open (simpler approach)
+  window.open(downloadUrl, '_blank');
+  
+  /* 
+  // Option 2: Using iframe (if window.open is blocked)
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = downloadUrl;
+  document.body.appendChild(iframe);
+  
+  setTimeout(() => {
+    document.body.removeChild(iframe);
+  }, 2000);
+  */
 };
 
 // Action functions
@@ -275,7 +300,7 @@ const editSubmission = (submission) => {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
-                    @click="window.location.href = `/mitra/pengajuan-seleksi/${submission.id}/download`"
+                    @click="downloadPdf(submission.id)"
                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                   >
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
