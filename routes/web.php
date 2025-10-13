@@ -40,7 +40,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // 2. Daftar Mitra
     Route::get('/daftar-mitra', function () {
-        return Inertia::render('Admin/DaftarMitra/Index');
+        // Fetch all mitra data with their associated users, ordered by newest first
+        $mitras = App\Models\DataMitra::with('user')
+            ->orderBy('created_at', 'desc')  // Add this line to sort by creation date (newest first)
+            ->get();
+        
+        return Inertia::render('Admin/DaftarMitra/Index', [
+            'mitras' => $mitras
+        ]);
     })->name('daftar-mitra.index');
 
     // 3. Daftar Seleksi Mitra
