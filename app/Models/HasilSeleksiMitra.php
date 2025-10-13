@@ -10,8 +10,8 @@ class HasilSeleksiMitra extends Model
     protected $primaryKey = 'id_hasil_seleksi_mitra';
 
     protected $fillable = [
+        'id_seleksi_mitra',
         'id_mitra',
-        'kesimpulan_akhir',
         'surat_permohonan',
         'akta_notaris',
         'nib',
@@ -34,6 +34,7 @@ class HasilSeleksiMitra extends Model
         'kesimpulan_sarana_penggilingan',
         'sarana_penggilingan_ada',
         'sarana_penggilingan_tidak_ada',
+        'kesimpulan_akhir',
     ];
 
     // JSON casting untuk kolom array
@@ -46,8 +47,31 @@ class HasilSeleksiMitra extends Model
         'sarana_penggilingan_tidak_ada' => 'array',
     ];
 
+    // Relasi ke DataMitra
     public function mitra()
     {
         return $this->belongsTo(DataMitra::class, 'id_mitra', 'id_mitra');
+    }
+
+    // Relasi ke DataSeleksiMitra
+    public function seleksiMitra()
+    {
+        return $this->belongsTo(DataSeleksiMitra::class, 'id_seleksi_mitra', 'id_seleksi_mitra');
+    }
+
+    // Event untuk update status_seleksi di DataSeleksiMitra
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($hasilSeleksi) {
+            if ($hasilSeleksi->id_seleksi_mitra && $hasilSeleksi->kesimpulan_akhir) {
+                $seleksiMitra = DataSeleksiMitra::find($hasilSeleksi->id_seleksi_mitra);
+                if ($seleksiMitra) {
+                    $seleksiMitra->status_seleksi = strtolower($hasilSeleksi->kesimpulan_akhir);
+                    $seleksiMitra->save();
+                }
+            }
+        });
     }
 }

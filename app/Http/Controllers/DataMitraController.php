@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\DataMitra;
 use Illuminate\Http\Request;
+use App\Services\ActivityAggregatorService;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 class DataMitraController extends Controller
 {
@@ -62,6 +64,8 @@ class DataMitraController extends Controller
         $validated['user_id'] = auth()->id();
 
         $mitra = DataMitra::create($validated);
+
+        ActivityAggregatorService::clearUserCache(Auth::id());
         return response()->json($mitra, 201);
     }
 
@@ -118,6 +122,8 @@ class DataMitraController extends Controller
                 $mitra->user->update($userUpdateData);
             }
         }
+
+        ActivityAggregatorService::clearUserCache(Auth::id());
     
         return response()->json($mitra);
     }

@@ -44,9 +44,15 @@ class DataSeleksiMitra extends Model
         'mb_surat_kuasa',
     ];
 
-    // Relasi ke DataMitra (banyak ke satu)
+    // Relasi ke DataMitra
     public function mitra()
     {
         return $this->belongsTo(DataMitra::class, 'id_mitra', 'id_mitra');
+    }
+
+    // Relasi ke HasilSeleksiMitra
+    public function hasilSeleksi()
+    {
+        return $this->hasOne(HasilSeleksiMitra::class, 'id_seleksi_mitra', 'id_seleksi_mitra');
     }
 }

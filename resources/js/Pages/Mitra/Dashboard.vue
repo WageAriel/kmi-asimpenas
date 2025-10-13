@@ -29,8 +29,10 @@ const mitraInfo = ref({
 });
 
 const urgentNotifications = ref([]);
-const selections = ref([]);          // daftar pengajuan seleksi user
-const klasifikasis = ref([]);        // daftar klasifikasi user
+const selections = ref([]);
+const klasifikasis = ref([]);
+const recentActivities = ref([]); // ✅ Ubah dari dummy ke empty array
+const isLoadingActivities = ref(true); // ✅ Tambah loading state
 
 const pendingCount = computed(() =>
     selections.value.filter(s => {
@@ -38,6 +40,7 @@ const pendingCount = computed(() =>
         return st === 'pending';
     }).length
 );
+
 const approvedCount = computed(() =>
     selections.value.filter(s => {
         const st = (s.status_seleksi || s.status || '').toLowerCase();
@@ -62,7 +65,9 @@ const latestSelectionStatusKey = computed(() => {
     if (s === 'pending') return 'pending';
     return 'not_submitted';
 });
+
 const latestSelectionStatusText = computed(() => getStatusText(latestSelectionStatusKey.value));
+
 const latestStatusColorClass = computed(() => {
     switch (latestSelectionStatusKey.value) {
         case 'approved': return 'text-green-600';
@@ -79,18 +84,22 @@ const latestKlasifikasi = computed(() => {
         (a, b) => new Date(b.created_at) - new Date(a.created_at)
     )[0];
 });
+
 const latestKlasifikasiResult = computed(() => latestKlasifikasi.value?.hasil_klasifikasi || '-');
 const klasifikasiSubtitle = computed(() => latestKlasifikasi.value ? 'Terverifikasi' : 'Belum ada');
-
-
 
 onMounted(async () => {
     try {
         const response = await axios.get('/data-mitra/my');
         const mitraData = response.data;
 
-        if (mitraData && mitraData.id) {
-            mitraInfo.value = mitraData;
+        if (mitraData && mitraData.id_mitra) {
+            mitraInfo.value = {
+                name: mitraData.nama_lengkap || 'PT. Sejahtera Abadi',
+                type: 'Mitra Penggilingan Padi',
+                status: 'approved',
+                registration_year: mitraData.created_at ? new Date(mitraData.created_at).getFullYear() : 2024
+            };
         }
     } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -98,7 +107,7 @@ onMounted(async () => {
                 id: 1,
                 type: 'warning',
                 title: 'Data Mitra Diperlukan',
-                message: 'Lengkapi data mitra terlebih dahulu sebelum mengajukan Puschase Order (PO)',
+                message: 'Lengkapi data mitra terlebih dahulu sebelum mengajukan Purchase Order (PO)',
                 action: 'Lengkapi Data',
                 route: 'input-data-mitra',
                 urgent: true
@@ -120,33 +129,75 @@ onMounted(async () => {
             klasifikasis.value = Array.isArray(klasRes.data) ? klasRes.data : [];
         }
     } catch (e) {
-        // Abaikan error lain agar dashboard tetap tampil
-        // Bisa ditambahkan logging jika diperlukan
+        console.error('Error loading data:', e);
     }
+
+    // ✅ Load activities dari API
+    await loadActivities();
 });
 
+// ✅ Function untuk load activities
+const loadActivities = async () => {
+    isLoadingActivities.value = true;
+    try {
+        const response = await axios.get('/activities/my', {
+            params: { limit: 10 }
+        });
+        recentActivities.value = response.data;
+    } catch (error) {
+        console.error('Error loading activities:', error);
+        recentActivities.value = [];
+    } finally {
+        isLoadingActivities.value = false;
+    }
+};
 
-// Notifikasi urgent
-// const urgentNotifications = ref([
-//     {
-//         id: 1,
-//         type: 'warning',
-//         title: 'Data Mitra Diperlukan',
-//         message: 'Lengkapi data mitra terlebih dahulu sebelum mengajukan Puschase Order (PO)',
-//         action: 'Lengkapi Data',
-//         urgent: true
-//     },
-//     {
-//         id: 2,
-//         type: 'info',
-//         title: 'Hasil Seleksi Tersedia',
-//         message: 'Hasil seleksi mitra periode 2025 telah dipublikasikan. Cek status pengajuan Anda.',
-//         action: 'Lihat Hasil',
-//         urgent: false
-//     }
-// ]);
+// ✅ Function untuk refresh activities
+const refreshActivities = async () => {
+    isLoadingActivities.value = true;
+    try {
+        const response = await axios.post('/activities/refresh', {
+            limit: 10
+        });
+        recentActivities.value = response.data.data || response.data;
+    } catch (error) {
+        console.error('Error refreshing activities:', error);
+        // Jika gagal, coba load biasa
+        await loadActivities();
+    } finally {
+        isLoadingActivities.value = false;
+    }
+};
 
+// ✅ Helper untuk warna status aktivitas berdasarkan status
+const getActivityColorClass = (status) => {
+    switch(status) {
+        case 'completed':
+        case 'approved':
+            return { bg: 'bg-green-100', text: 'text-green-600' };
+        case 'pending':
+            return { bg: 'bg-yellow-100', text: 'text-yellow-600' };
+        case 'rejected':
+        case 'action_required':
+            return { bg: 'bg-red-100', text: 'text-red-600' };
+        default:
+            return { bg: 'bg-blue-100', text: 'text-blue-600' };
+    }
+};
 
+// ✅ Helper untuk icon berdasarkan activity type
+const getActivityIcon = (activityType) => {
+    const icons = {
+        'mitra_created': 'M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z',
+        'mitra_updated': 'M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z',
+        'seleksi_submitted': 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+        'seleksi_approved': 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+        'seleksi_rejected': 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
+        'klasifikasi_submitted': 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+        'klasifikasi_completed': 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'
+    };
+    return icons[activityType] || 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+};
 
 // Data dummy untuk testing
 const statistik = ref({
@@ -173,9 +224,11 @@ const getStatusClass = (status) => {
 
 const getStatusText = (status) => {
     switch(status) {
-        case 'approved': return 'Lolos Seleksi';
-        case 'pending': return 'Sedang Diverifikasi';
-        case 'rejected': return 'Tidak Lolos';
+        case 'approved': return 'Disetujui';
+        case 'completed': return 'Selesai';
+        case 'pending': return 'Pending';
+        case 'rejected': return 'Ditolak';
+        case 'action_required': return 'Perlu Tindakan';
         case 'not_submitted': return 'Belum Mengajukan';
         default: return 'Status Tidak Diketahui';
     }
@@ -185,7 +238,9 @@ const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 };
 
@@ -231,43 +286,11 @@ const quickActions = ref([
     }
 ]);
 
-// Recent activities dummy data
-const recentActivities = ref([
-    {
-        id: 1,
-        type: 'submission',
-        title: 'Pengajuan Seleksi 2025 Disubmit',
-        description: 'Dokumen pengajuan telah berhasil dikirim untuk diverifikasi',
-        status: 'pending',
-        date: '2025-01-15',
-        admin_note: 'Sedang dalam tahap verifikasi dokumen'
-    },
-    {
-        id: 2,
-        type: 'selection_result',
-        title: 'Hasil Seleksi Disetujui',
-        description: 'Selamat! Pengajuan seleksi mitra Anda telah disetujui',
-        status: 'approved',
-        date: '2025-02-10',
-        admin_note: 'Memenuhi semua kriteria seleksi. Silakan lanjutkan ke tahap klasifikasi'
-    },
-    {
-        id: 3,
-        type: 'classification_submission',
-        title: 'Pengajuan Klasifikasi Mitra',
-        description: 'Dokumen klasifikasi mitra telah disubmit untuk evaluasi',
-        status: 'pending',
-        date: '2025-02-15',
-        admin_note: 'Sedang dalam tahap verifikasi peralatan dan fasilitas'
-    },
-]);
-
 const goToAction = (action) => {
     if (action.route) {
         window.location.href = route(action.route, action.params ?? {});
     }
 };
-
 </script>
 
 <template>
@@ -326,7 +349,7 @@ const goToAction = (action) => {
                                         notification.type === 'warning' ? 'text-red-700' : 'text-blue-700'
                                     ]">{{ notification.message }}</p>
                                     <div class="mt-4">
-                                        <button  @click="goToAction(notification)" :class="[
+                                        <button @click="goToAction(notification)" :class="[
                                             'text-sm font-medium px-4 py-2 rounded-lg transition-colors',
                                             notification.type === 'warning' 
                                                 ? 'bg-red-100 text-red-800 hover:bg-red-200' 
@@ -476,31 +499,60 @@ const goToAction = (action) => {
 
                 <!-- Content Grid -->
                 <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                    <!-- Recent Activities -->
+                    <!-- ✅ Recent Activities - UPDATED -->
                     <div class="xl:col-span-2">
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-200">
                             <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
                                 <h3 class="text-xl font-bold text-gray-900">Riwayat Aktivitas Terbaru</h3>
-                                <button class="text-sm text-blue-600 hover:text-blue-800 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
-                                    Lihat Semua
+                                <button 
+                                    @click="refreshActivities"
+                                    :disabled="isLoadingActivities"
+                                    class="text-sm text-blue-600 hover:text-blue-800 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <svg 
+                                        :class="['w-4 h-4', { 'animate-spin': isLoadingActivities }]" 
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    {{ isLoadingActivities ? 'Loading...' : 'Refresh' }}
                                 </button>
                             </div>
                             <div class="p-8">
-                                <div class="space-y-6">
-                                    <div v-for="activity in recentActivities" :key="activity.id" 
-                                         class="flex items-start p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                                <!-- ✅ Loading State -->
+                                <div v-if="isLoadingActivities" class="flex justify-center items-center py-12">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                                </div>
+
+                                <!-- ✅ Empty State -->
+                                <div v-else-if="recentActivities.length === 0" class="text-center py-12">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada aktivitas</h3>
+                                    <p class="mt-1 text-sm text-gray-500">Aktivitas Anda akan muncul di sini setelah melakukan tindakan</p>
+                                </div>
+
+                                <!-- ✅ Activities List -->
+                                <div v-else class="space-y-6">
+                                    <div 
+                                        v-for="activity in recentActivities" 
+                                        :key="activity.id" 
+                                        class="flex items-start p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                                    >
                                         <div class="flex-shrink-0 mr-6">
                                             <div :class="[
                                                 'w-10 h-10 rounded-xl flex items-center justify-center shadow-sm',
-                                                activity.status === 'completed' ? 'bg-green-100' :
-                                                activity.status === 'pending' ? 'bg-yellow-100' : 'bg-red-100'
+                                                getActivityColorClass(activity.status).bg
                                             ]">
-                                                <svg :class="[
-                                                    'w-5 h-5',
-                                                    activity.status === 'completed' ? 'text-green-600' :
-                                                    activity.status === 'pending' ? 'text-yellow-600' : 'text-red-600'
-                                                ]" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                <svg 
+                                                    :class="['w-5 h-5', getActivityColorClass(activity.status).text]" 
+                                                    fill="currentColor" 
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path :d="getActivityIcon(activity.type)" />
                                                 </svg>
                                             </div>
                                         </div>
@@ -511,16 +563,19 @@ const goToAction = (action) => {
                                                     'px-3 py-1 text-xs font-medium rounded-full',
                                                     getStatusClass(activity.status)
                                                 ]">
-                                                    {{ activity.status === 'completed' ? 'Selesai' :
-                                                       activity.status === 'pending' ? 'Pending' :
-                                                       activity.status === 'action_required' ? 'Perlu Tindakan' : 'Diterima' }}
+                                                    {{ getStatusText(activity.status) }}
                                                 </span>
                                             </div>
                                             <p class="text-gray-600 text-sm mb-2">{{ activity.description }}</p>
-                                            <p v-if="activity.admin_note" class="text-xs text-blue-600 mb-2 italic">
-                                                Admin: {{ activity.admin_note }}
+                                            <p v-if="activity.admin_note" class="text-xs text-blue-600 mb-2 italic bg-blue-50 p-2 rounded">
+                                                <strong>Catatan Admin:</strong> {{ activity.admin_note }}
                                             </p>
-                                            <p class="text-xs text-gray-500">{{ formatDate(activity.date) }}</p>
+                                            <div class="flex items-center justify-between mt-3">
+                                                <p class="text-xs text-gray-500">{{ formatDate(activity.date) }}</p>
+                                                <p v-if="activity.performed_by" class="text-xs text-gray-500">
+                                                    oleh {{ activity.performed_by }}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
