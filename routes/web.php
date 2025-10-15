@@ -53,10 +53,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // 3. Daftar Seleksi Mitra
     Route::get('/seleksi-mitra', function () {
-        return Inertia::render('Admin/DaftarSeleksiMitra/Index');
+        $seleksiMitras = App\Models\DataSeleksiMitra::with('mitra')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return Inertia::render('Admin/DaftarSeleksiMitra/Index', [
+            'seleksiMitras' => $seleksiMitras
+        ]);
     })->name('seleksi-mitra.index');
 
-    // 4. Daftar Hasil Seleksi Mitra
+    // 4. Daftar Klasifikasi Mitra
+    Route::get('/klasifikasi-mitra', function () {
+        $klasifikasiMitras = App\Models\KlasifikasiMitra::with('mitra')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return Inertia::render('Admin/DaftarKlasifikasiMitra/Index', [
+            'klasifikasiMitras' => $klasifikasiMitras
+        ]);
+    })->name('klasifikasi-mitra.index');
+
+    // 5. Daftar Hasil Seleksi Mitra
     Route::get('/hasil-seleksi-mitra', function () {
         return Inertia::render('Admin/DaftarHasilSeleksiMitra/Index');
     })->name('hasil-seleksi-mitra.index');

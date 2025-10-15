@@ -53,6 +53,11 @@ const menuItems = [
         icon: DocumentTextIcon
     },
     {
+        name: 'Daftar Klasifikasi Mitra',
+        route: 'admin.klasifikasi-mitra.index',
+        icon: DocumentTextIcon
+    },
+    {
         name: 'Daftar Hasil Seleksi Mitra',
         route: 'admin.hasil-seleksi-mitra.index',
         icon: CheckCircleIcon
