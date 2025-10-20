@@ -107,7 +107,52 @@ public function mySeleksi()
         ]);
 
         $seleksimitra->update($validated);
+        
+        // Jika status diubah oleh admin, buat atau update hasil seleksi
+        if (isset($validated['status_seleksi']) && in_array($validated['status_seleksi'], ['lolos', 'tidak lolos'])) {
+            $this->createOrUpdateHasilSeleksi($seleksimitra, $validated['status_seleksi']);
+        }
+        
         return response()->json($seleksimitra);
+    }
+    
+    /**
+     * Create or update hasil seleksi based on admin decision
+     */
+    private function createOrUpdateHasilSeleksi($seleksimitra, $status)
+    {
+        $hasilSeleksi = \App\Models\HasilSeleksiMitra::where('id_seleksi_mitra', $seleksimitra->id_seleksi_mitra)->first();
+        
+        $kesimpulanAkhir = ($status === 'lolos') ? 'Lolos' : 'Tidak Lolos';
+        
+        $data = [
+            'id_seleksi_mitra' => $seleksimitra->id_seleksi_mitra,
+            'id_mitra' => $seleksimitra->id_mitra,
+            'kesimpulan_akhir' => $kesimpulanAkhir,
+            // Set all individual fields based on status
+            'surat_permohonan' => $seleksimitra->surat_permohonan === 'ada' ? $kesimpulanAkhir : null,
+            'akta_notaris' => $seleksimitra->akta_notaris === 'ada' ? $kesimpulanAkhir : null,
+            'nib' => $seleksimitra->nib === 'ada' ? $kesimpulanAkhir : null,
+            'ktp' => $seleksimitra->ktp === 'ada' ? $kesimpulanAkhir : null,
+            'no_rekening' => $seleksimitra->no_rekening === 'ada' ? $kesimpulanAkhir : null,
+            'npwp' => $seleksimitra->npwp === 'ada' ? $kesimpulanAkhir : null,
+            'surat_kuasa' => $seleksimitra->surat_kuasa === 'ada' ? $kesimpulanAkhir : null,
+            'lantai_jemur' => $seleksimitra->lantai_jemur === 'ada' ? $kesimpulanAkhir : null,
+            'sarana_lainnya' => $seleksimitra->sarana_lainnya === 'ada' ? $kesimpulanAkhir : null,
+            'mesin_memecah_kulit' => $seleksimitra->mesin_memecah_kulit === 'ada' ? $kesimpulanAkhir : null,
+            'mesin_pemisah_gabah_dengan_beras' => $seleksimitra->mesin_pemisah_gabah === 'ada' ? $kesimpulanAkhir : null,
+            'mesin_penyosoh' => $seleksimitra->mesin_penyosoh === 'ada' ? $kesimpulanAkhir : null,
+            'alat_pemisah_beras' => $seleksimitra->alat_pemisah_beras === 'ada' ? $kesimpulanAkhir : null,
+            'kesimpulan_dokumen' => $kesimpulanAkhir,
+            'kesimpulan_sarana_pengeringan' => $kesimpulanAkhir,
+            'kesimpulan_sarana_penggilingan' => $kesimpulanAkhir,
+        ];
+        
+        if ($hasilSeleksi) {
+            $hasilSeleksi->update($data);
+        } else {
+            \App\Models\HasilSeleksiMitra::create($data);
+        }
     }
 
     public function destroy($id)

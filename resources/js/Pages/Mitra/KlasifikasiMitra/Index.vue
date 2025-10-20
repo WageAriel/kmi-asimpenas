@@ -52,7 +52,7 @@ const hasApprovedSubmission = computed(() => {
 });
 
 const hasCurrentYearClassification = computed(() => {
-    return props.classifications.some(c => (c.year || 2025) === currentYear);
+    return classifications.value.some(c => (c.year || currentYear) === currentYear);
 });
 
 // Helper functions  
@@ -262,14 +262,14 @@ const editClassification = (classification) => {
                         <h3 class="text-xl font-bold text-white mb-2">Klasifikasi Mitra</h3>
                         <p class="text-green-100">
                             <span v-if="!hasApprovedSubmission">Selesaikan pengajuan seleksi terlebih dahulu</span>
-                            <span v-else-if="hasCurrentYearClassification">Anda sudah memiliki klasifikasi untuk tahun
-                                ini</span>
+                            <span v-else-if="hasCurrentYearClassification">Anda sudah memiliki klasifikasi untuk tahun ini</span>
                             <span v-else>Siap untuk melakukan klasifikasi mitra</span>
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3">
-                        <!-- v-if="hasApprovedSubmission && !hasCurrentYearClassification" -->
-                        <button @click="goToForm()"
+                        <button 
+                            v-if="hasApprovedSubmission && !hasCurrentYearClassification"
+                            @click="goToForm()"
                             class="inline-flex items-center px-6 py-3 bg-white text-green-600 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white transition-colors">
                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
@@ -278,6 +278,13 @@ const editClassification = (classification) => {
                             </svg>
                             Klasifikasi Baru
                         </button>
+                        
+                        <div v-if="hasCurrentYearClassification" class="flex items-center px-4 py-2 bg-white/20 rounded-lg">
+                            <svg class="w-5 h-5 text-white mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span class="text-white text-sm font-medium">Klasifikasi {{ currentYear }} Sudah Ada</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -417,7 +424,7 @@ const editClassification = (classification) => {
                             melakukan klasifikasi.</span>
                         <span v-else>Mulai dengan membuat klasifikasi mitra baru.</span>
                     </p>
-                    <div v-if="hasApprovedSubmission" class="mt-6">
+                    <div v-if="hasApprovedSubmission && !hasCurrentYearClassification" class="mt-6">
                         <button @click="goToForm()"
                             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">

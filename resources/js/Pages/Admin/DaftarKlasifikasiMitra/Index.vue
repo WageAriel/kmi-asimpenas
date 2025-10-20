@@ -1,7 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
 // Accept data from the controller as props
@@ -101,16 +101,34 @@ const formatDate = (dateString) => {
 const viewDetails = (item) => {
     selectedKlasifikasi.value = item;
     showModal.value = true;
+    showDropdown.value = false;
+    successMessage.value = '';
+    errorMessage.value = '';
 };
 
 // Close modal
 const closeModal = () => {
     showModal.value = false;
     selectedKlasifikasi.value = null;
+    showDropdown.value = false;
+    successMessage.value = '';
+    errorMessage.value = '';
 };
+
+// Dropdown state
+const showDropdown = ref(false);
+const isUpdating = ref(false);
+const successMessage = ref('');
+const errorMessage = ref('');
 
 // Update classification result
 const updateKlasifikasi = async (id, result) => {
+    if (isUpdating.value) return;
+    
+    isUpdating.value = true;
+    errorMessage.value = '';
+    successMessage.value = '';
+    
     try {
         await axios.put(`/klasifikasi-mitra/${id}`, {
             hasil_klasifikasi: result
@@ -126,11 +144,44 @@ const updateKlasifikasi = async (id, result) => {
         if (selectedKlasifikasi.value && selectedKlasifikasi.value.id_klasifikasi_mitra === id) {
             selectedKlasifikasi.value.hasil_klasifikasi = result;
         }
+        
+        successMessage.value = `Berhasil memverifikasi mitra ke Kelas ${result}`;
+        showDropdown.value = false;
+        
+        // Auto close success message after 3 seconds
+        setTimeout(() => {
+            successMessage.value = '';
+        }, 3000);
     } catch (error) {
         console.error('Error updating klasifikasi:', error);
-        alert('Gagal memperbarui hasil klasifikasi.');
+        errorMessage.value = 'Gagal memperbarui hasil klasifikasi. Silakan coba lagi.';
+    } finally {
+        isUpdating.value = false;
     }
 };
+
+// Toggle dropdown
+const toggleDropdown = () => {
+    showDropdown.value = !showDropdown.value;
+};
+
+// Close dropdown when clicking outside
+const handleClickOutside = (event) => {
+    const dropdown = document.getElementById('classification-dropdown');
+    if (dropdown && !dropdown.contains(event.target)) {
+        showDropdown.value = false;
+    }
+};
+
+// Add event listener on mount
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
+
+// Remove event listener on unmount
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>
@@ -251,34 +302,11 @@ const updateKlasifikasi = async (id, result) => {
                                 <p class="text-sm text-gray-500">Tanggal Klasifikasi</p>
                                 <p class="font-medium">{{ formatDate(selectedKlasifikasi.created_at) }}</p>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Hasil Klasifikasi</p>
-                                <div class="flex items-center space-x-2">
-                                    <span :class="['px-2 py-1 text-xs font-medium rounded-full', getClassificationColor(selectedKlasifikasi.hasil_klasifikasi)]">
-                                        {{ selectedKlasifikasi.hasil_klasifikasi ? `Kelas ${selectedKlasifikasi.hasil_klasifikasi}` : 'Belum Dinilai' }}
-                                    </span>
-                                    
-                                    <div class="flex space-x-1 ml-2" v-if="!selectedKlasifikasi.hasil_klasifikasi">
-                                        <button 
-                                            @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'A')"
-                                            class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs hover:bg-green-200"
-                                        >
-                                            A
-                                        </button>
-                                        <button 
-                                            @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'B')"
-                                            class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs hover:bg-blue-200"
-                                        >
-                                            B
-                                        </button>
-                                        <button 
-                                            @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'C')"
-                                            class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs hover:bg-yellow-200"
-                                        >
-                                            C
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="col-span-2">
+                                <p class="text-sm text-gray-500 mb-2">Hasil Klasifikasi</p>
+                                <span :class="['px-3 py-1.5 text-sm font-medium rounded-full inline-block', getClassificationColor(selectedKlasifikasi.hasil_klasifikasi)]">
+                                    {{ selectedKlasifikasi.hasil_klasifikasi ? `Kelas ${selectedKlasifikasi.hasil_klasifikasi}` : 'Belum Dinilai' }}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -399,10 +427,90 @@ const updateKlasifikasi = async (id, result) => {
                         </div>
                     </div>
                     
-                    <div class="flex justify-end space-x-3">
+                    <!-- Success/Error Messages -->
+                    <div v-if="successMessage" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ successMessage }}
+                    </div>
+                    
+                    <div v-if="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ errorMessage }}
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between items-center">
+                        <!-- Dropdown Button untuk Verifikasi Klasifikasi -->
+                        <div class="relative" id="classification-dropdown">
+                            <button 
+                                @click="toggleDropdown"
+                                :disabled="isUpdating || selectedKlasifikasi.hasil_klasifikasi"
+                                :class="[
+                                    'inline-flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-colors',
+                                    isUpdating || selectedKlasifikasi.hasil_klasifikasi
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500'
+                                ]"
+                            >
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span v-if="isUpdating">Memproses...</span>
+                                <span v-else-if="selectedKlasifikasi.hasil_klasifikasi">
+                                    Sudah Diverifikasi (Kelas {{ selectedKlasifikasi.hasil_klasifikasi }})
+                                </span>
+                                <span v-else>Verifikasi Klasifikasi</span>
+                                <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div 
+                                v-if="showDropdown && !selectedKlasifikasi.hasil_klasifikasi"
+                                class="absolute left-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10"
+                            >
+                                <button
+                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'A')"
+                                    class="w-full text-left px-4 py-2 text-sm hover:bg-green-50 flex items-center transition-colors"
+                                    :disabled="isUpdating"
+                                >
+                                    <span class="w-6 h-6 rounded-full bg-green-100 text-green-800 flex items-center justify-center mr-3 font-bold text-xs">
+                                        A
+                                    </span>
+                                    <span class="text-gray-700">Kelas A (Terbaik)</span>
+                                </button>
+                                <button
+                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'B')"
+                                    class="w-full text-left px-4 py-2 text-sm hover:bg-blue-50 flex items-center transition-colors"
+                                    :disabled="isUpdating"
+                                >
+                                    <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center mr-3 font-bold text-xs">
+                                        B
+                                    </span>
+                                    <span class="text-gray-700">Kelas B (Menengah)</span>
+                                </button>
+                                <button
+                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'C')"
+                                    class="w-full text-left px-4 py-2 text-sm hover:bg-yellow-50 flex items-center transition-colors"
+                                    :disabled="isUpdating"
+                                >
+                                    <span class="w-6 h-6 rounded-full bg-yellow-100 text-yellow-800 flex items-center justify-center mr-3 font-bold text-xs">
+                                        C
+                                    </span>
+                                    <span class="text-gray-700">Kelas C (Standar)</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tombol Tutup -->
                         <button 
                             @click="closeModal" 
-                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium text-sm"
                         >
                             Tutup
                         </button>

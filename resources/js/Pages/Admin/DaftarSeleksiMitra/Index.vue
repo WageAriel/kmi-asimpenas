@@ -80,6 +80,7 @@ const approveSeleksi = async () => {
     
     isLoading.value = true;
     errorMessage.value = null;
+    successMessage.value = null;
     
     try {
         const response = await axios.put(`/data-seleksi-mitra/${selectedItem.value.id_seleksi_mitra}`, {
@@ -94,15 +95,20 @@ const approveSeleksi = async () => {
         
         if (index !== -1) {
             props.seleksiMitras[index].status_seleksi = 'lolos';
+            selectedItem.value.status_seleksi = 'lolos';
         }
         
-        successMessage.value = 'Status berhasil diubah menjadi LOLOS';
+        successMessage.value = 'Status berhasil diubah menjadi LOLOS. Data hasil seleksi telah dibuat/diperbarui.';
         
-        // Optional: Close modal after short delay
-        // setTimeout(() => closeModal(), 2000);
+        // Close modal after delay
+        setTimeout(() => {
+            closeModal();
+            // Reload halaman untuk refresh data
+            window.location.reload();
+        }, 2000);
     } catch (error) {
         console.error('Error approving seleksi:', error);
-        errorMessage.value = 'Gagal mengubah status. Silakan coba lagi.';
+        errorMessage.value = error.response?.data?.message || 'Gagal mengubah status. Silakan coba lagi.';
     } finally {
         isLoading.value = false;
     }
@@ -114,6 +120,7 @@ const rejectSeleksi = async () => {
     
     isLoading.value = true;
     errorMessage.value = null;
+    successMessage.value = null;
     
     try {
         const response = await axios.put(`/data-seleksi-mitra/${selectedItem.value.id_seleksi_mitra}`, {
@@ -128,15 +135,20 @@ const rejectSeleksi = async () => {
         
         if (index !== -1) {
             props.seleksiMitras[index].status_seleksi = 'tidak lolos';
+            selectedItem.value.status_seleksi = 'tidak lolos';
         }
         
-        successMessage.value = 'Status berhasil diubah menjadi TIDAK LOLOS';
+        successMessage.value = 'Status berhasil diubah menjadi TIDAK LOLOS. Data hasil seleksi telah dibuat/diperbarui.';
         
-        // Optional: Close modal after short delay
-        // setTimeout(() => closeModal(), 2000);
+        // Close modal after delay
+        setTimeout(() => {
+            closeModal();
+            // Reload halaman untuk refresh data
+            window.location.reload();
+        }, 2000);
     } catch (error) {
         console.error('Error rejecting seleksi:', error);
-        errorMessage.value = 'Gagal mengubah status. Silakan coba lagi.';
+        errorMessage.value = error.response?.data?.message || 'Gagal mengubah status. Silakan coba lagi.';
     } finally {
         isLoading.value = false;
     }

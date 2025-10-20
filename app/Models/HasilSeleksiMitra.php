@@ -68,8 +68,12 @@ class HasilSeleksiMitra extends Model
             if ($hasilSeleksi->id_seleksi_mitra && $hasilSeleksi->kesimpulan_akhir) {
                 $seleksiMitra = DataSeleksiMitra::find($hasilSeleksi->id_seleksi_mitra);
                 if ($seleksiMitra) {
-                    $seleksiMitra->status_seleksi = strtolower($hasilSeleksi->kesimpulan_akhir);
-                    $seleksiMitra->save();
+                    // Prevent infinite loop - only update if different
+                    $newStatus = strtolower($hasilSeleksi->kesimpulan_akhir);
+                    if ($seleksiMitra->status_seleksi !== $newStatus) {
+                        $seleksiMitra->status_seleksi = $newStatus;
+                        $seleksiMitra->saveQuietly(); // Save without triggering events
+                    }
                 }
             }
         });
