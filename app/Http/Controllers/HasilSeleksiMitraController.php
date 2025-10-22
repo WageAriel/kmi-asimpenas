@@ -250,10 +250,127 @@ class HasilSeleksiMitraController extends Controller
         try {
             $seleksiMitra = $hasilSeleksiMitra->seleksiMitra;
             
-            // Proses ulang seperti di store()
-            // ... (logic yang sama seperti di store)
-            
-            $hasilSeleksiMitra->update($validated);
+            // Proses dokumen
+            $dokumenMapping = [
+                'surat_permohonan' => 'Surat Permohonan',
+                'akta_notaris' => 'Akta Notaris',
+                'nib' => 'NIB',
+                'ktp' => 'KTP',
+                'no_rekening' => 'No Rekening',
+                'npwp' => 'NPWP',
+                'surat_kuasa' => 'Surat Kuasa',
+            ];
+
+            $dokumenAdaValid = [];
+            $dokumenTidakAda = [];
+            $dokumenLolos = 0;
+            $dokumenTotal = 0;
+
+            foreach ($dokumenMapping as $field => $label) {
+                if ($seleksiMitra->$field === 'ada') {
+                    $dokumenTotal++;
+                    if (isset($validated[$field])) {
+                        if ($validated[$field] === 'Lolos') {
+                            $dokumenAdaValid[] = $label;
+                            $dokumenLolos++;
+                        } else {
+                            $dokumenTidakAda[] = $label;
+                        }
+                    }
+                }
+            }
+
+            $kesimpulanDokumen = ($dokumenTotal > 0 && $dokumenLolos === $dokumenTotal) ? 'Lolos' : 'Tidak Lolos';
+
+            // Proses sarana pengeringan
+            $pengeringanMapping = [
+                'lantai_jemur' => 'Lantai Jemur',
+                'sarana_lainnya' => 'Sarana Lainnya',
+            ];
+
+            $pengeringanAda = [];
+            $pengeringanTidakAda = [];
+            $pengeringanLolos = 0;
+            $pengeringanTotal = 0;
+
+            foreach ($pengeringanMapping as $field => $label) {
+                if ($seleksiMitra->$field === 'ada') {
+                    $pengeringanTotal++;
+                    if (isset($validated[$field])) {
+                        if ($validated[$field] === 'Lolos') {
+                            $pengeringanAda[] = $label;
+                            $pengeringanLolos++;
+                        } else {
+                            $pengeringanTidakAda[] = $label;
+                        }
+                    }
+                }
+            }
+
+            $kesimpulanPengeringan = ($pengeringanTotal > 0 && $pengeringanLolos === $pengeringanTotal) ? 'Lolos' : 'Tidak Lolos';
+
+            // Proses sarana penggilingan
+            $penggilinganMapping = [
+                'mesin_memecah_kulit' => 'Mesin Memecah Kulit',
+                'mesin_pemisah_gabah_dengan_beras' => 'Mesin Pemisah Gabah dengan Beras',
+                'mesin_penyosoh' => 'Mesin Penyosoh',
+                'alat_pemisah_beras' => 'Alat Pemisah Beras',
+            ];
+
+            $penggilinganAda = [];
+            $penggilinganTidakAda = [];
+            $penggilinganLolos = 0;
+            $penggilinganTotal = 0;
+
+            foreach ($penggilinganMapping as $field => $label) {
+                $seleksiField = ($field === 'mesin_pemisah_gabah_dengan_beras') ? 'mesin_pemisah_gabah' : $field;
+                
+                if ($seleksiMitra->$seleksiField === 'ada') {
+                    $penggilinganTotal++;
+                    if (isset($validated[$field])) {
+                        if ($validated[$field] === 'Lolos') {
+                            $penggilinganAda[] = $label;
+                            $penggilinganLolos++;
+                        } else {
+                            $penggilinganTidakAda[] = $label;
+                        }
+                    }
+                }
+            }
+
+            $kesimpulanPenggilingan = ($penggilinganTotal > 0 && $penggilinganLolos === $penggilinganTotal) ? 'Lolos' : 'Tidak Lolos';
+
+            // Tentukan kesimpulan akhir
+            $kesimpulanAkhir = ($kesimpulanDokumen === 'Lolos' && 
+                               $kesimpulanPengeringan === 'Lolos' && 
+                               $kesimpulanPenggilingan === 'Lolos') ? 'Lolos' : 'Tidak Lolos';
+
+            // Update hasil seleksi
+            $hasilSeleksiMitra->update([
+                'surat_permohonan' => $validated['surat_permohonan'] ?? null,
+                'akta_notaris' => $validated['akta_notaris'] ?? null,
+                'nib' => $validated['nib'] ?? null,
+                'ktp' => $validated['ktp'] ?? null,
+                'no_rekening' => $validated['no_rekening'] ?? null,
+                'npwp' => $validated['npwp'] ?? null,
+                'surat_kuasa' => $validated['surat_kuasa'] ?? null,
+                'lantai_jemur' => $validated['lantai_jemur'] ?? null,
+                'sarana_lainnya' => $validated['sarana_lainnya'] ?? null,
+                'mesin_memecah_kulit' => $validated['mesin_memecah_kulit'] ?? null,
+                'mesin_pemisah_gabah_dengan_beras' => $validated['mesin_pemisah_gabah_dengan_beras'] ?? null,
+                'mesin_penyosoh' => $validated['mesin_penyosoh'] ?? null,
+                'alat_pemisah_beras' => $validated['alat_pemisah_beras'] ?? null,
+                'kesimpulan_dokumen' => $kesimpulanDokumen,
+                'dokumen_ada_valid' => $dokumenAdaValid,
+                'dokumen_tidak_ada' => $dokumenTidakAda,
+                'kesimpulan_sarana_pengeringan' => $kesimpulanPengeringan,
+                'sarana_pengeringan_ada' => $pengeringanAda,
+                'sarana_pengeringan_tidak_ada' => $pengeringanTidakAda,
+                'kesimpulan_sarana_penggilingan' => $kesimpulanPenggilingan,
+                'sarana_penggilingan_ada' => $penggilinganAda,
+                'sarana_penggilingan_tidak_ada' => $penggilinganTidakAda,
+                'kesimpulan_akhir' => $kesimpulanAkhir,
+            ]);
             
             DB::commit();
             

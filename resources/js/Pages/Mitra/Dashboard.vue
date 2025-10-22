@@ -29,6 +29,7 @@ const mitraInfo = ref({
 });
 
 const urgentNotifications = ref([]);
+const birthdayNotifications = ref([]);
 const selections = ref([]);
 const klasifikasis = ref([]);
 const recentActivities = ref([]); // ✅ Ubah dari dummy ke empty array
@@ -134,6 +135,9 @@ onMounted(async () => {
 
     // ✅ Load activities dari API
     await loadActivities();
+    
+    // ✅ Load birthday notifications
+    await loadBirthdayNotifications();
 });
 
 // ✅ Function untuk load activities
@@ -167,6 +171,53 @@ const refreshActivities = async () => {
     } finally {
         isLoadingActivities.value = false;
     }
+};
+
+// ✅ Load birthday notifications
+const loadBirthdayNotifications = async () => {
+    try {
+        console.log('🎂 Loading birthday notifications...');
+        const response = await axios.get('/data-mitra/birthdays', {
+            params: { days: 7 } // 7 hari ke depan
+        });
+        
+        console.log('🎂 Birthday API Response:', response.data);
+        
+        const birthdays = response.data || [];
+        console.log('🎂 Total birthdays found:', birthdays.length);
+        
+        // Filter only today's birthdays for urgent notifications
+        const todayBirthdays = birthdays.filter(b => b.is_today);
+        console.log('🎂 Today birthdays:', todayBirthdays.length);
+        
+        // Add to birthday notifications
+        birthdayNotifications.value = birthdays;
+        
+        // Add today's birthdays to urgent notifications
+        todayBirthdays.forEach(birthday => {
+            console.log('🎂 Adding urgent notification for:', birthday.nama_cp);
+            urgentNotifications.value.push({
+                id: `birthday-${birthday.id_mitra}`,
+                type: 'birthday',
+                title: '🎉 Ulang Tahun Hari Ini!',
+                message: `${birthday.nama_cp} dari ${birthday.nama_perusahaan} berulang tahun ke-${birthday.age} hari ini!`,
+                action: 'Kirim Ucapan',
+                birthday_data: birthday,
+                urgent: true
+            });
+        });
+        
+        console.log('🎂 Birthday notifications loaded successfully');
+    } catch (error) {
+        console.error('❌ Error loading birthdays:', error);
+        console.error('❌ Error details:', error.response?.data);
+        birthdayNotifications.value = [];
+    }
+};
+
+// Dismiss birthday notification
+const dismissBirthdayNotification = (notificationId) => {
+    dismissNotification(notificationId);
 };
 
 // ✅ Helper untuk warna status aktivitas berdasarkan status
@@ -327,13 +378,18 @@ const goToAction = (action) => {
                     <div v-for="notification in urgentNotifications" :key="notification.id"
                          :class="[
                              'p-6 rounded-xl border-l-4 mb-4 shadow-sm',
-                             notification.type === 'warning' ? 'bg-red-50 border-red-400' : 'bg-blue-50 border-blue-400'
+                             notification.type === 'warning' ? 'bg-red-50 border-red-400' : 
+                             notification.type === 'birthday' ? 'bg-purple-50 border-purple-400' : 
+                             'bg-blue-50 border-blue-400'
                          ]">
                         <div class="flex justify-between items-start">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     <svg v-if="notification.type === 'warning'" class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <svg v-else-if="notification.type === 'birthday'" class="h-4 w-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z"/>
                                     </svg>
                                     <svg v-else class="h-4 w-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
@@ -342,18 +398,22 @@ const goToAction = (action) => {
                                 <div class="ml-4">
                                     <h3 :class="[
                                         'text-base font-semibold',
-                                        notification.type === 'warning' ? 'text-red-800' : 'text-blue-800'
+                                        notification.type === 'warning' ? 'text-red-800' : 
+                                        notification.type === 'birthday' ? 'text-purple-800' : 
+                                        'text-blue-800'
                                     ]">{{ notification.title }}</h3>
                                     <p :class="[
                                         'text-sm mt-1',
-                                        notification.type === 'warning' ? 'text-red-700' : 'text-blue-700'
+                                        notification.type === 'warning' ? 'text-red-700' : 
+                                        notification.type === 'birthday' ? 'text-purple-700' : 
+                                        'text-blue-700'
                                     ]">{{ notification.message }}</p>
-                                    <div class="mt-4">
+                                    <div class="mt-4" v-if="notification.action">
                                         <button @click="goToAction(notification)" :class="[
                                             'text-sm font-medium px-4 py-2 rounded-lg transition-colors',
-                                            notification.type === 'warning' 
-                                                ? 'bg-red-100 text-red-800 hover:bg-red-200' 
-                                                : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                                            notification.type === 'warning' ? 'bg-red-100 text-red-800 hover:bg-red-200' : 
+                                            notification.type === 'birthday' ? 'bg-purple-100 text-purple-800 hover:bg-purple-200' :
+                                            'bg-blue-100 text-blue-800 hover:bg-blue-200'
                                         ]">
                                             {{ notification.action }}
                                         </button>
@@ -365,6 +425,59 @@ const goToAction = (action) => {
                                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                 </svg>
                             </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Birthday Widget (Upcoming Birthdays) -->
+                <div v-if="birthdayNotifications.length > 0" class="mb-6">
+                    <div class="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl shadow-sm border border-purple-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex items-center justify-center h-10 w-10 rounded-xl bg-purple-100">
+                                    <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                    </svg>
+                                </div>
+                                <h3 class="ml-3 text-lg font-semibold text-purple-900">
+                                    🎂 Ulang Tahun Mitra
+                                </h3>
+                            </div>
+                            <span class="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                                {{ birthdayNotifications.length }} Mitra
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div 
+                                v-for="birthday in birthdayNotifications.slice(0, 5)" 
+                                :key="birthday.id_mitra"
+                                class="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-100 hover:border-purple-300 transition-colors"
+                            >
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold">
+                                            {{ birthday.nama_cp ? birthday.nama_cp.charAt(0).toUpperCase() : '?' }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">{{ birthday.nama_cp }}</p>
+                                        <p class="text-xs text-gray-500">{{ birthday.nama_perusahaan }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-semibold text-purple-600">
+                                        {{ birthday.is_today ? 'Hari Ini! 🎉' : `${birthday.days_until} hari lagi` }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">Usia: {{ birthday.age }} tahun</p>
+                                </div>
+                            </div>
+                            
+                            <div v-if="birthdayNotifications.length > 5" class="text-center pt-2">
+                                <button class="text-sm text-purple-600 hover:text-purple-800 font-medium">
+                                    Lihat {{ birthdayNotifications.length - 5 }} lainnya →
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

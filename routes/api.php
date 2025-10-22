@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->get('/data-mitra/my', [DataMitraController::class, 'myMitra']);
+Route::middleware('auth:sanctum')->get('/data-mitra/birthdays', [DataMitraController::class, 'getBirthdays']);
 Route::middleware('auth:sanctum')->get('/data-seleksi-mitra/my', [DataSeleksiMitraController::class, 'mySeleksi']);
 Route::middleware('auth:sanctum')->get('/klasifikasi-mitra/my', [KlasifikasiMitraController::class, 'myKlasifikasi']);
 Route::middleware('auth:sanctum')->get('/hasil-seleksi-mitra/my', [HasilSeleksiMitraController::class, 'myHasilSeleksi']);

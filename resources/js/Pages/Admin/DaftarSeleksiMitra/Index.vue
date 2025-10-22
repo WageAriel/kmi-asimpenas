@@ -402,8 +402,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_surat_permohonan"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -429,8 +430,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_akta_notaris"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -456,8 +458,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_nib"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -480,8 +483,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_ktp"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -507,8 +511,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_no_rekening"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -534,8 +539,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_npwp"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -561,8 +567,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_surat_kuasa"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -589,8 +596,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_lantai_jemur"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -611,8 +619,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_sarana_lainnya"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -639,8 +648,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_mesin_memecah_kulit"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -648,7 +658,6 @@ const rejectSeleksi = async () => {
                                     </select>
                                 </div>
                             </div>
-
                             <!-- Mesin Pemisah Gabah -->
                             <div class="grid grid-cols-1 md:grid-cols-3 items-center p-2 rounded-lg hover:bg-gray-50">
                                 <div>
@@ -661,8 +670,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_mesin_pemisah_gabah"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -670,7 +680,6 @@ const rejectSeleksi = async () => {
                                     </select>
                                 </div>
                             </div>
-
                             <!-- Mesin Penyosoh -->
                             <div class="grid grid-cols-1 md:grid-cols-3 items-center p-2 rounded-lg hover:bg-gray-50">
                                 <div>
@@ -683,8 +692,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_mesin_penyosoh"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
@@ -692,7 +702,6 @@ const rejectSeleksi = async () => {
                                     </select>
                                 </div>
                             </div>
-
                             <!-- Alat Pemisah Beras -->
                             <div class="grid grid-cols-1 md:grid-cols-3 items-center p-2 rounded-lg hover:bg-gray-50">
                                 <div>
@@ -705,8 +714,9 @@ const rejectSeleksi = async () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Status Kelayakan</p>
                                     <select 
-                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         v-model="selectedItem.status_alat_pemisah_beras"
+                                        :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
                                         <option value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\ActivityAggregatorService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+
 class DataMitraController extends Controller
 {
     
@@ -133,5 +134,69 @@ class DataMitraController extends Controller
         $mitra = DataMitra::findOrFail($id);
         $mitra->delete();
         return response()->json(['message' => 'Data mitra berhasil dihapus']);
+    }
+
+    /**
+     * Get mitra birthdays (today and upcoming)
+     */
+    public function getBirthdays(Request $request)
+    {
+        $days = (int) $request->input('days', 7); // Default 7 hari ke depan, cast to int
+        
+        $now = now();
+        $today = $now->copy()->startOfDay();
+        $endDate = $now->copy()->addDays($days)->endOfDay();
+        $currentYear = $now->year;
+        
+        // Get all mitra with tanggal_lahir
+        $mitras = DataMitra::whereNotNull('tanggal_lahir')
+            ->get()
+            ->filter(function ($mitra) use ($today, $endDate, $currentYear) {
+                if (!$mitra->tanggal_lahir) {
+                    return false;
+                }
+                
+                // Convert string to Carbon and get birthday this year
+                $birthDate = \Carbon\Carbon::parse($mitra->tanggal_lahir);
+                $birthday = \Carbon\Carbon::create($currentYear, $birthDate->month, $birthDate->day, 0, 0, 0);
+                
+                // Check if birthday is between today and endDate
+                return $birthday->between($today, $endDate);
+            })
+            ->map(function ($mitra) use ($today, $currentYear) {
+                $birthDate = \Carbon\Carbon::parse($mitra->tanggal_lahir);
+                $birthday = \Carbon\Carbon::create($currentYear, $birthDate->month, $birthDate->day, 0, 0, 0);
+                $age = $currentYear - $birthDate->year;
+                
+                // Calculate days until birthday
+                $daysUntil = (int) $today->diffInDays($birthday->copy());
+                
+                // Check if birthday is in the past this year
+                if ($birthday->lt($today)) {
+                    $daysUntil = 0; // Already passed
+                }
+                
+                // Check if today is the birthday
+                $isToday = $today->isSameDay($birthday);
+                if ($isToday) {
+                    $daysUntil = 0;
+                }
+                
+                return [
+                    'id_mitra' => $mitra->id_mitra,
+                    'nama_perusahaan' => $mitra->nama_perusahaan,
+                    'nama_cp' => $mitra->nama_cp,
+                    'tanggal_lahir' => $birthDate->format('Y-m-d'),
+                    'birthday_this_year' => $birthday->format('Y-m-d'),
+                    'age' => $age,
+                    'days_until' => $daysUntil,
+                    'is_today' => $isToday,
+                    'formatted_date' => $birthday->format('d F Y'),
+                ];
+            })
+            ->sortBy('days_until')
+            ->values();
+        
+        return response()->json($mitras);
     }
 }

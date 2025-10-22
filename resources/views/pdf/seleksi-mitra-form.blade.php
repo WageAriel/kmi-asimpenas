@@ -8,7 +8,7 @@
             font-family: 'Times New Roman', Times, serif;
             font-size: 11pt;
             line-height: 1.3;
-            margin: 3cm 2cm 2cm 2cm;
+            margin: 2cm 2cm 2cm 2cm;
         }
         .header {
             text-align: center;
@@ -39,7 +39,7 @@
         th, td {
             padding: 5px;
             text-align: left;
-            vertical-align: top;
+            vertical-align: middle;
         }
         .section-title {
             font-weight: bold;
@@ -67,29 +67,26 @@
             border-bottom: none;
         }
         .data-item {
-        display: flex;
-        margin-bottom: 2px;
-        flex-wrap: nowrap;
-        overflow: visible;
+            margin-bottom: 3px;
+            line-height: 1.5;
         }
-        .label {
-            width: 250px;  /* Perbesar lebar untuk mencakup nomor dan teks label */
-            flex-shrink: 0;
-            white-space: nowrap;
+        .data-item table {
+            border: none;
+            margin: 0;
         }
-        .colon {
-            width: 10px;
-            flex-shrink: 0;
-            white-space: nowrap;
-        }
-        .value {
-            flex: 1;
+        .data-item td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
         }
         .section-heading {
             font-weight: bold;
             text-transform: uppercase;
             margin-top: 15px;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .masa-berlaku {
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -104,129 +101,196 @@
 
     <!-- Bagian 1 - Data Seleksi -->
     <div class="data-item">
-        <span class="label">Nomor Urut Seleksi</span>
-        <span class="colon">:</span>
-        <span>{{ $nomor_urut_seleksi }}</span>
+        <table>
+            <tr>
+                <td width="200">Nomor Urut Seleksi</td>
+                <td width="10">:</td>
+                <td>{{ $nomor_urut_seleksi }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">Tanggal Seleksi</span>
-        <span class="colon">:</span>
-        <span>{{ $tanggal_seleksi }}</span>
+        <table>
+            <tr>
+                <td width="200">Tanggal Seleksi</td>
+                <td width="10">:</td>
+                <td>{{ $tanggal_seleksi }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">Nomor Entitas Bulog</span>
-        <span class="colon">:</span>
-        <span>{{ $mitra->no_vms ?? '-' }}</span>
+        <table>
+            <tr>
+                <td width="200">Nomor Entitas Bulog</td>
+                <td width="10">:</td>
+                <td>{{ $nomor_entitas_bulog }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">Unit Pelaksana Seleksi</span>
-        <span class="colon">:</span>
-        <span>ASIMPENAS</span>
+        <table>
+            <tr>
+                <td width="200">Unit Pelaksana Seleksi</td>
+                <td width="10">:</td>
+                <td>{{ $unit_pelaksana }}</td>
+            </tr>
+        </table>
     </div>
 
     <!-- Bagian 2 - Data Calon Mitra Kerja -->
     <div class="section-heading">DATA CALON MITRA KERJA</div>
     <div class="data-item">
-        <span class="label">1&nbsp;&nbsp;&nbsp;Nama Perusahaan</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->nama_perusahaan }}</span>
+        <table>
+            <tr>
+                <td width="200">1 Nama Perusahaan</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->nama_perusahaan }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">2&nbsp;&nbsp;&nbsp;Badan Hukum/Usaha</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->badan_hukum_usaha }}</span>
+        <table>
+            <tr>
+                <td width="200">2 Badan Hukum/Usaha</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->badan_hukum_usaha }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">3&nbsp;&nbsp;&nbsp;Alamat Perusahaan</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->alamat_perusahaan }}</span>
+        <table>
+            <tr>
+                <td width="200">3 Alamat Perusahaan</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->alamat_perusahaan }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">4&nbsp;&nbsp;&nbsp;Nomor Telp Perusahaan</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->no_telp_perusahaan }}</span>
+        <table>
+            <tr>
+                <td width="200">4 Nomor Telp Perusahaan</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->no_telp_perusahaan }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">5&nbsp;&nbsp;&nbsp;Nama Contact Person</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->nama_cp }}</span>
+        <table>
+            <tr>
+                <td width="200">5 Nama Contact Person</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->nama_cp }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">6&nbsp;&nbsp;&nbsp;Nomor Telp/HP Contact Person</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->no_telp_cp }}</span>
+        <table>
+            <tr>
+                <td width="200">6 Nomor Telp/HP Contact Person</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->no_telp_cp }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">7&nbsp;&nbsp;&nbsp;Nama Bank Koresponden</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->bank_korespondensi }}</span>
+        <table>
+            <tr>
+                <td width="200">7 Nama Bank Koresponden</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->bank_korespondensi }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">8&nbsp;&nbsp;&nbsp;Alamat Bank Koresponden</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->alamat_bank }}</span>
+        <table>
+            <tr>
+                <td width="200">8 Alamat Bank Koresponden</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->alamat_bank }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">9&nbsp;&nbsp;&nbsp;Nomor Rekening</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->no_rekening }}</span>
+        <table>
+            <tr>
+                <td width="200">9 Nomor Rekening</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->no_rekening }}</td>
+            </tr>
+        </table>
     </div>
     <div class="data-item">
-        <span class="label">10&nbsp;Status</span>
-        <span class="colon">:</span>
-        <span class="value">{{ $mitra->status_perusahaan }}</span>
+        <table>
+            <tr>
+                <td width="200">10 Status</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->status_perusahaan }}</td>
+            </tr>
+        </table>
     </div>
 
     <!-- Bagian 3 - Dokumen Perizinan -->
     <div class="section-title">DOKUMEN PERIJINAN</div>
     <table>
         <tr>
-            <th width="5%">No</th>
-            <th width="50%">Uraian</th>
-            <th width="30%">Keterangan</th>
-            <th width="15%">Masa Berlaku</th>
+            <th width="5%" rowspan="2" style="text-align: center;">No</th>
+            <th width="45%" rowspan="2" style="text-align: center;">Uraian</th>
+            <th colspan="2" style="text-align: center;">Keterangan</th>
+            <th width="15%" rowspan="2" style="text-align: center;">Masa Berlaku</th>
         </tr>
         <tr>
-            <td>1</td>
+            <th width="17.5%" style="text-align: center;">1. Ada</th>
+            <th width="17.5%" style="text-align: center;">2. Tidak Ada</th>
+        </tr>
+        <tr>
+            <td style="text-align: center;">1</td>
             <td>Surat Permohonan</td>
-            <td align="center">{{ $seleksi->surat_permohonan === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
-            <td>{{ $seleksi->mb_surat_permohonan }}</td>
+            <td style="text-align: center;">@if($seleksi->surat_permohonan === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->surat_permohonan !== 'ada')<strong>V</strong>@endif</td>
+            <td class="masa-berlaku">{{ $seleksi->mb_surat_permohonan ?? '-' }}</td>
         </tr>
         <tr>
-            <td>2</td>
+            <td style="text-align: center;">2</td>
             <td>Akta Notaris</td>
-            <td align="center">{{ $seleksi->akta_notaris === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
-            <td>{{ $seleksi->mb_akta_notaris }}</td>
+            <td style="text-align: center;">@if($seleksi->akta_notaris === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->akta_notaris !== 'ada')<strong>V</strong>@endif</td>
+            <td class="masa-berlaku">{{ $seleksi->mb_akta_notaris ?? '-' }}</td>
         </tr>
         <tr>
-            <td>3</td>
+            <td style="text-align: center;">3</td>
             <td>NIB</td>
-            <td align="center">{{ $seleksi->nib === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
-            <td>{{ $seleksi->mb_nib }}</td>
+            <td style="text-align: center;">@if($seleksi->nib === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->nib !== 'ada')<strong>V</strong>@endif</td>
+            <td class="masa-berlaku">{{ $seleksi->mb_nib ?? '-' }}</td>
         </tr>
         <tr>
-            <td>4</td>
+            <td style="text-align: center;">4</td>
             <td>KTP</td>
-            <td align="center">{{ $seleksi->ktp === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
-            <td>{{ $seleksi->mb_ktp }}</td>
+            <td style="text-align: center;">@if($seleksi->ktp === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->ktp !== 'ada')<strong>V</strong>@endif</td>
+            <td class="masa-berlaku">{{ $seleksi->mb_ktp ?? '-' }}</td>
         </tr>
         <tr>
-            <td>5</td>
+            <td style="text-align: center;">5</td>
             <td>No Rekening</td>
-            <td align="center">{{ $seleksi->no_rekening === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
-            <td>{{ $seleksi->mb_no_rekening }}</td>
+            <td style="text-align: center;">@if($seleksi->no_rekening === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->no_rekening !== 'ada')<strong>V</strong>@endif</td>
+            <td class="masa-berlaku">{{ $seleksi->mb_no_rekening ?? '-' }}</td>
         </tr>
         <tr>
-            <td>6</td>
+            <td style="text-align: center;">6</td>
             <td>NPWP</td>
-            <td align="center">{{ $seleksi->npwp === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
-            <td>{{ $seleksi->mb_npwp }}</td>
+            <td style="text-align: center;">@if($seleksi->npwp === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->npwp !== 'ada')<strong>V</strong>@endif</td>
+            <td class="masa-berlaku">{{ $seleksi->mb_npwp ?? '-' }}</td>
         </tr>
         <tr>
-            <td>7</td>
+            <td style="text-align: center;">7</td>
             <td>Surat Kuasa</td>
-            <td align="center">{{ $seleksi->surat_kuasa === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
-            <td>{{ $seleksi->mb_surat_kuasa }}</td>
+            <td style="text-align: center;">@if($seleksi->surat_kuasa === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->surat_kuasa !== 'ada')<strong>V</strong>@endif</td>
+            <td class="masa-berlaku">{{ $seleksi->mb_surat_kuasa ?? '-' }}</td>
         </tr>
     </table>
 
@@ -234,19 +298,25 @@
     <div class="section-title">SARANA PENGERINGAN</div>
     <table>
         <tr>
-            <th width="5%">No</th>
-            <th width="70%">Uraian</th>
-            <th width="25%">Keterangan</th>
+            <th width="5%" rowspan="2" style="text-align: center;">No</th>
+            <th width="60%" rowspan="2" style="text-align: center;">Uraian</th>
+            <th colspan="2" style="text-align: center;">Keterangan</th>
         </tr>
         <tr>
-            <td>1</td>
+            <th width="17.5%" style="text-align: center;">1. Ada</th>
+            <th width="17.5%" style="text-align: center;">2. Tidak Ada</th>
+        </tr>
+        <tr>
+            <td style="text-align: center;">1</td>
             <td>Lantai Jemur</td>
-            <td align="center">{{ $seleksi->lantai_jemur === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
+            <td style="text-align: center;">@if($seleksi->lantai_jemur === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->lantai_jemur !== 'ada')<strong>V</strong>@endif</td>
         </tr>
         <tr>
-            <td>2</td>
+            <td style="text-align: center;">2</td>
             <td>Sarana Lainnya</td>
-            <td align="center">{{ $seleksi->sarana_lainnya === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
+            <td style="text-align: center;">@if($seleksi->sarana_lainnya === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->sarana_lainnya !== 'ada')<strong>V</strong>@endif</td>
         </tr>
     </table>
 
@@ -254,29 +324,37 @@
     <div class="section-title">SARANA PENGGILINGAN</div>
     <table>
         <tr>
-            <th width="5%">No</th>
-            <th width="70%">Uraian</th>
-            <th width="25%">Keterangan</th>
+            <th width="5%" rowspan="2" style="text-align: center;">No</th>
+            <th width="60%" rowspan="2" style="text-align: center;">Uraian</th>
+            <th colspan="2" style="text-align: center;">Keterangan</th>
         </tr>
         <tr>
-            <td>1</td>
+            <th width="17.5%" style="text-align: center;">1. Ada</th>
+            <th width="17.5%" style="text-align: center;">2. Tidak Ada</th>
+        </tr>
+        <tr>
+            <td style="text-align: center;">1</td>
             <td>Mesin Pemecah Kulit</td>
-            <td align="center">{{ $seleksi->mesin_memecah_kulit === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
+            <td style="text-align: center;">@if($seleksi->mesin_memecah_kulit === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_memecah_kulit !== 'ada')<strong>V</strong>@endif</td>
         </tr>
         <tr>
-            <td>2</td>
+            <td style="text-align: center;">2</td>
             <td>Mesin Pemisah Gabah</td>
-            <td align="center">{{ $seleksi->mesin_pemisah_gabah === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
+            <td style="text-align: center;">@if($seleksi->mesin_pemisah_gabah === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_pemisah_gabah !== 'ada')<strong>V</strong>@endif</td>
         </tr>
         <tr>
-            <td>3</td>
+            <td style="text-align: center;">3</td>
             <td>Mesin Penyosoh</td>
-            <td align="center">{{ $seleksi->mesin_penyosoh === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
+            <td style="text-align: center;">@if($seleksi->mesin_penyosoh === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_penyosoh !== 'ada')<strong>V</strong>@endif</td>
         </tr>
         <tr>
-            <td>4</td>
+            <td style="text-align: center;">4</td>
             <td>Alat Pemisah Beras</td>
-            <td align="center">{{ $seleksi->alat_pemisah_beras === 'ada' ? '1. Ada' : '2. Tidak Ada' }}</td>
+            <td style="text-align: center;">@if($seleksi->alat_pemisah_beras === 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->alat_pemisah_beras !== 'ada')<strong>V</strong>@endif</td>
         </tr>
     </table>
 

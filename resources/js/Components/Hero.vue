@@ -1,6 +1,36 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
-import logoImg from '@/../../resources/assets/Images/bulog.png'; 
+import { Link, router, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import logoImg from '@/../../resources/assets/Images/bulog.png';
+
+const page = usePage();
+const user = computed(() => page.props.auth.user);
+const isAuthenticated = computed(() => !!user.value);
+
+// Get dashboard route based on user role
+const dashboardRoute = computed(() => {
+    if (!user.value) return '/login';
+    
+    if (user.value.role === 'admin') {
+        return '/admin/dashboard';
+    }
+    
+    if (user.value.role === 'mitra') {
+        return '/mitra/dashboard';
+    }
+    
+    return '/dashboard';
+});
+
+// Handle logout
+const handleLogout = () => {
+    router.post('/logout', {}, {
+        onSuccess: () => {
+            // Redirect to landing page after logout
+            router.visit('/');
+        }
+    });
+};
 </script>
 
 <template>
@@ -18,19 +48,56 @@ import logoImg from '@/../../resources/assets/Images/bulog.png';
                     </div>
                 </div>
 
-                <div class="flex gap-3">
-                    <Link 
-                        href="/login" 
-                        class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
-                    >
-                        Login
-                    </Link>
-                    <Link 
-                        href="/register" 
-                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    >
-                        Register
-                    </Link>
+                <!-- Conditional Buttons: Show different buttons based on auth status -->
+                <div class="flex gap-3 items-center">
+                    <!-- When user is NOT logged in -->
+                    <template v-if="!isAuthenticated">
+                        <Link 
+                            href="/login" 
+                            class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                        >
+                            Login
+                        </Link>
+                        <Link 
+                            href="/register" 
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        >
+                            Register
+                        </Link>
+                    </template>
+
+                    <!-- When user IS logged in -->
+                    <template v-else>
+                        <div class="flex items-center gap-3">
+                            <!-- User Info -->
+                            <div class="hidden sm:block text-right">
+                                <p class="text-sm font-medium text-gray-800">{{ user.name }}</p>
+                                <p class="text-xs text-gray-500 capitalize">{{ user.role }}</p>
+                            </div>
+
+                            <!-- Dashboard Button -->
+                            <Link 
+                                :href="dashboardRoute" 
+                                class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium flex items-center gap-2"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                Dashboard
+                            </Link>
+
+                            <!-- Logout Button -->
+                            <button 
+                                @click="handleLogout"
+                                class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center gap-2"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Logout
+                            </button>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
@@ -47,18 +114,34 @@ import logoImg from '@/../../resources/assets/Images/bulog.png';
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link 
-                        href="/register"
-                        class="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg"
-                    >
-                        Daftar untuk Seleksi PO
-                    </Link>
-                    <Link 
-                        href="/login"
-                        class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-colors"
-                    >
-                        Sudah Punya Akun?
-                    </Link>
+                    <!-- When NOT logged in -->
+                    <template v-if="!isAuthenticated">
+                        <Link 
+                            href="/register"
+                            class="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg"
+                        >
+                            Daftar untuk Seleksi PO
+                        </Link>
+                        <Link 
+                            href="/login"
+                            class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-colors"
+                        >
+                            Sudah Punya Akun?
+                        </Link>
+                    </template>
+
+                    <!-- When logged in -->
+                    <template v-else>
+                        <Link 
+                            :href="dashboardRoute"
+                            class="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg inline-flex items-center justify-center gap-2"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            Ke Dashboard
+                        </Link>
+                    </template>
                 </div>
             </div>
 
@@ -244,19 +327,37 @@ import logoImg from '@/../../resources/assets/Images/bulog.png';
 
                 <!-- Call to Action -->
                 <div class="text-center bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-12 text-white">
-                    <h2 class="text-3xl font-bold mb-4">Siap Mengikuti Seleksi Mitra PO?</h2>
-                    <p class="text-xl mb-8 text-blue-100">
-                        Daftarkan perusahaan Anda untuk mengikuti proses seleksi dan berpeluang mendapatkan Purchase Order dari kami
-                    </p>
-                    <Link 
-                        href="/register"
-                        class="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"
-                    >
-                        Daftar Seleksi Sekarang
-                        <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L8 12.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                        </svg>
-                    </Link>
+                    <template v-if="!isAuthenticated">
+                        <h2 class="text-3xl font-bold mb-4">Siap Mengikuti Seleksi Mitra PO?</h2>
+                        <p class="text-xl mb-8 text-blue-100">
+                            Daftarkan perusahaan Anda untuk mengikuti proses seleksi dan berpeluang mendapatkan Purchase Order dari kami
+                        </p>
+                        <Link 
+                            href="/register"
+                            class="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"
+                        >
+                            Daftar Seleksi Sekarang
+                            <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L8 12.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </Link>
+                    </template>
+                    
+                    <template v-else>
+                        <h2 class="text-3xl font-bold mb-4">Selamat Datang, {{ user.name }}! 👋</h2>
+                        <p class="text-xl mb-8 text-blue-100">
+                            Anda sudah terdaftar sebagai <span class="font-bold capitalize">{{ user.role }}</span>. Akses dashboard untuk mengelola data dan pengajuan Anda
+                        </p>
+                        <Link 
+                            :href="dashboardRoute"
+                            class="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"
+                        >
+                            Buka Dashboard
+                            <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L8 12.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </Link>
+                    </template>
                 </div>
             </div>
         </div>
