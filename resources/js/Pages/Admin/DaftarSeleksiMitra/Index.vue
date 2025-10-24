@@ -43,6 +43,8 @@ const selectedItem = ref(null);
 const isLoading = ref(false);
 const errorMessage = ref(null);
 const successMessage = ref(null);
+const hasilSeleksi = ref(null);
+const loadingHasilSeleksi = ref(false);
 
 // Format the date values
 const formatDate = (dateString) => {
@@ -60,18 +62,42 @@ const getStatusBadge = (val) => {
         : 'bg-red-100 text-red-800';
 };
 
+// Function to fetch hasil seleksi
+const fetchHasilSeleksi = async (idSeleksiMitra) => {
+    loadingHasilSeleksi.value = true;
+    hasilSeleksi.value = null;
+    
+    try {
+        const response = await axios.get(`/hasil-seleksi-mitra/by-seleksi/${idSeleksiMitra}`);
+        hasilSeleksi.value = response.data;
+    } catch (error) {
+        // Jika 404, berarti belum ada hasil seleksi
+        if (error.response?.status === 404) {
+            hasilSeleksi.value = null;
+        } else {
+            console.error('Error fetching hasil seleksi:', error);
+        }
+    } finally {
+        loadingHasilSeleksi.value = false;
+    }
+};
+
 // Function to open modal instead of navigating
-const lihatSeleksi = (item) => {
+const lihatSeleksi = async (item) => {
     selectedItem.value = item;
     showModal.value = true;
     errorMessage.value = null;
     successMessage.value = null;
+    
+    // Always try to fetch hasil seleksi
+    await fetchHasilSeleksi(item.id_seleksi_mitra);
 };
 
 // Function to close modal
 const closeModal = () => {
     showModal.value = false;
     selectedItem.value = null;
+    hasilSeleksi.value = null;
 };
 
 // Function to update status seleksi to "lolos"
@@ -381,6 +407,8 @@ const rejectSeleksi = async () => {
                         </div>
                     </div>
                     
+                    <!-- Form Seleksi - Hanya tampil jika belum ada hasil validasi -->
+                    <template v-if="!hasilSeleksi && !loadingHasilSeleksi">
                     <!-- Dokumen Perizinan -->
                     <div class="border-b border-gray-200 pb-5">
                         <h3 class="text-lg font-semibold mb-3">Dokumen Perizinan</h3>
@@ -726,6 +754,8 @@ const rejectSeleksi = async () => {
                             </div>
                         </div>
                     </div>
+                    </template>
+                    <!-- End Form Seleksi -->
                     
                     <!-- Status messages -->
                     <div v-if="errorMessage" class="bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded">
@@ -736,34 +766,244 @@ const rejectSeleksi = async () => {
                         {{ successMessage }}
                     </div>
                     
+                    <!-- Hasil Seleksi Section -->
+                    <div v-if="loadingHasilSeleksi" class="border-t border-gray-200 pt-5">
+                        <div class="flex items-center justify-center py-4">
+                            <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="ml-2 text-gray-600">Memuat hasil seleksi...</span>
+                        </div>
+                    </div>
+                    
+                    <div v-if="!loadingHasilSeleksi && hasilSeleksi" class="border-t border-gray-200 pt-5">
+                        <h3 class="text-lg font-semibold mb-4 text-green-700">📋 Hasil Validasi Seleksi</h3>
+                        
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg mb-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">Kesimpulan Akhir</p>
+                                    <span :class="['inline-flex items-center px-3 py-1 rounded-full text-sm font-bold mt-1', 
+                                        hasilSeleksi.kesimpulan_akhir === 'Lolos' ? 'bg-green-500 text-white' : 'bg-red-500 text-white']">
+                                        {{ hasilSeleksi.kesimpulan_akhir === 'Lolos' ? '✓ LOLOS' : '✗ TIDAK LOLOS' }}
+                                    </span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-gray-500">Tanggal Validasi</p>
+                                    <p class="text-sm font-medium">{{ formatDate(hasilSeleksi.created_at) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Kesimpulan per Kategori -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <p class="text-xs text-gray-500 mb-1">Dokumen</p>
+                                <span :class="['inline-flex items-center px-2 py-1 rounded text-xs font-semibold', 
+                                    hasilSeleksi.kesimpulan_dokumen === 'Lolos' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                    {{ hasilSeleksi.kesimpulan_dokumen }}
+                                </span>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <p class="text-xs text-gray-500 mb-1">Sarana Pengeringan</p>
+                                <span :class="['inline-flex items-center px-2 py-1 rounded text-xs font-semibold', 
+                                    hasilSeleksi.kesimpulan_sarana_pengeringan === 'Lolos' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                    {{ hasilSeleksi.kesimpulan_sarana_pengeringan }}
+                                </span>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded-lg p-3">
+                                <p class="text-xs text-gray-500 mb-1">Sarana Penggilingan</p>
+                                <span :class="['inline-flex items-center px-2 py-1 rounded text-xs font-semibold', 
+                                    hasilSeleksi.kesimpulan_sarana_penggilingan === 'Lolos' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                    {{ hasilSeleksi.kesimpulan_sarana_penggilingan }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Detail Dokumen -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Dokumen Ada & Valid -->
+                            <div v-if="hasilSeleksi.dokumen_ada_valid && hasilSeleksi.dokumen_ada_valid.length > 0" 
+                                 class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Dokumen Valid</p>
+                                <ul class="space-y-1">
+                                    <li v-for="(dok, index) in hasilSeleksi.dokumen_ada_valid" :key="index" 
+                                        class="text-xs text-green-700 flex items-center">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ dok }}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Dokumen Tidak Ada -->
+                            <div v-if="hasilSeleksi.dokumen_tidak_ada && hasilSeleksi.dokumen_tidak_ada.length > 0" 
+                                 class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Dokumen Tidak Ada</p>
+                                <ul class="space-y-1">
+                                    <li v-for="(dok, index) in hasilSeleksi.dokumen_tidak_ada" :key="index" 
+                                        class="text-xs text-red-700 flex items-center">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ dok }}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Sarana Pengeringan Ada -->
+                            <div v-if="hasilSeleksi.sarana_pengeringan_ada && hasilSeleksi.sarana_pengeringan_ada.length > 0" 
+                                 class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Pengeringan Tersedia</p>
+                                <ul class="space-y-1">
+                                    <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_ada" :key="index" 
+                                        class="text-xs text-green-700 flex items-center">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ sarana }}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Sarana Pengeringan Tidak Ada -->
+                            <div v-if="hasilSeleksi.sarana_pengeringan_tidak_ada && hasilSeleksi.sarana_pengeringan_tidak_ada.length > 0" 
+                                 class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Pengeringan Tidak Tersedia</p>
+                                <ul class="space-y-1">
+                                    <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_tidak_ada" :key="index" 
+                                        class="text-xs text-red-700 flex items-center">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ sarana }}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Sarana Penggilingan Ada -->
+                            <div v-if="hasilSeleksi.sarana_penggilingan_ada && hasilSeleksi.sarana_penggilingan_ada.length > 0" 
+                                 class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Penggilingan Tersedia</p>
+                                <ul class="space-y-1">
+                                    <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_ada" :key="index" 
+                                        class="text-xs text-green-700 flex items-center">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ sarana }}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Sarana Penggilingan Tidak Ada -->
+                            <div v-if="hasilSeleksi.sarana_penggilingan_tidak_ada && hasilSeleksi.sarana_penggilingan_tidak_ada.length > 0" 
+                                 class="bg-red-50 border border-red-200 rounded-lg p-3">
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Penggilingan Tidak Tersedia</p>
+                                <ul class="space-y-1">
+                                    <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_tidak_ada" :key="index" 
+                                        class="text-xs text-red-700 flex items-center">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ sarana }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Individual Fields -->
+                        <div class="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <p class="text-sm font-semibold text-gray-700 mb-3">Detail Status per Item:</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                                <div v-if="hasilSeleksi.surat_permohonan" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.surat_permohonan === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Surat Permohonan: {{ hasilSeleksi.surat_permohonan }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.akta_notaris" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.akta_notaris === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Akta Notaris: {{ hasilSeleksi.akta_notaris }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.nib" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.nib === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">NIB: {{ hasilSeleksi.nib }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.ktp" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.ktp === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">KTP: {{ hasilSeleksi.ktp }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.no_rekening" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.no_rekening === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">No Rekening: {{ hasilSeleksi.no_rekening }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.npwp" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.npwp === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">NPWP: {{ hasilSeleksi.npwp }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.surat_kuasa" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.surat_kuasa === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Surat Kuasa: {{ hasilSeleksi.surat_kuasa }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.lantai_jemur" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.lantai_jemur === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Lantai Jemur: {{ hasilSeleksi.lantai_jemur }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.sarana_lainnya" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.sarana_lainnya === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Sarana Lainnya: {{ hasilSeleksi.sarana_lainnya }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.mesin_memecah_kulit" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.mesin_memecah_kulit === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Mesin Memecah Kulit: {{ hasilSeleksi.mesin_memecah_kulit }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.mesin_pemisah_gabah_dengan_beras" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.mesin_pemisah_gabah_dengan_beras === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Mesin Pemisah Gabah: {{ hasilSeleksi.mesin_pemisah_gabah_dengan_beras }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.mesin_penyosoh" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.mesin_penyosoh === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Mesin Penyosoh: {{ hasilSeleksi.mesin_penyosoh }}</span>
+                                </div>
+                                <div v-if="hasilSeleksi.alat_pemisah_beras" class="flex items-center">
+                                    <span :class="['w-2 h-2 rounded-full mr-2', hasilSeleksi.alat_pemisah_beras === 'Lolos' ? 'bg-green-500' : 'bg-red-500']"></span>
+                                    <span class="text-gray-600">Alat Pemisah Beras: {{ hasilSeleksi.alat_pemisah_beras }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-4 mt-4">
                         <button 
                             @click="rejectSeleksi" 
-                            :disabled="isLoading || selectedItem.status_seleksi === 'tidak lolos'"
+                            :disabled="isLoading || hasilSeleksi !== null || selectedItem.status_seleksi === 'tidak lolos' || selectedItem.status_seleksi === 'lolos'"
                             :class="[
                                 'px-4 py-2 rounded-md font-medium text-sm transition-colors',
-                                isLoading || selectedItem.status_seleksi === 'tidak lolos' 
+                                isLoading || hasilSeleksi !== null || selectedItem.status_seleksi === 'tidak lolos' || selectedItem.status_seleksi === 'lolos'
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                                     : 'bg-red-600 text-white hover:bg-red-700'
                             ]"
                         >
-                            <span v-if="selectedItem.status_seleksi === 'tidak lolos'">Sudah Tidak Lolos</span>
+                            <span v-if="hasilSeleksi !== null">Sudah Divalidasi</span>
+                            <span v-else-if="selectedItem.status_seleksi === 'tidak lolos'">Sudah Tidak Lolos</span>
                             <span v-else-if="isLoading">Processing...</span>
                             <span v-else>Tidak Lolos</span>
                         </button>
                         
                         <button 
                             @click="approveSeleksi"
-                            :disabled="isLoading || selectedItem.status_seleksi === 'lolos'"
+                            :disabled="isLoading || hasilSeleksi !== null || selectedItem.status_seleksi === 'lolos' || selectedItem.status_seleksi === 'tidak lolos'"
                             :class="[
                                 'px-4 py-2 rounded-md font-medium text-sm transition-colors',
-                                isLoading || selectedItem.status_seleksi === 'lolos'
+                                isLoading || hasilSeleksi !== null || selectedItem.status_seleksi === 'lolos' || selectedItem.status_seleksi === 'tidak lolos'
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                                     : 'bg-green-600 text-white hover:bg-green-700'
                             ]"
                         >
-                            <span v-if="selectedItem.status_seleksi === 'lolos'">Sudah Lolos</span>
+                            <span v-if="hasilSeleksi !== null">Sudah Divalidasi</span>
+                            <span v-else-if="selectedItem.status_seleksi === 'lolos'">Sudah Lolos</span>
                             <span v-else-if="isLoading">Processing...</span>
                             <span v-else>Lolos</span>
                         </button>

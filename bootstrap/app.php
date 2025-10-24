@@ -18,6 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        // Nonaktifkan CSRF protection untuk route tertentu
+        $middleware->validateCsrfTokens(except: [
+            // 'hasil-seleksi-mitra',
+            // 'hasil-seleksi-mitra/*',
+            // 'admin/hasil-seleksi-mitra',
+            // 'admin/hasil-seleksi-mitra/*',
+        ]);
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'guest' => RedirectIfAuthenticated::class,
