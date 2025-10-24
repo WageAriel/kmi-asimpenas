@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 use App\Services\ActivityAggregatorService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use App\Imports\DataMitraImport;
-use App\Exports\DataMitraTemplateExport;
-use Maatwebsite\Excel\Facades\Excel;
 
 class DataMitraController extends Controller
 {
@@ -201,43 +198,5 @@ class DataMitraController extends Controller
             ->values();
         
         return response()->json($mitras);
-    }
-
-    /**
-     * Import data mitra from Excel
-     */
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:10240', // Max 10MB
-        ]);
-
-        try {
-            $import = new DataMitraImport();
-            Excel::import($import, $request->file('file'));
-
-            $summary = $import->getImportSummary();
-
-            ActivityAggregatorService::clearUserCache(Auth::id());
-
-            return response()->json([
-                'success' => true,
-                'message' => "Berhasil mengimport {$summary['imported']} data mitra",
-                'summary' => $summary,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengimport data: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    /**
-     * Download Excel template
-     */
-    public function downloadTemplate()
-    {
-        return Excel::download(new DataMitraTemplateExport(), 'template_data_mitra.xlsx');
     }
 }
