@@ -200,7 +200,7 @@ onUnmounted(() => {
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div>
                         <h3 class="text-xl font-bold text-white mb-2">Daftar Klasifikasi Mitra</h3>
-                        <p class="text-blue-100">
+                        <p class="text-white">
                             Kelola klasifikasi mitra yang terdaftar di sistem.
                         </p>
                     </div>
@@ -251,8 +251,8 @@ onUnmounted(() => {
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr v-for="item in filteredKlasifikasiMitras" :key="item.id_klasifikasi_mitra" class="hover:bg-gray-50">
-                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ item.mitra?.nama_perusahaan }}</td>
-                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ formatDate(item.created_at) }}</td>
+                                <td class="text-xs px-4 py-3 whitespace-nowrap">{{ item.mitra?.nama_perusahaan }}</td>
+                                <td class="text-xs px-4 py-3 whitespace-nowrap">{{ formatDate(item.created_at) }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <span :class="['px-2 py-1 text-xs font-medium rounded-full', getClassificationColor(item.hasil_klasifikasi)]">
                                         {{ item.hasil_klasifikasi ? `Kelas ${item.hasil_klasifikasi}` : 'Belum Dinilai' }}
@@ -263,7 +263,7 @@ onUnmounted(() => {
                                         @click="viewDetails(item)"
                                         class="inline-flex items-center text-green-600 hover:text-green-900 text-xs mr-3"
                                     >
-                                        Lihat Detail
+                                        Lihat
                                     </button>
                                 </td>
                             </tr>

@@ -197,7 +197,7 @@ const rejectSeleksi = async () => {
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div>
                         <h3 class="text-xl font-bold text-white mb-2">Daftar Seleksi Mitra</h3>
-                        <p class="text-blue-100">
+                        <p class="text-white">
                             Berikut adalah daftar mitra yang melakukan seleksi di sistem ASIMPENAS.
                         </p>
                     </div>

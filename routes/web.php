@@ -7,6 +7,7 @@ use App\Http\Controllers\ActivityController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\PDF;
 
 Route::get('/', function () {
     return Inertia::render('Landing', [
@@ -16,9 +17,6 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-
-
-
 
 Route::get('/test', function () {
     return Inertia::render('Test');
@@ -41,9 +39,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // 2. Daftar Mitra
     Route::get('/daftar-mitra', function () {
-        // Fetch all mitra data with their associated users, ordered by newest first
         $mitras = App\Models\DataMitra::with('user')
-            ->orderBy('created_at', 'desc')  // Add this line to sort by creation date (newest first)
+            ->orderBy('created_at', 'desc')
             ->get();
         
         return Inertia::render('Admin/DaftarMitra/Index', [
@@ -75,7 +72,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // 5. Daftar Hasil Seleksi Mitra
     Route::get('/hasil-seleksi-mitra', function () {
-        return Inertia::render('Admin/DaftarHasilSeleksiMitra/Index');
+        $hasilSeleksiMitras = App\Models\HasilSeleksiMitra::with(['mitra', 'seleksiMitra'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return Inertia::render('Admin/DaftarHasilSeleksiMitra/Index', [
+            'hasilSeleksiMitras' => $hasilSeleksiMitras
+        ]);
     })->name('hasil-seleksi-mitra.index');
 });
 
@@ -117,6 +120,10 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
         ]);
     })->name('klasifikasi-mitra.index');
 
+    //untuk  mengenerate tabel klasifikasi mitra ke pdf
+    Route::get('/klasifikasi/{id}/download', [PdfGeneratorController::class, 'downloadKlasifikasiMitraPdf'])
+    ->name('klasifikasi.download');
+
     //untuk mengakses form klasifikasi mitra
     Route::get('/klasifikasi-mitra/form', function () {
         return Inertia::render('Mitra/KlasifikasiMitra/Form', [
@@ -148,6 +155,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// API Routes
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/hasil-seleksi-mitra', function () {
+        return App\Models\HasilSeleksiMitra::with(['mitra', 'seleksiMitra'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    })->name('hasil-seleksi-mitra');
 });
 
 require __DIR__.'/auth.php';

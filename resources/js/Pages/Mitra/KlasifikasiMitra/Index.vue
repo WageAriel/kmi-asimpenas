@@ -215,9 +215,22 @@ const interpretClassification = (field, value) => {
     return '-'; // default jika field atau value tidak ada
 };
 
-// Action functions
+const downloadPdf = (classificationId) => {
+  if (!classificationId) {
+    console.error('Classification ID is undefined');
+    return;
+  }
+  
+  const downloadUrl = `/mitra/klasifikasi/${classificationId}/download`;
+  console.log('Attempting to download from:', downloadUrl);
+  
+  // Using window.open for direct download
+  window.open(downloadUrl, '_blank');
+};
+
+// Update goToForm function
 const goToForm = () => {
-    window.location.href = `/mitra/klasifikasi-mitra/form?year=${currentYear}`;
+  window.location.href = `/mitra/klasifikasi-mitra/form?year=${currentYear}`;
 };
 
 const showModal = ref(false);
@@ -398,11 +411,11 @@ const editClassification = (classification) => {
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <button
-                                        @click="window.location.href = `/mitra/pengajuan-seleksi/${submission.id}/download`"
+                                        @click="downloadPdf(classification.id)"
                                         class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 16v-8m0 8l-4-4m4 4l4-4M4 20h16" />
+                                            d="M12 16v-8m0 8l-4-4m4 4l4-4M4 20h16" />
                                         </svg>
                                         Download PDF
                                     </button>
