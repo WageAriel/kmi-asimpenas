@@ -126,7 +126,7 @@ class PdfGeneratorController extends Controller
             ];
 
             $pdf = PDF::loadView('pdf.klasifikasi-mitra-form', $data);
-            $pdf->setPaper('a4', 'portrait');
+            $pdf->setPaper('a3', 'portrait');
             $pdf->getDomPDF()->set_option("default_font", "Times New Roman");
             
             return $pdf->download('FORM-B_Klasifikasi_Mitra_' . $mitra->nama_perusahaan . '.pdf');
