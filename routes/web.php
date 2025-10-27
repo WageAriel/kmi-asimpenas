@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MitraController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ActivityController;
 use Illuminate\Foundation\Application;
@@ -149,6 +150,13 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
             ]
         ]);
     })->name('hasil-seleksi');
+
+    // Purchase Order routes
+    Route::resource('purchase-orders', PurchaseOrderController::class);
+    Route::get('/purchase-orders/{purchaseOrder}/surat-permohonan', [PurchaseOrderController::class, 'generateSuratPermohonan'])->name('purchase-orders.surat-permohonan');
+    Route::get('/purchase-orders/{purchaseOrder}/form-penawaran', [PurchaseOrderController::class, 'generateFormPenawaran'])->name('purchase-orders.form-penawaran');
+    Route::get('/purchase-orders/{purchaseOrder}/combined-pdf', [PurchaseOrderController::class, 'generateCombinedPdf'])->name('purchase-orders.combined-pdf');
+    Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])->name('purchase-orders.kualitas-options');
 });
 
 Route::middleware('auth')->group(function () {

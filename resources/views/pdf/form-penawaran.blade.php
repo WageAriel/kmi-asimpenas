@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Penawaran</title>
+    <style>
+        @page {
+            margin: 2cm;
+            size: A4;
+        }
+        
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.2;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .company-name {
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .address {
+            font-size: 10pt;
+            margin-bottom: 10px;
+        }
+        
+        .title {
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+            text-decoration: underline;
+            font-size: 14pt;
+        }
+        
+        .form-section {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .form-label {
+            width: 30%;
+            font-weight: bold;
+        }
+        
+        .form-value {
+            width: 70%;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            min-height: 20px;
+        }
+        
+        .commodity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .commodity-table th,
+        .commodity-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .commodity-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        .commodity-table td {
+            font-size: 10pt;
+        }
+        
+        .terms {
+            margin: 20px 0;
+            text-align: justify;
+            line-height: 1.5;
+        }
+        
+        .signature {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .signature-section {
+            width: 45%;
+            text-align: center;
+        }
+        
+        .signature-line {
+            margin-top: 60px;
+            border-bottom: 1px solid #000;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-item {
+            margin: 5px 0;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="form-value">{{ $purchaseOrder->nama_perusahaan }}</div>
+        <div class="form-value">{{ $validated->alamat_perusahaan }}</div>
+    </div>
+
+    <div class="title">
+        FORM PENAWARAN<br>
+        PENGADAAN {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}
+    </div>
+
+    <div class="form-section">
+        <div class="form-row">
+            <div class="form-label">Nama Perusahaan:</div>
+            <div class="form-value">{{ $purchaseOrder->nama_perusahaan }}</div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-label">Jenis Komoditas:</div>
+            <div class="form-value">{{ $purchaseOrder->jenis_komoditas_lengkap }}</div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-label">Jenis Pengadaan:</div>
+            <div class="form-value">{{ $purchaseOrder->jenis_pengadaan }}</div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-label">Komplek Pergudangan:</div>
+            <div class="form-value">{{ $purchaseOrder->komplek_pergudangan_lengkap }}</div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-label">Kualitas:</div>
+            <div class="form-value">{{ $purchaseOrder->kualitas_lengkap }}</div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-label">Tanggal Penawaran:</div>
+            <div class="form-value">{{ $tanggal }}</div>
+        </div>
+    </div>
+
+    <table class="commodity-table">
+        <thead>
+            <tr>
+                <th rowspan="2">No</th>
+                <th rowspan="2">Jenis Komoditas</th>
+                <th rowspan="2">Kualitas</th>
+                <th rowspan="2">Kuantum (Kg)</th>
+                <th colspan="2">Harga</th>
+                <th rowspan="2">Nilai Total (Rp)</th>
+                <th rowspan="2">Komplek Pergudangan</th>
+                <th rowspan="2">Keterangan</th>
+            </tr>
+            <tr>
+                <th>Per Kg (Rp)</th>
+                <th>Satuan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>{{ $purchaseOrder->jenis_komoditas_lengkap }}</td>
+                <td>{{ $purchaseOrder->kualitas_lengkap }}</td>
+                <td>{{ number_format($purchaseOrder->kuantum, 0, ',', '.') }}</td>
+                <td>{{ number_format($purchaseOrder->harga, 0, ',', '.') }}</td>
+                <td>Kg</td>
+                <td>{{ number_format($purchaseOrder->nilai, 0, ',', '.') }}</td>
+                <td>{{ $purchaseOrder->komplek_pergudangan_lengkap }}</td>
+                <td>{{ $purchaseOrder->jenis_pengadaan }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="terms">
+        <p><strong>SYARAT DAN KETENTUAN:</strong></p>
+        <ol>
+            <li>Harga yang ditawarkan sudah termasuk semua biaya sampai dengan gudang BULOG.</li>
+            <li>Pembayaran dilakukan setelah barang diterima dan sesuai dengan spesifikasi yang diminta.</li>
+            <li>Waktu pengiriman maksimal 7 (tujuh) hari setelah kontrak ditandatangani.</li>
+            <li>Barang yang tidak sesuai spesifikasi akan ditolak dan menjadi tanggung jawab pemasok.</li>
+            <li>Penawaran ini berlaku selama 30 (tiga puluh) hari sejak tanggal penawaran.</li>
+        </ol>
+    </div>
+
+    <div class="signature">
+        <div class="signature-section">
+            <p><strong>PENAWAR</strong></p>
+            <div class="signature-line"></div>
+            <p><strong>{{ strtoupper($purchaseOrder->created_by ?? 'BAGYO SUPRAPTO') }}</strong><br>
+            {{ $purchaseOrder->nama_perusahaan }}</p>
+        </div>
+        
+        <div class="signature-section">
+            <p><strong>PERUSAHAAN UMUM BULOG</strong></p>
+            <div class="signature-line"></div>
+            <p><strong>(.............................)</strong><br>
+            Pejabat yang Berwenang</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border: 1px solid #000; padding: 10px;">
+        <p><strong>PERSETUJUAN / DISPOSISI:</strong></p>
+        <div class="checkbox-item">
+            <input type="checkbox"> Disetujui untuk dilanjutkan ke proses kontrak
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox"> Perlu klarifikasi teknis
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox"> Perlu negosiasi harga
+        </div>
+        <div class="checkbox-item">
+            <input type="checkbox"> Ditolak dengan alasan: _________________________
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <p>Tanggal: _______________</p>
+            <p>Paraf: _______________</p>
+        </div>
+    </div>
+</body>
+</html>

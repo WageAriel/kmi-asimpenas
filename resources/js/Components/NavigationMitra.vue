@@ -53,6 +53,11 @@ const menuItems = [
         icon: Squares2X2Icon
     },
     {
+        name: 'Purchase Order',
+        route: 'mitra.purchase-orders.index',
+        icon: 'M9,5V9H21V5M9,19H21V15H9M9,14H21V10H9M4,9H8L6,7M4,19H8L6,17M4,14H8L6,12'
+    },
+    {
         name: 'Hasil Seleksi',
         route: 'mitra.hasil-seleksi',
         icon: CheckCircleIcon
