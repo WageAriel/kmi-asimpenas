@@ -29,14 +29,21 @@ class DataMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsE
         // Create user account if email is provided
         $user = null;
         if (!empty($row['email'])) {
-            $user = User::firstOrCreate(
-                ['email' => $row['email']],
-                [
+            // Check if user already exists
+            $existingUser = User::where('email', $row['email'])->first();
+            
+            if ($existingUser) {
+                // User already exists, use existing user
+                $user = $existingUser;
+            } else {
+                // Create new user with role mitra
+                $user = User::create([
                     'name' => $row['nama_perusahaan'],
-                    'password' => Hash::make('password123'), // Default password
+                    'email' => $row['email'],
+                    'password' => Hash::make('mitra123'), // Default password: mitra123
                     'role' => 'mitra'
-                ]
-            );
+                ]);
+            }
         }
 
         // Parse dates

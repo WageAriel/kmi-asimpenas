@@ -8,6 +8,7 @@ use App\Services\ActivityAggregatorService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Imports\DataMitraImport;
+use App\Exports\DataMitraExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 
@@ -262,6 +263,31 @@ class DataMitraController extends Controller
         
         $writer->save('php://output');
         exit;
+    }
+
+    /**
+     * Export mitra to Excel
+     */
+    public function export()
+    {
+        try {
+            $fileName = 'data_mitra_' . date('Y-m-d_His') . '.xlsx';
+            
+            \Log::info('Starting export data mitra');
+            
+            return Excel::download(new DataMitraExport, $fileName);
+            
+        } catch (\Exception $e) {
+            \Log::error('Export exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat export',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function myMitra()
