@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Services\ActivityAggregatorService;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Imports\DataMitraImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class DataMitraController extends Controller
 {
@@ -15,6 +18,250 @@ class DataMitraController extends Controller
     {
         $mitras = DataMitra::all();
         return response()->json($mitras);
+    }
+
+    /**
+     * Import mitra from Excel file
+     */
+    public function import(Request $request)
+    {
+        try {
+            // Validate request
+            $validated = $request->validate([
+                'file' => 'required|file|mimes:xlsx,xls,csv|max:5120', // Max 5MB
+            ], [
+                'file.required' => 'File harus dipilih',
+                'file.mimes' => 'File harus berformat Excel (.xlsx, .xls) atau CSV',
+                'file.max' => 'Ukuran file maksimal 5MB',
+            ]);
+
+            // Check if file was uploaded
+            if (!$request->hasFile('file')) {
+                return response()->json([
+                    'message' => 'File tidak ditemukan',
+                ], 400);
+            }
+
+            $file = $request->file('file');
+            
+            // Additional file validation
+            if (!$file->isValid()) {
+                return response()->json([
+                    'message' => 'File tidak valid atau corrupt',
+                ], 400);
+            }
+
+            \Log::info('Starting import', [
+                'filename' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
+            ]);
+
+            $import = new DataMitraImport();
+            Excel::import($import, $file);
+
+            // Check if there were any failures
+            $failures = $import->getFailures();
+            $errors = $import->getErrors();
+
+            if (!empty($failures) || !empty($errors)) {
+                $failureMessages = [];
+                
+                foreach ($failures as $failure) {
+                    $failureMessages[] = [
+                        'row' => $failure->row(),
+                        'attribute' => $failure->attribute(),
+                        'errors' => $failure->errors(),
+                        'values' => $failure->values(),
+                    ];
+                }
+
+                \Log::warning('Import completed with errors', [
+                    'failures_count' => count($failureMessages),
+                    'errors_count' => count($errors),
+                ]);
+
+                return response()->json([
+                    'message' => 'Import selesai dengan beberapa error',
+                    'failures' => $failureMessages,
+                    'errors' => $errors,
+                ], 422);
+            }
+
+            ActivityAggregatorService::clearAllActivitiesCache();
+
+            \Log::info('Import completed successfully');
+
+            return response()->json([
+                'message' => 'Data mitra berhasil diimport',
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error during import', [
+                'errors' => $e->errors(),
+            ]);
+
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors(),
+            ], 422);
+
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $failureMessages = [];
+            
+            foreach ($failures as $failure) {
+                $failureMessages[] = [
+                    'row' => $failure->row(),
+                    'attribute' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                ];
+            }
+
+            \Log::error('Excel validation error', [
+                'failures_count' => count($failureMessages),
+            ]);
+
+            return response()->json([
+                'message' => 'Validasi data Excel gagal',
+                'failures' => $failureMessages,
+            ], 422);
+
+        } catch (\Exception $e) {
+            \Log::error('Import exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat import',
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => basename($e->getFile()),
+            ], 500);
+        }
+    }
+
+    /**
+     * Download Excel template for import
+     */
+    public function downloadTemplate()
+    {
+        $headers = [
+            'nama_perusahaan',
+            'badan_hukum_usaha',
+            'alamat_perusahaan',
+            'kota_kabupaten',
+            'provinsi',
+            'nama_cp',
+            'nik',
+            'tempat_lahir',
+            'tanggal_lahir',
+            'no_telp_perusahaan',
+            'no_telp_cp',
+            'bank_korespondensi',
+            'alamat_bank',
+            'no_rekening',
+            'status_perusahaan',
+            'npwp',
+            'pkp',
+            'surat_kuasa',
+            'tanggal_seleksi',
+            'tanggal_klasifikasi',
+            'tanggal_penilaian',
+            'tanggal_penetapan',
+            'tanggal_surat_permohonan',
+            'tanggal_pakta_integritas',
+            'email',
+            'no_vms',
+            'kode_mitra',
+        ];
+
+        $exampleData = [
+            'PT. Contoh Mitra',
+            'PT',
+            'Jl. Contoh No. 123',
+            'Jakarta Selatan',
+            'DKI Jakarta',
+            'John Doe',
+            '3174012345678901',
+            'Jakarta',
+            '1990-01-15',
+            '021-1234567',
+            '081234567890',
+            'Bank Mandiri',
+            'Jl. Bank No. 1',
+            '1234567890',
+            'Distributor',
+            '01.234.567.8-901.000',
+            'pkp',
+            'ada',
+            '2025-01-01',
+            '2025-01-15',
+            '2025-02-01',
+            '2025-02-15',
+            '2024-12-01',
+            '2024-12-15',
+            'contoh@email.com',
+            'VMS001',
+            'MTR001',
+        ];
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set headers
+        $column = 'A';
+        $columnIndex = 0;
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . '1', $header);
+            $sheet->getStyle($column . '1')->getFont()->setBold(true);
+            $sheet->getStyle($column . '1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FFE2EFDA');
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+            
+            $column++;
+            $columnIndex++;
+        }
+
+        // Add instruction row
+
+        // Set example data (now on row 3)
+        $column = 'A';
+        foreach ($exampleData as $data) {
+            $cellCoordinate = $column . '2';
+            
+            // For text columns, explicitly set as string with text format
+            $currentHeader = $headers[ord($column) - ord('A')];
+            $textColumns = ['nik', 'npwp', 'no_rekening', 'no_telp_perusahaan', 'no_telp_cp'];
+            
+            if (in_array($currentHeader, $textColumns)) {
+                // Set value explicitly as string
+                $sheet->setCellValueExplicit(
+                    $cellCoordinate,
+                    $data,
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+                );
+            } else {
+                $sheet->setCellValue($cellCoordinate, $data);
+            }
+            
+            $column++;
+        }
+
+        // Create writer
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        
+        // Set headers for download
+        $fileName = 'template_import_mitra_' . date('Y-m-d_His') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+        
+        $writer->save('php://output');
+        exit;
     }
 
     public function myMitra()
@@ -67,6 +314,8 @@ class DataMitraController extends Controller
         $mitra = DataMitra::create($validated);
 
         ActivityAggregatorService::clearUserCache(Auth::id());
+        ActivityAggregatorService::clearAllActivitiesCache();
+        
         return response()->json($mitra, 201);
     }
 
@@ -125,6 +374,7 @@ class DataMitraController extends Controller
         }
 
         ActivityAggregatorService::clearUserCache(Auth::id());
+        ActivityAggregatorService::clearAllActivitiesCache();
     
         return response()->json($mitra);
     }

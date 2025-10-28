@@ -1,7 +1,7 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { HomeIcon, DocumentTextIcon, Squares2X2Icon, CheckCircleIcon } from '@heroicons/vue/24/outline';
+import { HomeIcon, DocumentTextIcon, Squares2X2Icon, CheckCircleIcon, ClipboardDocumentListIcon } from '@heroicons/vue/24/outline';
 import logoImg from '@/../../resources/assets/Images/bulog.png';
 
 const page = usePage();
@@ -55,7 +55,7 @@ const menuItems = [
     {
         name: 'Purchase Order',
         route: 'mitra.purchase-orders.index',
-        icon: 'M9,5V9H21V5M9,19H21V15H9M9,14H21V10H9M4,9H8L6,7M4,19H8L6,17M4,14H8L6,12'
+        icon: ClipboardDocumentListIcon
     },
     {
         name: 'Hasil Seleksi',

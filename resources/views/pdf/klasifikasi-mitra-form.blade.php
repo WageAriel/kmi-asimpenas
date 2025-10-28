@@ -184,11 +184,11 @@
                 ['name' => 'Alat Pengering Lainnya', 'field' => 'alat_pengering_lainnya', 'unit' => 'ton/hari']
             ] as $item)
             <tr>
-                <td class="text-center">{{ $no++ }}</td>
+                <td class="text-center" >{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
-                <td class="text-center">{{ $item['unit'] }}</td>
+                <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td class="text-center">
+                <td style="text-align: center;">
                     <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
                         V
                     </span>
@@ -221,9 +221,9 @@
             <tr>
                 <td class="text-center">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
-                <td class="text-center">{{ $item['unit'] }}</td>
+                <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td class="text-center">
+                <td style="text-align: center;">
                     <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
                         V
                     </span>
@@ -245,9 +245,9 @@
             <tr>
                 <td class="text-center">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
-                <td class="text-center">{{ $item['unit'] }}</td>
+                <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td class="text-center">
+                <td style="text-align: center;">
                     <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
                         V
                     </span>
@@ -267,9 +267,9 @@
             <tr>
                 <td class="text-center">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
-                <td class="text-center">{{ $item['unit'] }}</td>
+                <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td class="text-center">
+                <td style="text-align: center;">
                     <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
                         V
                     </span>
@@ -291,9 +291,9 @@
             <tr>
                 <td class="text-center">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
-                <td class="text-center">{{ $item['unit'] }}</td>
+                <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td class="text-center">
+                <td style="text-align: center;">
                     <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
                         V
                     </span>
@@ -313,9 +313,9 @@
             <tr>
                 <td class="text-center">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
-                <td class="text-center">{{ $item['unit'] }}</td>
+                <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td class="text-center">
+                <td style="text-align: center;">
                     <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
                         V
                     </span>

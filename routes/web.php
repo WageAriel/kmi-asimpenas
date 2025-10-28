@@ -5,6 +5,7 @@ use App\Http\Controllers\MitraController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -32,11 +33,9 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 //Route Dashboard Admin
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     // 1. Dashboard
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
     // 2. Daftar Mitra
     Route::get('/daftar-mitra', function () {
@@ -48,6 +47,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             'mitras' => $mitras
         ]);
     })->name('daftar-mitra.index');
+
+    // Import Mitra
+    Route::post('/daftar-mitra/import', [App\Http\Controllers\DataMitraController::class, 'import'])->name('daftar-mitra.import');
+    Route::get('/daftar-mitra/template', [App\Http\Controllers\DataMitraController::class, 'downloadTemplate'])->name('daftar-mitra.template');
 
     // 3. Daftar Seleksi Mitra
     Route::get('/seleksi-mitra', function () {

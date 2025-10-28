@@ -4,6 +4,7 @@ use App\Http\Controllers\DataSeleksiMitraController;
 use App\Http\Controllers\HasilSeleksiMitraController;
 use App\Http\Controllers\KlasifikasiMitraController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/activities/my', [ActivityController::class, 'myActivities']);
     Route::post('/activities/refresh', [ActivityController::class, 'refreshActivities']);
+    
+    // Dashboard stats and data
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats']);
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData']);
 });
 
 Route::middleware('auth:sanctum')->get('/data-mitra/my', [DataMitraController::class, 'myMitra']);

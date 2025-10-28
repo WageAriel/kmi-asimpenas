@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\DataSeleksiMitra;
 use App\Models\DataMitra;
+use App\Services\ActivityAggregatorService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DataSeleksiMitraController extends Controller
 {
@@ -70,6 +72,13 @@ public function mySeleksi()
         ]);
 
         $seleksimitra = DataSeleksiMitra::create($validated);
+        
+        // Clear cache for dashboard updates
+        if (Auth::check()) {
+            ActivityAggregatorService::clearUserCache(Auth::id());
+        }
+        ActivityAggregatorService::clearAllActivitiesCache();
+        
         return response()->json($seleksimitra, 201);
     }
     public function show($id)
@@ -112,6 +121,12 @@ public function mySeleksi()
         if (isset($validated['status_seleksi']) && in_array($validated['status_seleksi'], ['lolos', 'tidak lolos'])) {
             $this->createOrUpdateHasilSeleksi($seleksimitra, $validated['status_seleksi']);
         }
+        
+        // Clear cache for dashboard updates
+        if (Auth::check()) {
+            ActivityAggregatorService::clearUserCache(Auth::id());
+        }
+        ActivityAggregatorService::clearAllActivitiesCache();
         
         return response()->json($seleksimitra);
     }

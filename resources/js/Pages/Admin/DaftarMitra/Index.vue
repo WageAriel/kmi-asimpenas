@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 
@@ -43,6 +43,13 @@ const filteredMitras = computed(() => {
 const showModal = ref(false);
 const selectedMitra = ref(null);
 
+// Import functionality
+const showImportModal = ref(false);
+const selectedFile = ref(null);
+const isUploading = ref(false);
+const uploadError = ref(null);
+const uploadSuccess = ref(null);
+
 // Format status class based on status_perusahaan
 const getStatusClass = (status) => {
     if (!status) return 'bg-gray-100 text-gray-800';
@@ -69,6 +76,117 @@ const closeModal = () => {
 const goToForm = (type) => {
     window.location.href = route('input-data-mitra');
 };
+
+// Import functions
+const openImportModal = () => {
+    showImportModal.value = true;
+    selectedFile.value = null;
+    uploadError.value = null;
+    uploadSuccess.value = null;
+};
+
+const closeImportModal = () => {
+    showImportModal.value = false;
+    selectedFile.value = null;
+    uploadError.value = null;
+    uploadSuccess.value = null;
+};
+
+const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        // Validate file type
+        const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv'];
+        if (!validTypes.includes(file.type)) {
+            uploadError.value = 'File harus berformat Excel (.xlsx, .xls) atau CSV';
+            selectedFile.value = null;
+            return;
+        }
+        
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            uploadError.value = 'Ukuran file maksimal 5MB';
+            selectedFile.value = null;
+            return;
+        }
+        
+        selectedFile.value = file;
+        uploadError.value = null;
+    }
+};
+
+const uploadFile = async () => {
+    if (!selectedFile.value) {
+        uploadError.value = 'Pilih file terlebih dahulu';
+        return;
+    }
+
+    isUploading.value = true;
+    uploadError.value = null;
+    uploadSuccess.value = null;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile.value);
+
+    try {
+        console.log('Uploading file to:', route('admin.daftar-mitra.import'));
+        console.log('File:', selectedFile.value.name, selectedFile.value.size, 'bytes');
+
+        // Use axios which automatically handles CSRF token
+        const response = await axios.post(route('admin.daftar-mitra.import'), formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        console.log('Upload success:', response.data);
+
+        uploadSuccess.value = response.data.message || 'Data berhasil diimport';
+        selectedFile.value = null;
+        
+        // Reload page after successful import
+        setTimeout(() => {
+            router.reload();
+        }, 1500);
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        
+        if (error.response) {
+            // Server responded with error
+            const data = error.response.data;
+            
+            if (data.failures && data.failures.length > 0) {
+                const errorDetails = data.failures.slice(0, 5).map(f => 
+                    `Baris ${f.row}: ${f.errors.join(', ')}`
+                ).join('\n');
+                uploadError.value = `Terdapat error pada file:\n${errorDetails}`;
+                
+                if (data.failures.length > 5) {
+                    uploadError.value += `\n... dan ${data.failures.length - 5} error lainnya`;
+                }
+            } else if (data.errors) {
+                // Laravel validation errors
+                const errorMessages = Object.values(data.errors).flat();
+                uploadError.value = errorMessages.join('\n');
+            } else {
+                uploadError.value = data.message || 'Terjadi kesalahan saat import';
+            }
+        } else if (error.request) {
+            // Request made but no response
+            uploadError.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+        } else {
+            // Something else happened
+            uploadError.value = `Terjadi kesalahan: ${error.message}`;
+        }
+    } finally {
+        isUploading.value = false;
+    }
+};
+
+const downloadTemplate = () => {
+    window.location.href = route('admin.daftar-mitra.template');
+};
 </script>
 
 <template>
@@ -93,13 +211,13 @@ const goToForm = (type) => {
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <button
-                            @click="goToForm('new')"
+                            @click="openImportModal"
                             class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white transition-colors"
                         >
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                             </svg>
-                            Tambah Mitra Baru
+                            Import Excel
                         </button>
                     </div>
                 </div>
@@ -327,6 +445,121 @@ const goToForm = (type) => {
                 <div class="flex justify-end mt-6">
                     <button @click="closeModal" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                         Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Import Excel -->
+        <div v-if="showImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
+                <button @click="closeImportModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                
+                <h2 class="text-xl font-bold mb-6 text-blue-700">Import Data Mitra dari Excel</h2>
+                
+                <div class="space-y-4">
+                    <!-- Info Box -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-blue-900 mb-1">Panduan Import</h4>
+                                <ul class="text-sm text-blue-800 space-y-1">
+                                    <li>• File harus berformat Excel (.xlsx, .xls) atau CSV</li>
+                                    <li>• Ukuran file maksimal 5MB</li>
+                                    <li>• Download template untuk melihat format yang benar</li>
+                                    <li>• Pastikan kolom sesuai dengan template</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Template Button -->
+                    <div class="flex justify-center">
+                        <button
+                            @click="downloadTemplate"
+                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Download Template Excel
+                        </button>
+                    </div>
+
+                    <!-- File Upload Area -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                        <input
+                            type="file"
+                            @change="handleFileChange"
+                            accept=".xlsx,.xls,.csv"
+                            class="hidden"
+                            id="fileInput"
+                        />
+                        <label
+                            for="fileInput"
+                            class="flex flex-col items-center cursor-pointer"
+                        >
+                            <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            <span class="text-sm font-medium text-gray-700 mb-1">
+                                {{ selectedFile ? selectedFile.name : 'Klik untuk pilih file' }}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                Excel (.xlsx, .xls) atau CSV (max. 5MB)
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div v-if="uploadSuccess" class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-sm text-green-800">{{ uploadSuccess }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div v-if="uploadError" class="bg-red-50 border border-red-200 rounded-lg p-4 max-h-48 overflow-y-auto">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="text-sm text-red-800 whitespace-pre-wrap">{{ uploadError }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6">
+                    <button
+                        @click="closeImportModal"
+                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                        :disabled="isUploading"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="uploadFile"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+                        :disabled="!selectedFile || isUploading"
+                    >
+                        <span v-if="isUploading" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Mengupload...
+                        </span>
+                        <span v-else>Upload File</span>
                     </button>
                 </div>
             </div>
