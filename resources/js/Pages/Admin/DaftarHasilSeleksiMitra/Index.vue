@@ -72,15 +72,6 @@ const closeModal = () => {
     selectedItem.value = null;
 };
 
-// Generate PDF handler
-const generatePDF = async (id) => {
-    try {
-        window.location.href = `/hasil-seleksi-mitra/${id}/pdf`;
-    } catch (error) {
-        console.error('Error generating PDF:', error);
-        alert('Gagal mengunduh PDF');
-    }
-};
 
 onMounted(() => {
     fetchData();
@@ -181,12 +172,6 @@ onMounted(() => {
                                     class="text-blue-600 hover:text-blue-900 mr-3"
                                 >
                                     Lihat Detail
-                                </button>
-                                <button 
-                                    @click="generatePDF(item.id_hasil_seleksi_mitra)"
-                                    class="text-green-600 hover:text-green-900"
-                                >
-                                    Unduh PDF
                                 </button>
                             </td>
                         </tr>
