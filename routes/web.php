@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MitraController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,11 +33,9 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 //Route Dashboard Admin
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     // 1. Dashboard
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
     // 2. Daftar Mitra
     Route::get('/daftar-mitra', function () {
@@ -47,6 +47,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             'mitras' => $mitras
         ]);
     })->name('daftar-mitra.index');
+
+    // Import Mitra
+    Route::post('/daftar-mitra/import', [App\Http\Controllers\DataMitraController::class, 'import'])->name('daftar-mitra.import');
+    Route::get('/daftar-mitra/template', [App\Http\Controllers\DataMitraController::class, 'downloadTemplate'])->name('daftar-mitra.template');
+    Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
 
     // 3. Daftar Seleksi Mitra
     Route::get('/seleksi-mitra', function () {
@@ -149,6 +154,13 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
             ]
         ]);
     })->name('hasil-seleksi');
+
+    // Purchase Order routes
+    Route::resource('purchase-orders', PurchaseOrderController::class);
+    Route::get('/purchase-orders/{purchaseOrder}/surat-permohonan', [PurchaseOrderController::class, 'generateSuratPermohonan'])->name('purchase-orders.surat-permohonan');
+    Route::get('/purchase-orders/{purchaseOrder}/form-penawaran', [PurchaseOrderController::class, 'generateFormPenawaran'])->name('purchase-orders.form-penawaran');
+    Route::get('/purchase-orders/{purchaseOrder}/combined-pdf', [PurchaseOrderController::class, 'generateCombinedPdf'])->name('purchase-orders.combined-pdf');
+    Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])->name('purchase-orders.kualitas-options');
 });
 
 Route::middleware('auth')->group(function () {

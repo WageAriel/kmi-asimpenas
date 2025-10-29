@@ -343,8 +343,8 @@ const submitForm = async () => {
                 ]"
               >
                 <option value="">Pilih Status Perusahaan</option>
-                <option value="penggilingan">Penggilingan</option>
-                <option value="distributor">Distributor</option>
+                <option value="Penggilingan">Penggilingan</option>
+                <option value="Distributor">Distributor</option>
                 <option value="lainnya">Lainnya</option>
               </select>
             </div>

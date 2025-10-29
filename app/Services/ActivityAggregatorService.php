@@ -174,12 +174,94 @@ class ActivityAggregatorService
     }
 
     /**
+     * Get recent activities for admin dashboard (all users)
+     */
+    public static function getRecentActivities($limit = 10)
+    {
+        $cacheKey = "recent_activities_all";
+        
+        return Cache::remember($cacheKey, 300, function() use ($limit) {
+            $activities = [];
+
+            // Increase query limit to ensure we get enough data after filtering
+            $queryLimit = $limit * 2;
+
+            // Get recent mitra registrations
+            $recentMitras = DataMitra::with('user')
+                ->orderBy('created_at', 'desc')
+                ->take($queryLimit)
+                ->get();
+            
+            foreach ($recentMitras as $mitra) {
+                $activities[] = [
+                    'id' => 'mitra_' . $mitra->id_mitra,
+                    'type' => 'mitra_registered',
+                    'title' => 'Mitra Baru Terdaftar',
+                    'description' => ($mitra->nama_perusahaan ?? 'Mitra') . ' telah mendaftar',
+                    'time' => $mitra->created_at->diffForHumans(),
+                    'timestamp' => $mitra->created_at->timestamp,
+                ];
+            }
+
+            // Get recent seleksi submissions
+            $recentSeleksi = DataSeleksiMitra::with('mitra')
+                ->orderBy('created_at', 'desc')
+                ->take($queryLimit)
+                ->get();
+            
+            foreach ($recentSeleksi as $seleksi) {
+                $activities[] = [
+                    'id' => 'seleksi_' . $seleksi->id_seleksi_mitra,
+                    'type' => 'seleksi_submitted',
+                    'title' => 'Pengajuan Seleksi Baru',
+                    'description' => ($seleksi->mitra->nama_perusahaan ?? 'Mitra') . ' mengajukan seleksi',
+                    'time' => $seleksi->created_at->diffForHumans(),
+                    'timestamp' => $seleksi->created_at->timestamp,
+                ];
+            }
+
+            // Get recent klasifikasi
+            $recentKlasifikasi = KlasifikasiMitra::with('mitra')
+                ->orderBy('created_at', 'desc')
+                ->take($queryLimit)
+                ->get();
+            
+            foreach ($recentKlasifikasi as $klasifikasi) {
+                $activities[] = [
+                    'id' => 'klasifikasi_' . $klasifikasi->id_klasifikasi_mitra,
+                    'type' => 'klasifikasi_submitted',
+                    'title' => 'Pengajuan Klasifikasi',
+                    'description' => ($klasifikasi->mitra->nama_perusahaan ?? 'Mitra') . ' mengajukan klasifikasi',
+                    'time' => $klasifikasi->created_at->diffForHumans(),
+                    'timestamp' => $klasifikasi->created_at->timestamp,
+                ];
+            }
+
+            // Sort by timestamp descending (newest first)
+            usort($activities, function($a, $b) {
+                return $b['timestamp'] - $a['timestamp'];
+            });
+
+            // Return top N activities
+            return array_slice($activities, 0, $limit);
+        });
+    }
+
+    /**
      * Clear cache untuk user tertentu
      */
     public static function clearUserCache($userId)
     {
         $cacheKey = "user_activities_aggregated:{$userId}";
         Cache::forget($cacheKey);
+    }
+
+    /**
+     * Clear all activities cache
+     */
+    public static function clearAllActivitiesCache()
+    {
+        Cache::forget("recent_activities_all");
     }
 
     /**

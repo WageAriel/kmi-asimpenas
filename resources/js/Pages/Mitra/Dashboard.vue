@@ -22,10 +22,10 @@ const props = defineProps({
 
 // Data perusahaan mitra
 const mitraInfo = ref({
-    name: 'PT. Sejahtera Abadi',
-    type: 'Mitra Penggilingan Padi',
-    status: 'approved',
-    registration_year: 2024
+    name: 'Loading...',
+    type: 'Loading...',
+    status: 'pending',
+    registration_year: new Date().getFullYear()
 });
 
 const urgentNotifications = ref([]);
@@ -93,17 +93,34 @@ onMounted(async () => {
     try {
         const response = await axios.get('/data-mitra/my');
         const mitraData = response.data;
+        
+        console.log('📊 Mitra Data Loaded:', mitraData);
 
         if (mitraData && mitraData.id_mitra) {
+            // Update mitraInfo dengan data yang benar
+            const statusPerusahaan = mitraData.status_perusahaan || mitraData.badan_hukum_usaha || 'Mitra ASIMPENAS';
+            
             mitraInfo.value = {
-                name: mitraData.nama_lengkap || 'PT. Sejahtera Abadi',
-                type: 'Mitra Penggilingan Padi',
-                status: 'approved',
-                registration_year: mitraData.created_at ? new Date(mitraData.created_at).getFullYear() : 2024
+                name: mitraData.nama_perusahaan || 'Nama Perusahaan Belum Diisi',
+                type: statusPerusahaan,
+                status: 'approved', // Status approved karena user sudah terdaftar
+                registration_year: mitraData.created_at ? new Date(mitraData.created_at).getFullYear() : new Date().getFullYear()
             };
+            
+            console.log('✅ Mitra Info Updated:', mitraInfo.value);
         }
     } catch (error) {
+        console.error('❌ Error loading mitra data:', error);
+        
         if (error.response && error.response.status === 404) {
+            // Jika data mitra belum ada
+            mitraInfo.value = {
+                name: 'Data Mitra Belum Lengkap',
+                type: 'Silakan lengkapi data mitra',
+                status: 'pending',
+                registration_year: new Date().getFullYear()
+            };
+            
             urgentNotifications.value.push({
                 id: 1,
                 type: 'warning',
@@ -113,6 +130,8 @@ onMounted(async () => {
                 route: 'input-data-mitra',
                 urgent: true
             });
+        } else {
+            console.error('Error details:', error.response?.data);
         }
     }
 
