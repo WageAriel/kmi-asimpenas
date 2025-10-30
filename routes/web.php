@@ -87,7 +87,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     })->name('hasil-seleksi-mitra.index');
 });
 
-// Routes Dashboard Mitra tanpa middleware (untuk testing)
+// 1. Routes Dashboard Mitra tanpa middleware (untuk testing)
 Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Mitra/Dashboard', [
@@ -100,7 +100,7 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
         ]);
     })->name('dashboard');
 
-    //untuk mengakses tabel pengajuan seleksi
+    //2. untuk mengakses tabel pengajuan seleksi
     Route::get('/pengajuan-seleksi', function () {
         return Inertia::render('Mitra/PengajuanSeleksi/Index');
     })->name('pengajuan-seleksi.index');
@@ -118,7 +118,7 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
     Route::get('/pengajuan-seleksi/{id}/download', [PdfGeneratorController::class, 'downloadSeleksiMitraPdf'])
     ->name('pengajuan-seleksi.download');
 
-    //untuk mengakses tabel klasifikasi mitra
+    //3. untuk mengakses tabel klasifikasi mitra
     Route::get('/klasifikasi-mitra', function () {
         return Inertia::render('Mitra/KlasifikasiMitra/Index', [
             'title' => 'Klasifikasi Mitra'
@@ -142,6 +142,66 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
             ->with('success', 'Data klasifikasi mitra berhasil disimpan!');
     })->name('klasifikasi-mitra.store');
 
+    //4. untuk mengakses tabel puschase order
+    Route::get('/purchase-orders', function () {
+        $purchaseOrders = App\Models\PurchaseOrder::with('mitra')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return Inertia::render('Mitra/PurchaseOrder/Index', [
+            'purchaseOrders' => $purchaseOrders
+        ]);
+    })->name('purchase-orders.index');
+
+    // Form Create Purchase Order
+    Route::get('/purchase-orders/create', function () {
+        return Inertia::render('Mitra/PurchaseOrder/Create');
+    })->name('purchase-orders.create');
+
+    // Store Purchase Order
+    Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])
+        ->name('purchase-orders.store');
+
+    // Show Purchase Order
+    Route::get('/purchase-orders/{purchaseOrder}', function (App\Models\PurchaseOrder $purchaseOrder) {
+        return Inertia::render('Mitra/PurchaseOrder/Show', [
+            'purchaseOrder' => $purchaseOrder->load('mitra')
+        ]);
+    })->name('purchase-orders.show');
+
+    // Edit Purchase Order
+    Route::get('/purchase-orders/{purchaseOrder}/edit', function (App\Models\PurchaseOrder $purchaseOrder) {
+        return Inertia::render('Mitra/PurchaseOrder/Edit', [
+            'purchaseOrder' => $purchaseOrder
+        ]);
+    })->name('purchase-orders.edit');
+
+    // Update Purchase Order
+    Route::put('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update'])
+        ->name('purchase-orders.update');
+
+    // Delete Purchase Order
+    Route::delete('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])
+        ->name('purchase-orders.destroy');
+
+    // Generate PDF Routes
+    Route::get('/purchase-orders/{purchaseOrder}/surat-permohonan', 
+        [PdfGeneratorController::class, 'downloadSuratPermohonanPdf'])
+        ->name('purchase-orders.surat-permohonan');
+
+    Route::get('/purchase-orders/{purchaseOrder}/form-penawaran', 
+        [PdfGeneratorController::class, 'downloadFormPenawaranPdf'])
+        ->name('purchase-orders.form-penawaran');
+
+    Route::get('/purchase-orders/{purchaseOrder}/combined-pdf', 
+        [PdfGeneratorController::class, 'downloadCombinedPdf'])
+        ->name('purchase-orders.combined-pdf');
+
+    // Helper Route for Dynamic Options
+    Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])
+        ->name('purchase-orders.kualitas-options');
+
+    //5. untuk mengakses tabel hasil seleksi
     Route::get('/hasil-seleksi', function () {
         return Inertia::render('Mitra/HasilSeleksi', [
             'hasilSeleksi' => [
