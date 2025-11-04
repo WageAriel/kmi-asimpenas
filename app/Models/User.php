@@ -48,8 +48,12 @@ class User extends Authenticatable
     }
 
     public function mitra()
-{
-    return $this->hasOne(DataMitra::class, 'user_id', 'id');
-}
+    {
+        return $this->hasOne(DataMitra::class, 'user_id', 'id');
+    }
 
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
 }

@@ -90,12 +90,29 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 // 1. Routes Dashboard Mitra tanpa middleware (untuk testing)
 Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->group(function () {
     Route::get('/dashboard', function () {
+        $userId = auth()->id();
+        
+        // Hitung statistik Purchase Order untuk user yang sedang login
+        $totalPO = \App\Models\PurchaseOrder::where('user_id', $userId)->count();
+        $activePO = \App\Models\PurchaseOrder::where('user_id', $userId)
+            ->whereMonth('created_at', now()->month)
+            ->count();
+        $totalValueThisMonth = \App\Models\PurchaseOrder::where('user_id', $userId)
+            ->whereMonth('created_at', now()->month)
+            ->with('items')
+            ->get()
+            ->sum(function($po) {
+                return $po->total_nilai;
+            });
+        
         return Inertia::render('Mitra/Dashboard', [
             'statistik' => [
                 'pengajuan_total' => 3,
                 'pengajuan_approved' => 1,
                 'pengajuan_pending' => 2,
-                'po_aktif' => 5
+                'po_aktif' => $activePO,
+                'total_po' => $totalPO,
+                'total_nilai_bulan_ini' => $totalValueThisMonth
             ]
         ]);
     })->name('dashboard');
@@ -144,7 +161,8 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
 
     //4. untuk mengakses tabel puschase order
     Route::get('/purchase-orders', function () {
-        $purchaseOrders = App\Models\PurchaseOrder::with('mitra')
+        $purchaseOrders = App\Models\PurchaseOrder::with('items')
+            ->where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
             ->get();
             
@@ -164,15 +182,25 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
 
     // Show Purchase Order
     Route::get('/purchase-orders/{purchaseOrder}', function (App\Models\PurchaseOrder $purchaseOrder) {
+        // Pastikan user hanya bisa melihat PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+        
         return Inertia::render('Mitra/PurchaseOrder/Show', [
-            'purchaseOrder' => $purchaseOrder->load('mitra')
+            'purchaseOrder' => $purchaseOrder->load('items')
         ]);
     })->name('purchase-orders.show');
 
     // Edit Purchase Order
     Route::get('/purchase-orders/{purchaseOrder}/edit', function (App\Models\PurchaseOrder $purchaseOrder) {
+        // Pastikan user hanya bisa edit PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+        
         return Inertia::render('Mitra/PurchaseOrder/Edit', [
-            'purchaseOrder' => $purchaseOrder
+            'purchaseOrder' => $purchaseOrder->load('items')
         ]);
     })->name('purchase-orders.edit');
 

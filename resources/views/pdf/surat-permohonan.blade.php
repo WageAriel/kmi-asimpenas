@@ -174,23 +174,34 @@
             <tr>
                 <th>No</th>
                 <th>Jenis Komoditas</th>
-                <th>Jenis Pengadaan</th>
-                <th>Harga (Rp)</th>
+                <th>Harga (Rp/Kg)</th>
+                <th>Kuantum (Kg)</th>
                 <th>Nilai (Rp)</th>
                 <th>Komp. Pergud.</th>
-                <th>Kualitas</th>
             </tr>
         </thead>
         <tbody>
+            @forelse($purchaseOrder->items as $index => $item)
             <tr>
-                <td>1</td>
-                <td>{{ $purchaseOrder->jenis_komoditas_lengkap }}</td>
-                <td>{{ $purchaseOrder->jenis_pengadaan }}</td>
-                <td>{{ number_format($purchaseOrder->harga, 0, ',', '.') }}</td>
-                <td>{{ number_format($purchaseOrder->nilai, 0, ',', '.') }}</td>
-                <td>{{ $purchaseOrder->komplek_pergudangan_lengkap }}</td>
-                <td>{{ $purchaseOrder->kualitas_lengkap }}</td>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $item->jenis_komoditas_lengkap }} - {{ $item->kualitas_lengkap }}</td>
+                <td>{{ number_format($item->harga, 0, ',', '.') }}</td>
+                <td>{{ number_format($item->kuantum, 0, ',', '.') }}</td>
+                <td>{{ number_format($item->nilai, 0, ',', '.') }}</td>
+                <td>{{ $item->komplek_pergudangan_lengkap }}</td>
             </tr>
+            @empty
+            <tr>
+                <td colspan="6" style="text-align: center; color: #999;">Tidak ada data item</td>
+            </tr>
+            @endforelse
+            @if($purchaseOrder->items->count() > 0)
+            <tr style="font-weight: bold; background-color: #f5f5f5;">
+                <td colspan="4" style="text-align: right;">TOTAL:</td>
+                <td>{{ number_format($purchaseOrder->total_nilai, 0, ',', '.') }}</td>
+                <td>-</td>
+            </tr>
+            @endif
         </tbody>
     </table>
 

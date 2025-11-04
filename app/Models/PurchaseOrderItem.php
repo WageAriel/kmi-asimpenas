@@ -21,9 +21,9 @@ class PurchaseOrderItem extends Model
     ];
 
     protected $casts = [
-        'harga' => 'decimal:2',
-        'kuantum' => 'decimal:2',
-        'nilai' => 'decimal:2'
+        'harga' => 'integer',      // Harga per kg dalam rupiah
+        'kuantum' => 'decimal:2',  // Kuantum dalam kg (bisa desimal) 
+        'nilai' => 'integer'       // Nilai total dalam rupiah
     ];
 
     // Relationship dengan PurchaseOrder
@@ -48,5 +48,17 @@ class PurchaseOrderItem extends Model
             return $this->kualitas_custom;
         }
         return $this->kualitas;
+    }
+
+    // Accessor untuk mendapatkan jenis komoditas dari parent purchase order
+    public function getJenisKomoditasLengkapAttribute()
+    {
+        return $this->purchaseOrder->jenis_komoditas_lengkap;
+    }
+
+    // Accessor untuk mendapatkan satuan (default Kg)
+    public function getSatuanAttribute()
+    {
+        return 'Kg'; // Default satuan untuk semua item
     }
 }
