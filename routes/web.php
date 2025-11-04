@@ -37,7 +37,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // 1. Dashboard
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
-    // 2. Daftar Mitra
+    // 2. Daftar User
+    Route::get('/daftar-user', function () {
+        $users = App\Models\User::orderBy('created_at', 'desc')->get();
+        
+        return Inertia::render('Admin/DaftarUser/Index', [
+            'users' => $users
+        ]);
+    })->name('daftar-user.index');
+
+    // 3. Daftar Mitra
     Route::get('/daftar-mitra', function () {
         $mitras = App\Models\DataMitra::with('user')
             ->orderBy('created_at', 'desc')
@@ -53,7 +62,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/daftar-mitra/template', [App\Http\Controllers\DataMitraController::class, 'downloadTemplate'])->name('daftar-mitra.template');
     Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
 
-    // 3. Daftar Seleksi Mitra
+    // 4. Daftar Seleksi Mitra
     Route::get('/seleksi-mitra', function () {
         $seleksiMitras = App\Models\DataSeleksiMitra::with('mitra')
             ->orderBy('created_at', 'desc')
@@ -64,7 +73,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         ]);
     })->name('seleksi-mitra.index');
 
-    // 4. Daftar Klasifikasi Mitra
+    // 5. Daftar Klasifikasi Mitra
     Route::get('/klasifikasi-mitra', function () {
         $klasifikasiMitras = App\Models\KlasifikasiMitra::with('mitra')
             ->orderBy('created_at', 'desc')
@@ -75,7 +84,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         ]);
     })->name('klasifikasi-mitra.index');
 
-    // 5. Daftar Hasil Seleksi Mitra
+    // 6. Daftar Hasil Seleksi Mitra
     Route::get('/hasil-seleksi-mitra', function () {
         $hasilSeleksiMitras = App\Models\HasilSeleksiMitra::with(['mitra', 'seleksiMitra'])
             ->orderBy('created_at', 'desc')

@@ -11,32 +11,61 @@ const props = defineProps({
     }
 });
 
-// Sort mitras by created_at (newest first)
-const sortedMitras = computed(() => {
-    // Create a copy to avoid modifying props directly
-    return [...props.mitras].sort((a, b) => {
-        // Sort by created_at in descending order (newest first)
-        return new Date(b.created_at) - new Date(a.created_at);
-    });
-});
-
 // Add search functionality
 const searchQuery = ref('');
 
+// Sort state
+const sortBy = ref('created_at');
+const sortOrder = ref('desc');
+
+// Sort function
+const toggleSort = (column) => {
+    if (sortBy.value === column) {
+        sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortBy.value = column;
+        sortOrder.value = 'asc';
+    }
+};
+
 // Filter mitras based on search query
 const filteredMitras = computed(() => {
-    if (!searchQuery.value) return sortedMitras.value;
+    let filtered = [...props.mitras];
     
-    const query = searchQuery.value.toLowerCase();
-    return sortedMitras.value.filter(mitra => {
-        return (
-            mitra.nama_perusahaan?.toLowerCase().includes(query) ||
-            mitra.nama_cp?.toLowerCase().includes(query) ||
-            mitra.alamat_perusahaan?.toLowerCase().includes(query) ||
-            mitra.no_telp_perusahaan?.toLowerCase().includes(query) ||
-            mitra.status_perusahaan?.toLowerCase().includes(query)
-        );
+    // Apply search filter
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        filtered = filtered.filter(mitra => {
+            return (
+                mitra.nama_perusahaan?.toLowerCase().includes(query) ||
+                mitra.badan_hukum_usaha?.toLowerCase().includes(query) ||
+                mitra.status_perusahaan?.toLowerCase().includes(query)
+            );
+        });
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+        let comparison = 0;
+        
+        switch (sortBy.value) {
+            case 'nama_perusahaan':
+                comparison = a.nama_perusahaan?.localeCompare(b.nama_perusahaan);
+                break;
+            case 'badan_hukum':
+                comparison = a.badan_hukum_usaha?.localeCompare(b.badan_hukum_usaha);
+                break;
+            case 'status':
+                comparison = a.status_perusahaan?.localeCompare(b.status_perusahaan);
+                break;
+            default:
+                comparison = new Date(b.created_at) - new Date(a.created_at);
+        }
+        
+        return sortOrder.value === 'desc' ? comparison * -1 : comparison;
     });
+
+    return filtered;
 });
 
 // For modal functionality
@@ -273,13 +302,37 @@ const exportData = () => {
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Perusahaan</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Badan Hukum</th>
+                                <th 
+                                    @click="toggleSort('nama_perusahaan')" 
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                                >
+                                    Nama Perusahaan
+                                    <span v-if="sortBy === 'nama_perusahaan'" class="ml-1">
+                                        {{ sortOrder === 'desc' ? '▼' : '▲' }}
+                                    </span>
+                                </th>
+                                <th 
+                                    @click="toggleSort('badan_hukum')" 
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                                >
+                                    Badan Hukum
+                                    <span v-if="sortBy === 'badan_hukum'" class="ml-1">
+                                        {{ sortOrder === 'desc' ? '▼' : '▲' }}
+                                    </span>
+                                </th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Alamat</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama CP</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No Telp Perusahaan</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No Telp CP</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th 
+                                    @click="toggleSort('status')" 
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
+                                >
+                                    Status
+                                    <span v-if="sortBy === 'status'" class="ml-1">
+                                        {{ sortOrder === 'desc' ? '▼' : '▲' }}
+                                    </span>
+                                </th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                             </tr>
                         </thead>

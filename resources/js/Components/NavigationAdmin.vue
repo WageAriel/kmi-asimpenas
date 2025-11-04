@@ -1,7 +1,7 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { HomeIcon, DocumentIcon, ClipboardDocumentCheckIcon, DocumentChartBarIcon, DocumentCheckIcon } from '@heroicons/vue/24/outline';
+import { HomeIcon, UsersIcon, DocumentIcon, ClipboardDocumentCheckIcon, DocumentChartBarIcon, DocumentCheckIcon } from '@heroicons/vue/24/outline';
 import logoImg from '@/../../resources/assets/Images/bulog.png'; 
 
 const page = usePage();
@@ -41,6 +41,11 @@ const menuItems = [
         name: 'Dashboard',
         route: 'admin.dashboard',
         icon: HomeIcon
+    },
+    {
+        name: 'Daftar User',
+        route: 'admin.daftar-user.index',
+        icon: UsersIcon
     },
     {
         name: 'Daftar Mitra',
