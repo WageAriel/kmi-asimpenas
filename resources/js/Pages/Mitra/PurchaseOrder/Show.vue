@@ -6,8 +6,25 @@ const props = defineProps({
     purchaseOrder: Object
 });
 
+// Debug: log data yang diterima dari backend
+console.log('Purchase Order Data:', props.purchaseOrder);
+console.log('Total Harga:', props.purchaseOrder.total_harga, typeof props.purchaseOrder.total_harga);
+console.log('Total Kuantum:', props.purchaseOrder.total_kuantum, typeof props.purchaseOrder.total_kuantum);
+console.log('Total Nilai:', props.purchaseOrder.total_nilai, typeof props.purchaseOrder.total_nilai);
+
 const formatCurrency = (value) => {
-    return new Intl.NumberFormat('id-ID').format(value);
+    // Handle null, undefined, or NaN values
+    if (value === null || value === undefined || isNaN(value)) {
+        return '0';
+    }
+    
+    // Ensure value is a number
+    const numValue = Number(value);
+    if (isNaN(numValue)) {
+        return '0';
+    }
+    
+    return new Intl.NumberFormat('id-ID').format(numValue);
 };
 
 const downloadSuratPermohonan = () => {
@@ -113,17 +130,17 @@ const downloadCombinedPdf = () => {
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="bg-blue-50 p-4 rounded-lg">
                                 <h3 class="text-sm font-medium text-blue-600 uppercase tracking-wide">Total Harga</h3>
-                                <p class="mt-2 text-2xl font-bold text-blue-900">Rp {{ formatCurrency(purchaseOrder.total_harga) }}</p>
+                                <p class="mt-2 text-2xl font-bold text-blue-900">Rp {{ formatCurrency(purchaseOrder.total_harga || 0) }}</p>
                             </div>
                             
                             <div class="bg-green-50 p-4 rounded-lg">
                                 <h3 class="text-sm font-medium text-green-600 uppercase tracking-wide">Total Kuantum</h3>
-                                <p class="mt-2 text-2xl font-bold text-green-900">{{ formatCurrency(purchaseOrder.total_kuantum) }} <span class="text-lg">Kg</span></p>
+                                <p class="mt-2 text-2xl font-bold text-green-900">{{ formatCurrency(purchaseOrder.total_kuantum || 0) }} <span class="text-lg">Kg</span></p>
                             </div>
                             
                             <div class="bg-purple-50 p-4 rounded-lg">
                                 <h3 class="text-sm font-medium text-purple-600 uppercase tracking-wide">Total Nilai</h3>
-                                <p class="mt-2 text-2xl font-bold text-purple-900">Rp {{ formatCurrency(purchaseOrder.total_nilai) }}</p>
+                                <p class="mt-2 text-2xl font-bold text-purple-900">Rp {{ formatCurrency(purchaseOrder.total_nilai || 0) }}</p>
                             </div>
                         </div>
                     </div>

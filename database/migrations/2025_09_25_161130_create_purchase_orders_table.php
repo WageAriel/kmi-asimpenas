@@ -13,17 +13,12 @@ return new class extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // User relationship dari awal
             $table->string('nama_perusahaan');
             $table->string('jenis_komoditas');
             $table->string('jenis_komoditas_custom')->nullable(); // untuk input manual
             $table->enum('jenis_pengadaan', ['PSO', 'Komersial']);
-            $table->decimal('harga', 15, 2); // harga per kg
-            $table->decimal('kuantum', 15, 2); // dalam kg
-            $table->decimal('nilai', 15, 2); // harga * kuantum
-            $table->string('komplek_pergudangan');
-            $table->string('komplek_pergudangan_custom')->nullable(); // untuk input manual
-            $table->string('kualitas');
-            $table->string('kualitas_custom')->nullable(); // untuk input manual
+            // Field harga, kuantum, nilai, komplek_pergudangan, kualitas dipindah ke items table
             $table->string('agenda_no')->nullable();
             $table->date('tanggal_terima')->nullable();
             $table->text('paraf')->nullable();

@@ -10,6 +10,7 @@ class PurchaseOrder extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'nama_perusahaan',
         'jenis_komoditas',
         'jenis_komoditas_custom',
@@ -25,6 +26,12 @@ class PurchaseOrder extends Model
         'tanggal_terima' => 'datetime'
     ];
 
+    // Relationship dengan User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // Relationship dengan PurchaseOrderItem
     public function items()
     {
@@ -34,19 +41,28 @@ class PurchaseOrder extends Model
     // Accessor untuk total harga
     public function getTotalHargaAttribute()
     {
-        return $this->items->sum('harga');
+        if (!$this->relationLoaded('items')) {
+            $this->load('items');
+        }
+        return (int) $this->items->sum('harga') ?? 0;
     }
 
     // Accessor untuk total kuantum
     public function getTotalKuantumAttribute()
     {
-        return $this->items->sum('kuantum');
+        if (!$this->relationLoaded('items')) {
+            $this->load('items');
+        }
+        return (int) $this->items->sum('kuantum') ?? 0;
     }
 
     // Accessor untuk total nilai
     public function getTotalNilaiAttribute()
     {
-        return $this->items->sum('nilai');
+        if (!$this->relationLoaded('items')) {
+            $this->load('items');
+        }
+        return (int) $this->items->sum('nilai') ?? 0;
     }
 
     // Accessor untuk mendapatkan jenis komoditas yang tepat
@@ -101,7 +117,17 @@ class PurchaseOrder extends Model
     public static function getKomplekPergudanganOptions()
     {
         return [
-            'Karanganom', 'Krikilan', 'Ngabeyan', 'Banaran', 'Telukan', 'Triyagan', 'Gedong', 'Meger', 'Duyungan', 'Virtual', 'Custom'
+            'Karanganom', 
+            'Krikilan', 
+            'Ngabeyan', 
+            'Banaran', 
+            'Telukan', 
+            'Triyagan', 
+            'Gedong', 
+            'Meger', 
+            'Duyungan', 
+            'Virtual', 
+            'Custom'
         ];
     }
 

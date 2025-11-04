@@ -9,61 +9,78 @@ import { ref, computed, watch, onMounted } from 'vue';
 
 const props = defineProps({
     purchaseOrder: Object,
-    jenisKomoditasOptions: Array,
-    komplekPergudanganOptions: Array
+    jenisKomoditasOptions: {
+        type: Array,
+        default: () => ['GKP', 'GKG', 'Beras', 'Jagung', 'Gula Pasir', 'Minyak Goreng', 'Lain-lain']
+    },
+    komplekPergudanganOptions: {
+        type: Array,
+        default: () => ['Karanganom', 'Krikilan', 'Ngabeyan', 'Banaran', 'Telukan', 'Triyagan', 'Gedong', 'Meger', 'Duyungan', 'Virtual', 'Custom']
+    }
 });
 
+// Initialize form dengan data dari items
+const initialItems = (props.purchaseOrder.items && props.purchaseOrder.items.length > 0) 
+    ? props.purchaseOrder.items.map(item => ({
+        id: item.id,
+        harga: item.harga ? item.harga.toString() : '',
+        kuantum: item.kuantum ? parseFloat(item.kuantum).toString() : '',
+        komplek_pergudangan: item.komplek_pergudangan || '',
+        komplek_pergudangan_custom: item.komplek_pergudangan_custom || '',
+        kualitas: item.kualitas || '',
+        kualitas_custom: item.kualitas_custom || '',
+    }))
+    : [{
+        harga: '',
+        kuantum: '',
+        komplek_pergudangan: '',
+        komplek_pergudangan_custom: '',
+        kualitas: '',
+        kualitas_custom: '',
+    }];
+
 const form = useForm({
-    nama_perusahaan: props.purchaseOrder.nama_perusahaan,
-    jenis_komoditas: props.purchaseOrder.jenis_komoditas,
-    jenis_komoditas_custom: props.purchaseOrder.jenis_komoditas_custom,
-    jenis_pengadaan: props.purchaseOrder.jenis_pengadaan,
-    harga: props.purchaseOrder.harga.toString(),
-    kuantum: props.purchaseOrder.kuantum.toString(),
-    komplek_pergudangan: props.purchaseOrder.komplek_pergudangan,
-    komplek_pergudangan_custom: props.purchaseOrder.komplek_pergudangan_custom,
-    kualitas: props.purchaseOrder.kualitas,
-    kualitas_custom: props.purchaseOrder.kualitas_custom,
-    agenda_no: props.purchaseOrder.agenda_no,
-    tanggal_terima: props.purchaseOrder.tanggal_terima,
-    paraf: props.purchaseOrder.paraf,
-    kontrak_yll: props.purchaseOrder.kontrak_yll
+    nama_perusahaan: props.purchaseOrder.nama_perusahaan || '',
+    jenis_komoditas: props.purchaseOrder.jenis_komoditas || '',
+    jenis_komoditas_custom: props.purchaseOrder.jenis_komoditas_custom || '',
+    jenis_pengadaan: props.purchaseOrder.jenis_pengadaan || '',
+    agenda_no: props.purchaseOrder.agenda_no || '',
+    tanggal_terima: props.purchaseOrder.tanggal_terima || '',
+    paraf: props.purchaseOrder.paraf || '',
+    kontrak_yll: props.purchaseOrder.kontrak_yll || '',
+    kualitas_items: initialItems
 });
 
 const kualitasOptions = ref([]);
 const showJenisKomoditasCustom = computed(() => form.jenis_komoditas === 'Lain-lain');
-const showKomplekPergudanganCustom = computed(() => form.komplek_pergudangan === 'Custom');
-const showKualitasCustom = computed(() => form.kualitas === 'Lain-lain');
 
-// Hitung nilai total secara real-time
-const nilaiTotal = computed(() => {
-    const harga = parseFloat(form.harga) || 0;
-    const kuantum = parseFloat(form.kuantum) || 0;
-    return (harga * kuantum).toLocaleString('id-ID');
+// Computed untuk total keseluruhan
+const totalNilai = computed(() => {
+    return form.kualitas_items.reduce((total, item) => {
+        const harga = parseFloat(item.harga) || 0;
+        const kuantum = parseFloat(item.kuantum) || 0;
+        return total + (harga * kuantum);
+    }, 0);
 });
 
 // Format angka dengan separator ribuan
 const formatNumber = (value) => {
     if (!value) return '';
-    // Hapus semua karakter non-digit
     const number = value.toString().replace(/\D/g, '');
-    // Format dengan separator ribuan
     return number.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
 
-// Handle input harga
-const handleHargaInput = (event) => {
+// Handle input harga untuk setiap item
+const handleHargaInput = (event, index) => {
     const value = event.target.value.replace(/\./g, '');
-    form.harga = value;
-    // Update tampilan input dengan format
+    form.kualitas_items[index].harga = value;
     event.target.value = formatNumber(value);
 };
 
-// Handle input kuantum
-const handleKuantumInput = (event) => {
+// Handle input kuantum untuk setiap item
+const handleKuantumInput = (event, index) => {
     const value = event.target.value.replace(/\./g, '');
-    form.kuantum = value;
-    // Update tampilan input dengan format
+    form.kualitas_items[index].kuantum = value;
     event.target.value = formatNumber(value);
 };
 
@@ -78,62 +95,68 @@ const updateKualitasOptions = (jenisKomoditas) => {
             break;
         case 'GKG':
             kualitasOptions.value = ['GKG', 'Lain-lain'];
-            // Set default ke nama komoditas jika kualitas kosong
-            if (!form.kualitas) form.kualitas = 'GKG';
             break;
         case 'Jagung':
             kualitasOptions.value = ['Jagung', 'Lain-lain'];
-            // Set default ke nama komoditas jika kualitas kosong
-            if (!form.kualitas) form.kualitas = 'Jagung';
             break;
         case 'Gula Pasir':
             kualitasOptions.value = ['Gula Pasir', 'Lain-lain'];
-            // Set default ke nama komoditas jika kualitas kosong
-            if (!form.kualitas) form.kualitas = 'Gula Pasir';
             break;
         case 'Minyak Goreng':
             kualitasOptions.value = ['Minyak Goreng', 'Lain-lain'];
-            // Set default ke nama komoditas jika kualitas kosong
-            if (!form.kualitas) form.kualitas = 'Minyak Goreng';
             break;
         case 'Lain-lain':
             kualitasOptions.value = ['Lain-lain'];
-            // Set default ke nama komoditas jika kualitas kosong
-            if (!form.kualitas) form.kualitas = 'Lain-lain';
             break;
         default:
             kualitasOptions.value = ['Lain-lain'];
-            // Set default ke nama komoditas jika kualitas kosong
-            if (!form.kualitas) form.kualitas = 'Lain-lain';
             break;
     }
 };
 
+// Functions untuk mengelola items
+const addKualitasItem = () => {
+    form.kualitas_items.push({
+        harga: '',
+        kuantum: '',
+        komplek_pergudangan: '',
+        komplek_pergudangan_custom: '',
+        kualitas: '',
+        kualitas_custom: '',
+    });
+};
+
+const removeKualitasItem = (index) => {
+    if (form.kualitas_items.length > 1) {
+        form.kualitas_items.splice(index, 1);
+    }
+};
+
+// Computed untuk show custom fields per item
+const showKomplekPergudanganCustom = (index) => {
+    return form.kualitas_items[index]?.komplek_pergudangan === 'Custom';
+};
+
+const showKualitasCustom = (index) => {
+    return form.kualitas_items[index]?.kualitas === 'Lain-lain';
+};
+
 // Watch perubahan jenis komoditas untuk update kualitas
 watch(() => form.jenis_komoditas, (newValue) => {
-    // Reset kualitas saat jenis komoditas berubah (kecuali saat pertama load)
-    if (newValue !== props.purchaseOrder.jenis_komoditas) {
-        form.kualitas = '';
-        form.kualitas_custom = '';
-    }
-    
     updateKualitasOptions(newValue);
+    
+    // Reset kualitas untuk semua items jika jenis komoditas berubah
+    if (newValue !== props.purchaseOrder.jenis_komoditas) {
+        form.kualitas_items.forEach(item => {
+            item.kualitas = '';
+            item.kualitas_custom = '';
+        });
+    }
 });
 
 // Initialize kualitas options saat component mounted
 onMounted(() => {
     updateKualitasOptions(form.jenis_komoditas);
-    
-    // Format input numbers on mount
-    const hargaInput = document.getElementById('harga');
-    const kuantumInput = document.getElementById('kuantum');
-    
-    if (hargaInput) {
-        hargaInput.value = formatNumber(form.harga);
-    }
-    if (kuantumInput) {
-        kuantumInput.value = formatNumber(form.kuantum);
-    }
 });
 
 
@@ -241,111 +264,151 @@ const submit = () => {
                             <InputError class="mt-2" :message="form.errors.jenis_pengadaan" />
                         </div>
 
-                        <!-- Harga dan Kuantum -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <InputLabel for="harga" value="Harga (Rp/Kg)" />
-                                <div class="mt-1 relative rounded-md shadow-sm">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-500 sm:text-sm">Rp</span>
-                                    </div>
-                                    <input
-                                        id="harga"
-                                        type="text"
-                                        @input="handleHargaInput"
-                                        class="block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        placeholder="0"
-                                        required
-                                    />
+                        <!-- Item Kualitas (Multi-item) -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-medium text-gray-900">Detail Item Purchase Order</h3>
+                                <button
+                                    type="button"
+                                    @click="addKualitasItem"
+                                    class="px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                    + Tambah Item
+                                </button>
+                            </div>
+
+                            <div v-for="(item, index) in form.kualitas_items" :key="index" class="mb-6 p-4 border border-gray-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="text-md font-medium text-gray-800">Item {{ index + 1 }}</h4>
+                                    <button
+                                        v-if="form.kualitas_items.length > 1"
+                                        type="button"
+                                        @click="removeKualitasItem(index)"
+                                        class="text-red-600 hover:text-red-800 text-sm"
+                                    >
+                                        Hapus Item
+                                    </button>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.harga" />
-                            </div>
 
-                            <div>
-                                <InputLabel for="kuantum" value="Kuantum (Kg)" />
-                                <div class="mt-1 relative rounded-md shadow-sm">
-                                    <input
-                                        id="kuantum"
-                                        type="text"
-                                        @input="handleKuantumInput"
-                                        class="block w-full pr-12 py-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        placeholder="0"
-                                        required
-                                    />
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-500 sm:text-sm">Kg</span>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <!-- Harga -->
+                                    <div>
+                                        <InputLabel :for="`harga_${index}`" value="Harga (Rp/Kg)" />
+                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span class="text-gray-500 sm:text-sm">Rp</span>
+                                            </div>
+                                            <input
+                                                :id="`harga_${index}`"
+                                                type="text"
+                                                @input="handleHargaInput($event, index)"
+                                                :value="formatNumber(item.harga)"
+                                                class="block w-full pl-10 pr-3 py-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                placeholder="0"
+                                                required
+                                            />
+                                        </div>
+                                        <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.harga`]" />
+                                    </div>
+
+                                    <!-- Kuantum -->
+                                    <div>
+                                        <InputLabel :for="`kuantum_${index}`" value="Kuantum (Kg)" />
+                                        <div class="mt-1 relative rounded-md shadow-sm">
+                                            <input
+                                                :id="`kuantum_${index}`"
+                                                type="text"
+                                                @input="handleKuantumInput($event, index)"
+                                                :value="formatNumber(item.kuantum)"
+                                                class="block w-full pr-12 py-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                placeholder="0"
+                                                required
+                                            />
+                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                <span class="text-gray-500 sm:text-sm">Kg</span>
+                                            </div>
+                                        </div>
+                                        <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.kuantum`]" />
                                     </div>
                                 </div>
-                                <InputError class="mt-2" :message="form.errors.kuantum" />
-                            </div>
-                        </div>
 
-                        <!-- Nilai Total (readonly) -->
-                        <div>
-                            <InputLabel value="Nilai Total" />
-                            <div class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 font-medium">
-                                Rp {{ nilaiTotal }}
-                            </div>
-                        </div>
+                                <!-- Nilai per item (readonly) -->
+                                <div class="mb-4">
+                                    <InputLabel value="Nilai Item" />
+                                    <div class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-900 font-medium">
+                                        Rp {{ ((parseFloat(item.harga) || 0) * (parseFloat(item.kuantum) || 0)).toLocaleString('id-ID') }}
+                                    </div>
+                                </div>
 
-                        <!-- Komplek Pergudangan -->
-                        <div>
-                            <InputLabel for="komplek_pergudangan" value="Komplek Pergudangan" />
-                            <select
-                                id="komplek_pergudangan"
-                                v-model="form.komplek_pergudangan"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                required
-                            >
-                                <option value="">Pilih komplek pergudangan</option>
-                                <option v-for="option in komplekPergudanganOptions" :key="option" :value="option">
-                                    {{ option === 'Custom' ? 'Lainnya (Input Manual)' : 'Komplek ' + option }}
-                                </option>
-                            </select>
-                            <InputError class="mt-2" :message="form.errors.komplek_pergudangan" />
-                            
-                            <!-- Custom input untuk "Custom" -->
-                            <div v-if="showKomplekPergudanganCustom" class="mt-3">
-                                <InputLabel for="komplek_pergudangan_custom" value="Nama Komplek Pergudangan" />
-                                <TextInput
-                                    id="komplek_pergudangan_custom"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    v-model="form.komplek_pergudangan_custom"
-                                    placeholder="Masukkan nama komplek pergudangan"
-                                />
-                                <InputError class="mt-2" :message="form.errors.komplek_pergudangan_custom" />
-                            </div>
-                        </div>
+                                <!-- Komplek Pergudangan -->
+                                <div class="mb-4">
+                                    <InputLabel :for="`komplek_pergudangan_${index}`" value="Komplek Pergudangan" />
+                                    <select
+                                        :id="`komplek_pergudangan_${index}`"
+                                        v-model="item.komplek_pergudangan"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
+                                    >
+                                        <option value="">Pilih komplek pergudangan</option>
+                                        <option v-for="option in komplekPergudanganOptions" :key="option" :value="option">
+                                            {{ option === 'Custom' ? 'Lainnya (Input Manual)' : 'Komplek ' + option }}
+                                        </option>
+                                    </select>
+                                    <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.komplek_pergudangan`]" />
+                                    
+                                    <!-- Custom input untuk "Custom" -->
+                                    <div v-if="showKomplekPergudanganCustom(index)" class="mt-3">
+                                        <InputLabel :for="`komplek_pergudangan_custom_${index}`" value="Nama Komplek Pergudangan" />
+                                        <TextInput
+                                            :id="`komplek_pergudangan_custom_${index}`"
+                                            type="text"
+                                            class="mt-1 block w-full"
+                                            v-model="item.komplek_pergudangan_custom"
+                                            placeholder="Masukkan nama komplek pergudangan"
+                                        />
+                                        <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.komplek_pergudangan_custom`]" />
+                                    </div>
+                                </div>
 
-                        <!-- Kualitas -->
-                        <div>
-                            <InputLabel for="kualitas" value="Kualitas" />
-                            <select
-                                id="kualitas"
-                                v-model="form.kualitas"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                required
-                                :disabled="!form.jenis_komoditas"
-                            >
-                                <option value="">{{ form.jenis_komoditas ? 'Pilih kualitas' : 'Pilih jenis komoditas terlebih dahulu' }}</option>
-                                <option v-for="option in kualitasOptions" :key="option" :value="option">
-                                    {{ option }}
-                                </option>
-                            </select>
-                            <InputError class="mt-2" :message="form.errors.kualitas" />
-                            
-                            <!-- Custom input untuk "Lain-lain" -->
-                            <div v-if="showKualitasCustom" class="mt-3">
-                                <InputLabel for="kualitas_custom" value="Spesifikasi Kualitas" />
-                                <TextInput
-                                    id="kualitas_custom"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    v-model="form.kualitas_custom"
-                                    placeholder="Masukkan spesifikasi kualitas lainnya"
-                                />
-                                <InputError class="mt-2" :message="form.errors.kualitas_custom" />
+                                <!-- Kualitas -->
+                                <div>
+                                    <InputLabel :for="`kualitas_${index}`" value="Kualitas" />
+                                    <select
+                                        :id="`kualitas_${index}`"
+                                        v-model="item.kualitas"
+                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
+                                        :disabled="!form.jenis_komoditas"
+                                    >
+                                        <option value="">{{ form.jenis_komoditas ? 'Pilih kualitas' : 'Pilih jenis komoditas terlebih dahulu' }}</option>
+                                        <option v-for="option in kualitasOptions" :key="option" :value="option">
+                                            {{ option }}
+                                        </option>
+                                    </select>
+                                    <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.kualitas`]" />
+                                    
+                                    <!-- Custom input untuk "Lain-lain" -->
+                                    <div v-if="showKualitasCustom(index)" class="mt-3">
+                                        <InputLabel :for="`kualitas_custom_${index}`" value="Spesifikasi Kualitas" />
+                                        <TextInput
+                                            :id="`kualitas_custom_${index}`"
+                                            type="text"
+                                            class="mt-1 block w-full"
+                                            v-model="item.kualitas_custom"
+                                            placeholder="Masukkan spesifikasi kualitas lainnya"
+                                        />
+                                        <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.kualitas_custom`]" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Keseluruhan -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="text-right">
+                                    <span class="text-lg font-semibold text-gray-900">
+                                        Total Keseluruhan: Rp {{ totalNilai.toLocaleString('id-ID') }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 

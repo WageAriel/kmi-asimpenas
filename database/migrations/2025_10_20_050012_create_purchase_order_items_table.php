@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('purchase_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_order_id')->constrained()->onDelete('cascade');
-            $table->decimal('harga', 15, 2);
-            $table->decimal('kuantum', 15, 2);
-            $table->decimal('nilai', 15, 2);
+            $table->bigInteger('harga'); // Harga per kg dalam rupiah (integer)
+            $table->decimal('kuantum', 15, 2); // Kuantum dalam kg (bisa desimal)
+            $table->bigInteger('nilai'); // Nilai total dalam rupiah (integer)
             $table->string('komplek_pergudangan');
             $table->string('komplek_pergudangan_custom')->nullable();
             $table->string('kualitas');

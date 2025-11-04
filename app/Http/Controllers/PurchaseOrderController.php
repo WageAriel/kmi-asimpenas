@@ -16,6 +16,7 @@ class PurchaseOrderController extends Controller
     public function index()
     {
         $purchaseOrders = PurchaseOrder::with('items')
+            ->where('user_id', auth()->id())
             ->latest()
             ->paginate(10)
             ->through(fn ($po) => [
@@ -69,6 +70,7 @@ class PurchaseOrderController extends Controller
 
         // Create the main Purchase Order
         $purchaseOrder = PurchaseOrder::create([
+            'user_id' => auth()->id(),
             'nama_perusahaan' => $validated['nama_perusahaan'],
             'jenis_komoditas' => $validated['jenis_komoditas'],
             'jenis_komoditas_custom' => $validated['jenis_komoditas_custom'],
@@ -92,6 +94,11 @@ class PurchaseOrderController extends Controller
      */
     public function show(PurchaseOrder $purchaseOrder)
     {
+        // Pastikan user hanya bisa melihat PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+
         $purchaseOrder->load('items');
         
         return Inertia::render('Mitra/PurchaseOrder/Show', [
@@ -100,9 +107,9 @@ class PurchaseOrderController extends Controller
                 'nama_perusahaan' => $purchaseOrder->nama_perusahaan,
                 'jenis_komoditas' => $purchaseOrder->jenis_komoditas_lengkap,
                 'jenis_pengadaan' => $purchaseOrder->jenis_pengadaan,
-                'total_harga' => $purchaseOrder->total_harga,
-                'total_kuantum' => $purchaseOrder->total_kuantum,
-                'total_nilai' => $purchaseOrder->total_nilai,
+                'total_harga' => (int) $purchaseOrder->total_harga,
+                'total_kuantum' => (int) $purchaseOrder->total_kuantum,
+                'total_nilai' => (int) $purchaseOrder->total_nilai,
                 'agenda_no' => $purchaseOrder->agenda_no,
                 'tanggal_terima' => $purchaseOrder->tanggal_terima?->format('Y-m-d'),
                 'paraf' => $purchaseOrder->paraf,
@@ -112,9 +119,9 @@ class PurchaseOrderController extends Controller
                 'items' => $purchaseOrder->items->map(function ($item) {
                     return [
                         'id' => $item->id,
-                        'harga' => $item->harga,
-                        'kuantum' => $item->kuantum,
-                        'nilai' => $item->nilai,
+                        'harga' => (int) $item->harga,
+                        'kuantum' => (float) $item->kuantum,
+                        'nilai' => (int) $item->nilai,
                         'komplek_pergudangan' => $item->komplek_pergudangan_lengkap,
                         'kualitas' => $item->kualitas_lengkap,
                     ];
@@ -128,8 +135,37 @@ class PurchaseOrderController extends Controller
      */
     public function edit(PurchaseOrder $purchaseOrder)
     {
+        // Pastikan user hanya bisa edit PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+
+        $purchaseOrder->load('items');
+
         return Inertia::render('Mitra/PurchaseOrder/Edit', [
-            'purchaseOrder' => $purchaseOrder,
+            'purchaseOrder' => [
+                'id' => $purchaseOrder->id,
+                'nama_perusahaan' => $purchaseOrder->nama_perusahaan,
+                'jenis_komoditas' => $purchaseOrder->jenis_komoditas,
+                'jenis_komoditas_custom' => $purchaseOrder->jenis_komoditas_custom,
+                'jenis_pengadaan' => $purchaseOrder->jenis_pengadaan,
+                'agenda_no' => $purchaseOrder->agenda_no,
+                'tanggal_terima' => $purchaseOrder->tanggal_terima?->format('Y-m-d'),
+                'paraf' => $purchaseOrder->paraf,
+                'kontrak_yll' => $purchaseOrder->kontrak_yll,
+                'items' => $purchaseOrder->items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'harga' => (int) $item->harga,
+                        'kuantum' => (float) $item->kuantum,
+                        'nilai' => (int) $item->nilai,
+                        'komplek_pergudangan' => $item->komplek_pergudangan,
+                        'komplek_pergudangan_custom' => $item->komplek_pergudangan_custom,
+                        'kualitas' => $item->kualitas,
+                        'kualitas_custom' => $item->kualitas_custom,
+                    ];
+                })
+            ],
             'jenisKomoditasOptions' => PurchaseOrder::getJenisKomoditasOptions(),
             'komplekPergudanganOptions' => PurchaseOrder::getKomplekPergudanganOptions(),
         ]);
@@ -140,27 +176,71 @@ class PurchaseOrderController extends Controller
      */
     public function update(Request $request, PurchaseOrder $purchaseOrder)
     {
+        // Pastikan user hanya bisa update PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+
         $validated = $request->validate([
             'nama_perusahaan' => 'required|string|max:255',
             'jenis_komoditas' => 'required|string',
             'jenis_komoditas_custom' => 'nullable|string|max:255',
             'jenis_pengadaan' => 'required|in:PSO,Komersial',
-            'harga' => 'required|numeric|min:0',
-            'kuantum' => 'required|numeric|min:0',
-            'komplek_pergudangan' => 'required|string',
-            'komplek_pergudangan_custom' => 'nullable|string|max:255',
-            'kualitas' => 'required|string',
-            'kualitas_custom' => 'nullable|string|max:255',
+            'kualitas_items' => 'required|array|min:1',
+            'kualitas_items.*.id' => 'nullable|integer|exists:purchase_order_items,id',
+            'kualitas_items.*.harga' => 'required|numeric|min:0',
+            'kualitas_items.*.kuantum' => 'required|numeric|min:0',
+            'kualitas_items.*.komplek_pergudangan' => 'required|string',
+            'kualitas_items.*.komplek_pergudangan_custom' => 'nullable|string|max:255',
+            'kualitas_items.*.kualitas' => 'required|string',
+            'kualitas_items.*.kualitas_custom' => 'nullable|string|max:255',
             'agenda_no' => 'nullable|string|max:255',
             'tanggal_terima' => 'nullable|date',
             'paraf' => 'nullable|string',
             'kontrak_yll' => 'nullable|in:REALISASI S/D,DISETUJUI/TIDAK',
         ]);
 
-        // Hitung ulang nilai
-        $validated['nilai'] = $validated['harga'] * $validated['kuantum'];
+        // Update main PO data
+        $purchaseOrder->update([
+            'nama_perusahaan' => $validated['nama_perusahaan'],
+            'jenis_komoditas' => $validated['jenis_komoditas'],
+            'jenis_komoditas_custom' => $validated['jenis_komoditas_custom'],
+            'jenis_pengadaan' => $validated['jenis_pengadaan'],
+            'agenda_no' => $validated['agenda_no'],
+            'tanggal_terima' => $validated['tanggal_terima'],
+            'paraf' => $validated['paraf'],
+            'kontrak_yll' => $validated['kontrak_yll'],
+        ]);
 
-        $purchaseOrder->update($validated);
+        // Get existing item IDs
+        $existingItemIds = $purchaseOrder->items->pluck('id')->toArray();
+        $submittedItemIds = [];
+
+        // Update or create items
+        foreach ($validated['kualitas_items'] as $itemData) {
+            $itemData['nilai'] = $itemData['harga'] * $itemData['kuantum'];
+            
+            if (isset($itemData['id']) && $itemData['id']) {
+                // Update existing item
+                $item = $purchaseOrder->items()->find($itemData['id']);
+                if ($item) {
+                    $item->update($itemData);
+                    $submittedItemIds[] = $itemData['id'];
+                }
+            } else {
+                // Create new item
+                $itemData['purchase_order_id'] = $purchaseOrder->id;
+                unset($itemData['id']); // Remove null id
+                $newItem = \App\Models\PurchaseOrderItem::create($itemData);
+                $submittedItemIds[] = $newItem->id;
+            }
+        }
+
+        // Delete items that were removed
+        $itemsToDelete = array_diff($existingItemIds, $submittedItemIds);
+        if (!empty($itemsToDelete)) {
+            \App\Models\PurchaseOrderItem::whereIn('id', $itemsToDelete)->delete();
+        }
 
         return redirect()->route('mitra.purchase-orders.show', $purchaseOrder)
             ->with('success', 'Purchase Order berhasil diupdate!');
@@ -171,6 +251,11 @@ class PurchaseOrderController extends Controller
      */
     public function destroy(PurchaseOrder $purchaseOrder)
     {
+        // Pastikan user hanya bisa delete PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+
         $purchaseOrder->delete();
 
         return redirect()->route('mitra.purchase-orders.index')
@@ -182,6 +267,14 @@ class PurchaseOrderController extends Controller
      */
     public function generateSuratPermohonan(PurchaseOrder $purchaseOrder)
     {
+        // Pastikan user hanya bisa generate PDF PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+
+        // Load relasi items untuk PDF
+        $purchaseOrder->load('items');
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
@@ -199,6 +292,14 @@ class PurchaseOrderController extends Controller
      */
     public function generateFormPenawaran(PurchaseOrder $purchaseOrder)
     {
+        // Pastikan user hanya bisa generate PDF PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+
+        // Load relasi items untuk PDF
+        $purchaseOrder->load('items');
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
@@ -213,8 +314,19 @@ class PurchaseOrderController extends Controller
     /**
      * Generate Combined PDF (Surat Permohonan + Form Penawaran)
      */
+    /**
+     * Generate Combined PDF (Surat Permohonan + Form Penawaran)
+     */
     public function generateCombinedPdf(PurchaseOrder $purchaseOrder)
     {
+        // Pastikan user hanya bisa generate PDF PO mereka sendiri
+        if ($purchaseOrder->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this Purchase Order.');
+        }
+
+        // Load relasi items untuk PDF
+        $purchaseOrder->load('items');
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),

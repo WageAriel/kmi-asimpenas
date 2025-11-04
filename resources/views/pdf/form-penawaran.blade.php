@@ -147,13 +147,13 @@
         </div>
         
         <div class="form-row">
-            <div class="form-label">Komplek Pergudangan:</div>
-            <div class="form-value">{{ $purchaseOrder->komplek_pergudangan_lengkap }}</div>
+            <div class="form-label">Jumlah Item:</div>
+            <div class="form-value">{{ $purchaseOrder->items->count() }} item</div>
         </div>
         
         <div class="form-row">
-            <div class="form-label">Kualitas:</div>
-            <div class="form-value">{{ $purchaseOrder->kualitas_lengkap }}</div>
+            <div class="form-label">Total Nilai:</div>
+            <div class="form-value">Rp {{ number_format($purchaseOrder->total_nilai, 0, ',', '.') }}</div>
         </div>
         
         <div class="form-row">
@@ -165,32 +165,36 @@
     <table class="commodity-table">
         <thead>
             <tr>
-                <th rowspan="2">No</th>
-                <th rowspan="2">Jenis Komoditas</th>
-                <th rowspan="2">Kualitas</th>
-                <th rowspan="2">Kuantum (Kg)</th>
-                <th colspan="2">Harga</th>
-                <th rowspan="2">Nilai Total (Rp)</th>
-                <th rowspan="2">Komplek Pergudangan</th>
-                <th rowspan="2">Keterangan</th>
-            </tr>
-            <tr>
-                <th>Per Kg (Rp)</th>
-                <th>Satuan</th>
+                <th>No</th>
+                <th>Jenis Komoditas</th>
+                <th>Harga (Rp/Kg)</th>
+                <th>Kuantum (Kg)</th>
+                <th>Nilai (Rp)</th>
+                <th>Komp. Pergud.</th>
             </tr>
         </thead>
         <tbody>
+            @forelse($purchaseOrder->items as $index => $item)
             <tr>
-                <td>1</td>
-                <td>{{ $purchaseOrder->jenis_komoditas_lengkap }}</td>
-                <td>{{ $purchaseOrder->kualitas_lengkap }}</td>
-                <td>{{ number_format($purchaseOrder->kuantum, 0, ',', '.') }}</td>
-                <td>{{ number_format($purchaseOrder->harga, 0, ',', '.') }}</td>
-                <td>Kg</td>
-                <td>{{ number_format($purchaseOrder->nilai, 0, ',', '.') }}</td>
-                <td>{{ $purchaseOrder->komplek_pergudangan_lengkap }}</td>
-                <td>{{ $purchaseOrder->jenis_pengadaan }}</td>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $item->jenis_komoditas_lengkap }} - {{ $item->kualitas_lengkap }}</td>
+                <td>{{ number_format($item->harga, 0, ',', '.') }}</td>
+                <td>{{ number_format($item->kuantum, 0, ',', '.') }}</td>
+                <td>{{ number_format($item->nilai, 0, ',', '.') }}</td>
+                <td>{{ $item->komplek_pergudangan_lengkap }}</td>
             </tr>
+            @empty
+            <tr>
+                <td colspan="6" style="text-align: center; color: #999;">Tidak ada data item</td>
+            </tr>
+            @endforelse
+            @if($purchaseOrder->items->count() > 0)
+            <tr style="font-weight: bold; background-color: #f5f5f5;">
+                <td colspan="4" style="text-align: right;">TOTAL:</td>
+                <td>{{ number_format($purchaseOrder->total_nilai, 0, ',', '.') }}</td>
+                <td>-</td>
+            </tr>
+            @endif
         </tbody>
     </table>
 
