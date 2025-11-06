@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\KlasifikasiMitra;
 use App\Models\DataMitra;
+use App\Imports\KlasifikasiMitraImport;
+use App\Exports\KlasifikasiMitraExport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KlasifikasiMitraController extends Controller
 {
@@ -116,5 +120,81 @@ class KlasifikasiMitraController extends Controller
         $klasifikasi->delete();
 
         return response()->json(['message' => 'Klasifikasi mitra berhasil dihapus']);
+    }
+
+    /**
+     * Import data klasifikasi mitra from Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:5120', // max 5MB
+        ]);
+
+        try {
+            $import = new KlasifikasiMitraImport();
+            Excel::import($import, $request->file('file'));
+
+            // Check if there are any failures
+            $failures = $import->failures();
+            
+            if ($failures->count() > 0) {
+                $errorMessages = [];
+                foreach ($failures as $failure) {
+                    $errorMessages[] = [
+                        'row' => $failure->row(),
+                        'attribute' => $failure->attribute(),
+                        'errors' => $failure->errors(),
+                    ];
+                }
+                
+                return response()->json([
+                    'message' => 'Import selesai dengan beberapa error',
+                    'failures' => $errorMessages
+                ], 422);
+            }
+
+            return response()->json([
+                'message' => 'Data klasifikasi mitra berhasil diimport'
+            ], 200);
+
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = [];
+            
+            foreach ($failures as $failure) {
+                $errorMessages[] = [
+                    'row' => $failure->row(),
+                    'attribute' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                ];
+            }
+            
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'failures' => $errorMessages
+            ], 422);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Export data klasifikasi mitra to Excel
+     */
+    public function export()
+    {
+        return Excel::download(new KlasifikasiMitraExport(false), 'data-klasifikasi-mitra-' . date('Y-m-d') . '.xlsx');
+    }
+
+    /**
+     * Download template Excel untuk import
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(new KlasifikasiMitraExport(true), 'template-data-klasifikasi-mitra.xlsx');
     }
 }

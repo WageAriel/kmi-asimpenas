@@ -179,6 +179,119 @@ const rejectSeleksi = async () => {
         isLoading.value = false;
     }
 };
+
+// Import functionality
+const showImportModal = ref(false);
+const selectedFile = ref(null);
+const isUploading = ref(false);
+const uploadError = ref(null);
+const uploadSuccess = ref(null);
+
+// Import functions
+const openImportModal = () => {
+    showImportModal.value = true;
+    selectedFile.value = null;
+    uploadError.value = null;
+    uploadSuccess.value = null;
+};
+
+const closeImportModal = () => {
+    showImportModal.value = false;
+    selectedFile.value = null;
+    uploadError.value = null;
+    uploadSuccess.value = null;
+};
+
+const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        // Validate file type
+        const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv'];
+        if (!validTypes.includes(file.type)) {
+            uploadError.value = 'File harus berformat Excel (.xlsx, .xls) atau CSV';
+            selectedFile.value = null;
+            return;
+        }
+        
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            uploadError.value = 'Ukuran file maksimal 5MB';
+            selectedFile.value = null;
+            return;
+        }
+        
+        selectedFile.value = file;
+        uploadError.value = null;
+    }
+};
+
+const uploadFile = async () => {
+    if (!selectedFile.value) {
+        uploadError.value = 'Pilih file terlebih dahulu';
+        return;
+    }
+
+    isUploading.value = true;
+    uploadError.value = null;
+    uploadSuccess.value = null;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile.value);
+
+    try {
+        const response = await axios.post('/data-seleksi-mitra/import', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        uploadSuccess.value = response.data.message || 'Data berhasil diimport';
+        selectedFile.value = null;
+        
+        // Reload page after successful import
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+
+    } catch (error) {
+        console.error('Upload error:', error);
+        
+        if (error.response) {
+            const data = error.response.data;
+            
+            if (data.failures && data.failures.length > 0) {
+                const errorDetails = data.failures.slice(0, 5).map(f => 
+                    `Baris ${f.row}: ${f.errors.join(', ')}`
+                ).join('\n');
+                uploadError.value = `Terdapat error pada file:\n${errorDetails}`;
+                
+                if (data.failures.length > 5) {
+                    uploadError.value += `\n... dan ${data.failures.length - 5} error lainnya`;
+                }
+            } else if (data.errors) {
+                const errorMessages = Object.values(data.errors).flat();
+                uploadError.value = errorMessages.join('\n');
+            } else {
+                uploadError.value = data.message || 'Terjadi kesalahan saat import';
+            }
+        } else if (error.request) {
+            uploadError.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+        } else {
+            uploadError.value = `Terjadi kesalahan: ${error.message}`;
+        }
+    } finally {
+        isUploading.value = false;
+    }
+};
+
+const downloadTemplate = () => {
+    window.location.href = '/data-seleksi-mitra/export/template';
+};
+
+// Export function
+const exportData = () => {
+    window.location.href = '/data-seleksi-mitra/export/data';
+};
 </script>
 
 <template>
@@ -200,6 +313,26 @@ const rejectSeleksi = async () => {
                         <p class="text-white">
                             Berikut adalah daftar mitra yang melakukan seleksi di sistem ASIMPENAS.
                         </p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
+                        <button
+                            @click="exportData"
+                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium shadow-sm"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Export Excel
+                        </button>
+                        <button
+                            @click="openImportModal"
+                            class="inline-flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors duration-200 font-medium shadow-sm"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            Import Excel
+                        </button>
                     </div>
                 </div>
             </div>
@@ -434,7 +567,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_surat_permohonan"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -462,7 +595,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_akta_notaris"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -490,7 +623,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_nib"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -515,7 +648,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_ktp"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -543,7 +676,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_no_rekening"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -571,7 +704,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_npwp"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -599,7 +732,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_surat_kuasa"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -628,7 +761,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_lantai_jemur"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -651,7 +784,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_sarana_lainnya"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -680,7 +813,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_mesin_memecah_kulit"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -702,7 +835,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_mesin_pemisah_gabah"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -724,7 +857,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_mesin_penyosoh"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -746,7 +879,7 @@ const rejectSeleksi = async () => {
                                         v-model="selectedItem.status_alat_pemisah_beras"
                                         :disabled="selectedItem.status_seleksi !== 'pending'"
                                     >
-                                        <option value="">Pilih status</option>
+                                        <option disabled value="">Pilih status</option>
                                         <option value="lolos">Lolos</option>
                                         <option value="tidak lolos">Tidak Lolos</option>
                                     </select>
@@ -1012,6 +1145,99 @@ const rejectSeleksi = async () => {
                             Tutup
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Import Excel -->
+        <div v-if="showImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
+                <button @click="closeImportModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                
+                <h2 class="text-xl font-bold mb-6 text-blue-700">Import Data Seleksi Mitra dari Excel</h2>
+                
+                <div class="space-y-4">
+                    <!-- Info Box -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="text-sm text-blue-800">
+                                <p class="font-semibold mb-1">Panduan Import:</p>
+                                <ul class="list-disc list-inside space-y-1 ml-2">
+                                    <li>File harus berformat Excel (.xlsx, .xls) atau CSV</li>
+                                    <li>Ukuran file maksimal 5MB</li>
+                                    <li>Kolom <strong>Nama Perusahaan</strong> akan digunakan untuk mencari ID mitra</li>
+                                    <li>Pastikan nama perusahaan sudah terdaftar di database</li>
+                                    <li>Nilai dokumen/sarana: "ada" atau "tidak ada"</li>
+                                    <li>Format tanggal: YYYY-MM-DD atau gunakan format tanggal Excel</li>
+                                    <li>Untuk MB KTP bisa diisi "seumur hidup"</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Template Button -->
+                    <div class="flex justify-center">
+                        <button
+                            @click="downloadTemplate"
+                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium text-sm shadow-sm"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Download Template Excel
+                        </button>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                        <input
+                            type="file"
+                            @change="handleFileChange"
+                            accept=".xlsx,.xls,.csv"
+                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                        <p v-if="selectedFile" class="mt-2 text-sm text-green-600">
+                            File dipilih: {{ selectedFile.name }}
+                        </p>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div v-if="uploadError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm whitespace-pre-line">
+                        {{ uploadError }}
+                    </div>
+
+                    <!-- Success Message -->
+                    <div v-if="uploadSuccess" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+                        {{ uploadSuccess }}
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6">
+                    <button
+                        @click="closeImportModal"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium text-sm"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="uploadFile"
+                        :disabled="!selectedFile || isUploading"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
+                    >
+                        <svg v-if="isUploading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span v-if="isUploading">Mengupload...</span>
+                        <span v-else>Upload & Import</span>
+                    </button>
                 </div>
             </div>
         </div>

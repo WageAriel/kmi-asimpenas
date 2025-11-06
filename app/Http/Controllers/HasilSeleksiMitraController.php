@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\HasilSeleksiMitra;
 use App\Models\DataSeleksiMitra;
 use App\Models\DataMitra;
+use App\Exports\HasilSeleksiMitraExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HasilSeleksiMitraController extends Controller
 {
@@ -396,8 +398,7 @@ class HasilSeleksiMitraController extends Controller
         try {
             // Reset status seleksi mitra ke pending
             if ($hasilSeleksiMitra->seleksiMitra) {
-                $hasilSeleksiMitra->seleksiMitra->status_seleksi = 'pending';
-                $hasilSeleksiMitra->seleksiMitra->save();
+                $hasilSeleksiMitra->seleksiMitra->update(['status_seleksi' => 'pending']);
             }
             
             $hasilSeleksiMitra->delete();
@@ -408,9 +409,17 @@ class HasilSeleksiMitraController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'message' => 'Gagal menghapus hasil seleksi',
+                'message' => 'Gagal menghapus data',
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Export data hasil seleksi mitra to Excel
+     */
+    public function export()
+    {
+        return Excel::download(new HasilSeleksiMitraExport(), 'hasil-seleksi-mitra-' . date('Y-m-d') . '.xlsx');
     }
 }
