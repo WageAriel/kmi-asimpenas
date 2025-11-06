@@ -273,6 +273,9 @@ Route::prefix('api')->name('api.')->group(function () {
             ->orderBy('created_at', 'desc')
             ->get();
     })->name('hasil-seleksi-mitra');
+    Route::get('/karyawan', function() {
+        return App\Models\Karyawan::all();
+    });
 });
 
 require __DIR__.'/auth.php';
