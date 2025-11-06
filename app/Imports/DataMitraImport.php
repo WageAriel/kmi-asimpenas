@@ -20,6 +20,24 @@ class DataMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsE
     protected $failures = [];
 
     /**
+     * Prepare data before validation
+     * Convert numeric values to strings for NIK, NPWP, phone numbers, etc.
+     */
+    public function prepareForValidation($data, $index)
+    {
+        // Convert numeric fields to string to handle Excel scientific notation
+        $numericFields = ['nik', 'npwp', 'no_telp_perusahaan', 'no_telp_cp', 'no_rekening', 'no_vms', 'kode_mitra'];
+        
+        foreach ($numericFields as $field) {
+            if (isset($data[$field]) && is_numeric($data[$field])) {
+                $data[$field] = sprintf('%.0f', floatval($data[$field]));
+            }
+        }
+        
+        return $data;
+    }
+
+    /**
      * @param array $row
      *
      * @return \Illuminate\Database\Eloquent\Model|null

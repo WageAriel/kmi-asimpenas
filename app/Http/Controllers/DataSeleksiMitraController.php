@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\DataSeleksiMitra;
 use App\Models\DataMitra;
 use App\Services\ActivityAggregatorService;
+use App\Imports\DataSeleksiMitraImport;
+use App\Exports\DataSeleksiMitraExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DataSeleksiMitraController extends Controller
 {
@@ -275,6 +278,88 @@ public function mySeleksi()
         $seleksimitra = DataSeleksiMitra::findOrFail($id);
         $seleksimitra->delete();
         return response()->json(['message' => 'Data seleksi mitra berhasil dihapus']);
+    }
+
+    /**
+     * Import data seleksi mitra from Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:5120', // max 5MB
+        ]);
+
+        try {
+            $import = new DataSeleksiMitraImport();
+            Excel::import($import, $request->file('file'));
+
+            // Check if there are any failures
+            $failures = $import->failures();
+            
+            if ($failures->count() > 0) {
+                $errorMessages = [];
+                foreach ($failures as $failure) {
+                    $errorMessages[] = [
+                        'row' => $failure->row(),
+                        'attribute' => $failure->attribute(),
+                        'errors' => $failure->errors(),
+                    ];
+                }
+                
+                return response()->json([
+                    'message' => 'Import selesai dengan beberapa error',
+                    'failures' => $errorMessages
+                ], 422);
+            }
+
+            // Clear cache for dashboard updates
+            if (Auth::check()) {
+                ActivityAggregatorService::clearUserCache(Auth::id());
+            }
+            ActivityAggregatorService::clearAllActivitiesCache();
+
+            return response()->json([
+                'message' => 'Data seleksi mitra berhasil diimport'
+            ], 200);
+
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = [];
+            
+            foreach ($failures as $failure) {
+                $errorMessages[] = [
+                    'row' => $failure->row(),
+                    'attribute' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                ];
+            }
+            
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'failures' => $errorMessages
+            ], 422);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Export data seleksi mitra to Excel
+     */
+    public function export()
+    {
+        return Excel::download(new DataSeleksiMitraExport(false), 'data-seleksi-mitra-' . date('Y-m-d') . '.xlsx');
+    }
+
+    /**
+     * Download template Excel untuk import
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(new DataSeleksiMitraExport(true), 'template-data-seleksi-mitra.xlsx');
     }
 
 }

@@ -1,0 +1,114 @@
+<?php
+
+namespace App\Imports;
+
+use App\Models\DataSeleksiMitra;
+use App\Models\DataMitra;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Carbon\Carbon;
+
+class DataSeleksiMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
+{
+    use SkipsFailures;
+
+    /**
+     * @param array $row
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function model(array $row)
+    {
+        // Cari ID mitra berdasarkan nama perusahaan
+        $mitra = DataMitra::where('nama_perusahaan', $row['nama_perusahaan'])->first();
+        
+        if (!$mitra) {
+            throw new \Exception("Mitra dengan nama '{$row['nama_perusahaan']}' tidak ditemukan");
+        }
+
+        // Helper function untuk convert date
+        $parseDate = function($value) {
+            if (empty($value) || strtolower($value) === 'seumur hidup') {
+                return null;
+            }
+            
+            try {
+                // Try to parse as Excel date number
+                if (is_numeric($value)) {
+                    return Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
+                }
+                
+                // Try to parse as string date
+                return Carbon::parse($value);
+            } catch (\Exception $e) {
+                return null;
+            }
+        };
+
+        // Helper function untuk convert enum value
+        $parseEnum = function($value) {
+            if (empty($value)) {
+                return null;
+            }
+            
+            $value = strtolower(trim($value));
+            return in_array($value, ['ada', 'tidak ada']) ? $value : null;
+        };
+
+        return new DataSeleksiMitra([
+            'id_mitra' => $mitra->id_mitra,
+            'surat_permohonan' => $parseEnum($row['surat_permohonan'] ?? null),
+            'mb_surat_permohonan' => $parseDate($row['mb_surat_permohonan'] ?? null),
+            'akta_notaris' => $parseEnum($row['akta_notaris'] ?? null),
+            'mb_akta_notaris' => $parseDate($row['mb_akta_notaris'] ?? null),
+            'nib' => $parseEnum($row['nib'] ?? null),
+            'mb_nib' => $parseDate($row['mb_nib'] ?? null),
+            'ktp' => $parseEnum($row['ktp'] ?? null),
+            'mb_ktp' => isset($row['mb_ktp']) && strtolower($row['mb_ktp']) === 'seumur hidup' ? 'seumur hidup' : $parseDate($row['mb_ktp'] ?? null),
+            'no_rekening' => $parseEnum($row['no_rekening'] ?? null),
+            'mb_no_rekening' => $parseDate($row['mb_no_rekening'] ?? null),
+            'npwp' => $parseEnum($row['npwp'] ?? null),
+            'mb_npwp' => $parseDate($row['mb_npwp'] ?? null),
+            'surat_kuasa' => $parseEnum($row['surat_kuasa'] ?? null),
+            'mb_surat_kuasa' => $parseDate($row['mb_surat_kuasa'] ?? null),
+            'lantai_jemur' => $parseEnum($row['lantai_jemur'] ?? null),
+            'sarana_lainnya' => $parseEnum($row['sarana_lainnya'] ?? null),
+            'mesin_memecah_kulit' => $parseEnum($row['mesin_memecah_kulit'] ?? null),
+            'mesin_pemisah_gabah' => $parseEnum($row['mesin_pemisah_gabah'] ?? null),
+            'mesin_penyosoh' => $parseEnum($row['mesin_penyosoh'] ?? null),
+            'alat_pemisah_beras' => $parseEnum($row['alat_pemisah_beras'] ?? null),
+            'status_seleksi' => 'pending',
+        ]);
+    }
+
+    public function rules(): array
+    {
+        return [
+            'nama_perusahaan' => 'required|string',
+            'surat_permohonan' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'akta_notaris' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'nib' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'ktp' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'no_rekening' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'npwp' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'surat_kuasa' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'lantai_jemur' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'sarana_lainnya' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'mesin_memecah_kulit' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'mesin_pemisah_gabah' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'mesin_penyosoh' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+            'alat_pemisah_beras' => 'nullable|in:ada,tidak ada,Ada,Tidak Ada',
+        ];
+    }
+
+    public function customValidationMessages()
+    {
+        return [
+            'nama_perusahaan.required' => 'Nama perusahaan tidak boleh kosong',
+            '*.in' => 'Nilai harus "ada" atau "tidak ada"',
+        ];
+    }
+}
