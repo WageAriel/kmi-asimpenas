@@ -129,10 +129,13 @@ const generatePdf = async () => {
 
     isGeneratingPdf.value = true;
     try {
-        const response = await axios.get(`/seleksi-mitra/${selectedItemForPdf.value.id_seleksi_mitra}/surat-penetapan`, {
-            params: { id_karyawan: selectedKaryawan.value },
-            responseType: 'blob'
-        });
+        const response = await axios.get(
+            `/admin/seleksi-mitra/${selectedItemForPdf.value.id_seleksi_mitra}/surat-penetapan`, // Tambahkan prefix /admin/
+            {
+                params: { id_karyawan: selectedKaryawan.value },
+                responseType: 'blob'
+            }
+        );
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
@@ -141,9 +144,11 @@ const generatePdf = async () => {
         document.body.appendChild(link);
         link.click();
         link.remove();
+        
+        window.URL.revokeObjectURL(url);
     } catch (error) {
         console.error('Error generating PDF:', error);
-        alert('Terjadi kesalahan saat generate PDF');
+        alert('Terjadi kesalahan saat generate PDF: ' + (error.response?.data?.message || error.message));
     } finally {
         isGeneratingPdf.value = false;
         showPdfModal.value = false;
@@ -368,15 +373,6 @@ const exportData = () => {
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
                         <button
-                            @click="exportData"
-                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium shadow-sm"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Export Excel
-                        </button>
-                        <button
                             @click="openImportModal"
                             class="inline-flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors duration-200 font-medium shadow-sm"
                         >
@@ -384,6 +380,15 @@ const exportData = () => {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                             </svg>
                             Import Excel
+                        </button>
+                        <button
+                            @click="exportData"
+                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium shadow-sm"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Export Excel
                         </button>
                     </div>
                 </div>

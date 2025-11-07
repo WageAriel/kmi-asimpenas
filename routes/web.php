@@ -73,6 +73,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         ]);
     })->name('seleksi-mitra.index');
 
+    // Generate PDF Surat Penetapan
+    Route::get('/seleksi-mitra/{id}/surat-penetapan', [PdfGeneratorController::class, 'generateSuratPenetapan'])
+        ->name('seleksi-mitra.surat-penetapan');
+
     // 5. Daftar Klasifikasi Mitra
     Route::get('/klasifikasi-mitra', function () {
         $klasifikasiMitras = App\Models\KlasifikasiMitra::with('mitra')
@@ -94,6 +98,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
             'hasilSeleksiMitras' => $hasilSeleksiMitras
         ]);
     })->name('hasil-seleksi-mitra.index');
+
+    // Generate PDF Berita Acara Hasil Seleksi Mitra Pangan
+    Route::get('/hasil-seleksi-mitra/{id}/berita-acara', [PdfGeneratorController::class, 'generateBeritaAcara'])
+    ->name('hasil-seleksi-mitra.berita-acara');
 });
 
 // 1. Routes Dashboard Mitra tanpa middleware (untuk testing)

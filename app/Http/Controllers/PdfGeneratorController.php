@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\DataSeleksiMitra;
 use App\Models\DataMitra;
 use App\Models\KlasifikasiMitra;
+use App\Models\Karyawan;
+use App\Models\HasilSeleksiMitra;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
@@ -133,6 +135,141 @@ class PdfGeneratorController extends Controller
             
         } catch (\Exception $e) {
             Log::error("Klasifikasi PDF Generation Error: " . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    private function terbilang($angka) {
+        $angka = abs($angka);
+        $baca = array(
+            '', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh'
+        );
+        
+        return $baca[$angka];
+    }
+
+    private function bulanIndo($bulan) {
+        $arrBulan = array(
+            1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        );
+        
+        return $arrBulan[$bulan];
+    }
+
+    public function generateSuratPenetapan($id, Request $request) {
+        try {
+            $seleksi = DataSeleksiMitra::with('mitra')->findOrFail($id);
+            $karyawan = Karyawan::findOrFail($request->id_karyawan);
+            
+            $today = now();
+            
+            $data = [
+                'seleksi' => $seleksi,
+                'mitra' => $seleksi->mitra,
+                'karyawan' => $karyawan,
+                'hari' => \Carbon\Carbon::now()->locale('id')->isoFormat('dddd'),
+                'tanggal' => sprintf(
+                    "%s bulan %s tahun %s (%s)",
+                    $this->terbilang($today->day),
+                    $this->bulanIndo($today->month),
+                    'Dua Ribu Dua Puluh Lima',
+                    $today->format('d-m-Y')
+                ),
+                'nomor_surat' => sprintf(
+                    "%d/11030/SP/MITRAPANGAN/%s/%s",
+                    $id,
+                    $this->getRomanMonth($today->month),
+                    $today->year
+                ),
+                'nomor_BA' => sprintf(
+                    "%d/11030/BA/SELEKSI/%s/%s",
+                    $id,
+                    $this->getRomanMonth($today->month),
+                    $today->year
+                ),
+            ];
+            
+            $pdf = PDF::loadView('pdf.surat-penetapan-mitra', $data);
+            return $pdf->download('surat-penetapan-'.$seleksi->mitra->nama_perusahaan.'.pdf');
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    private function getRomanMonth($month) 
+    {
+        $romans = [
+            1 => 'I',
+            2 => 'II',
+            3 => 'III',
+            4 => 'IV',
+            5 => 'V',
+            6 => 'VI',
+            7 => 'VII',
+            8 => 'VIII',
+            9 => 'IX',
+            10 => 'X',
+            11 => 'XI',
+            12 => 'XII'
+        ];
+        
+        return $romans[$month];
+    }
+
+    public function generateBeritaAcara($id, Request $request)
+    {
+        try {
+            $hasilSeleksi = HasilSeleksiMitra::with(['mitra', 'seleksiMitra'])->findOrFail($id);
+            $pelaksana = Karyawan::findOrFail($request->id_pelaksana);
+            $pengetahui = Karyawan::findOrFail($request->id_pengetahui);
+            
+            $today = now();
+            
+            $data = [
+                'nomor_surat' => sprintf(
+                    "%d/11030/BA/SELEKSI/%s/%s",
+                    $id,
+                    $this->getRomanMonth($today->month),
+                    $today->year
+                ),
+                'tahun' => $today->year,
+                'hari' => $today->locale('id')->isoFormat('dddd'),
+                'tanggal' => sprintf(
+                    "%s bulan %s tahun %s (%s)",
+                    $this->terbilang($today->day),
+                    $this->bulanIndo($today->month),
+                    'Dua Ribu Dua Puluh Lima',
+                    $today->format('d-m-Y')
+                ),
+                'nomor_urut_seleksi' => sprintf("%03d", $hasilSeleksi->seleksiMitra->id_seleksi_mitra),
+                'tanggal_seleksi' => $hasilSeleksi->created_at->isoFormat('D MMMM Y'),
+                'nomor_entitas_bulog' => '11030',
+                'unit_pelaksana' => 'SURAKARTA',
+                'nama_perusahaan' => $hasilSeleksi->mitra->nama_perusahaan,
+                'badan_usaha' => $hasilSeleksi->mitra->badan_hukum_usaha,
+                'alamat' => $hasilSeleksi->mitra->alamat_perusahaan,
+                'status_mitra' => $hasilSeleksi->mitra->status ?? 'Penggilingan',
+                'hasil_seleksi' => $hasilSeleksi,
+                'hasil_akhir' => strtoupper($hasilSeleksi->kesimpulan_akhir),
+                'nama_pj_mitra' => $hasilSeleksi->mitra->nama_cp,
+                'nama_pj_bulog' => $pengetahui->nama_karyawan,
+                'pelaksana' => $pelaksana,
+                'pengetahui' => $pengetahui
+            ];
+
+            $pdf = PDF::loadView('pdf.berita-acara-hasil-seleksi', $data);
+            $pdf->setPaper('A4', 'portrait');
+            
+            $filename = sprintf(
+                'BA-SELEKSI-%s-%s.pdf',
+                str_replace(' ', '-', $hasilSeleksi->mitra->nama_perusahaan),
+                $today->format('dmY')
+            );
+
+            return $pdf->download($filename);
+            
+        } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

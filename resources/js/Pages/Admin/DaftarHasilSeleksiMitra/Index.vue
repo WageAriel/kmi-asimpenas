@@ -60,10 +60,64 @@ const getStatusBadge = (status) => {
     }
 };
 
-// View detail handler
-const viewDetail = (item) => {
-    selectedItem.value = item;
-    showModal.value = true;
+// Add new refs
+const showPdfModal = ref(false);
+const selectedItemForPdf = ref(null);
+const selectedPelaksana = ref('');
+const selectedPengetahui = ref('');
+const karyawanList = ref([]);
+const isGeneratingPdf = ref(false);
+
+// Modify viewDetail function
+const viewDetail = async (item) => {
+    selectedItemForPdf.value = item;
+    showPdfModal.value = true;
+    try {
+        const response = await axios.get('/api/karyawan');
+        karyawanList.value = response.data;
+    } catch (error) {
+        console.error('Error fetching karyawan:', error);
+    }
+};
+
+// Add function to generate PDF
+const generatePdf = async () => {
+    if (!selectedPelaksana.value || !selectedPengetahui.value) {
+        alert('Silakan pilih kedua karyawan terlebih dahulu');
+        return;
+    }
+
+    isGeneratingPdf.value = true;
+    try {
+        const response = await axios.get(
+            `/admin/hasil-seleksi-mitra/${selectedItemForPdf.value.id_hasil_seleksi_mitra}/berita-acara`,
+            {
+                params: { 
+                    id_pelaksana: selectedPelaksana.value,
+                    id_pengetahui: selectedPengetahui.value
+                },
+                responseType: 'blob'
+            }
+        );
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `berita-acara-${selectedItemForPdf.value.mitra?.nama_perusahaan}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Terjadi kesalahan saat generate PDF');
+    } finally {
+        isGeneratingPdf.value = false;
+        showPdfModal.value = false;
+        selectedItemForPdf.value = null;
+        selectedPelaksana.value = '';
+        selectedPengetahui.value = '';
+    }
 };
 
 // Close modal handler
@@ -187,7 +241,7 @@ onMounted(() => {
                                     @click="viewDetail(item)"
                                     class="text-blue-600 hover:text-blue-900 mr-3"
                                 >
-                                    Lihat Detail
+                                    Download PDF
                                 </button>
                             </td>
                         </tr>
@@ -199,6 +253,77 @@ onMounted(() => {
                     <p class="text-gray-500">
                         {{ searchQuery ? 'Tidak ada data yang sesuai dengan pencarian.' : 'Belum ada data hasil seleksi.' }}
                     </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add this before closing AdminLayout -->
+        <div v-if="showPdfModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
+                <button @click="showPdfModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <h2 class="text-xl font-bold mb-6">Generate Berita Acara</h2>
+
+                <div class="space-y-6">
+                    <!-- Pelaksana Seleksi -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Pilih Pelaksana Seleksi
+                        </label>
+                        <select 
+                            v-model="selectedPelaksana"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        >
+                            <option value="">Pilih Karyawan</option>
+                            <option v-for="karyawan in karyawanList" 
+                                    :key="karyawan.id_karyawan" 
+                                    :value="karyawan.id_karyawan">
+                                {{ karyawan.nama_karyawan }} - {{ karyawan.jabatan }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Yang Mengetahui -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Pilih Yang Mengetahui
+                        </label>
+                        <select 
+                            v-model="selectedPengetahui"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        >
+                            <option value="">Pilih Karyawan</option>
+                            <option v-for="karyawan in karyawanList" 
+                                    :key="karyawan.id_karyawan" 
+                                    :value="karyawan.id_karyawan">
+                                {{ karyawan.nama_karyawan }} - {{ karyawan.jabatan }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button 
+                        @click="showPdfModal = false"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium text-sm"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="generatePdf"
+                        :disabled="!selectedPelaksana || !selectedPengetahui || isGeneratingPdf"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    >
+                        <svg v-if="isGeneratingPdf" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isGeneratingPdf ? 'Generating...' : 'Generate PDF' }}
+                    </button>
                 </div>
             </div>
         </div>

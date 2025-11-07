@@ -37,15 +37,23 @@
             width: 20px;
         }
         .signature-section {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
+        margin-top: 40px;
+        width: 100%;
+        position: relative;
         }
-        .signature-box {
+        .signature-left {
+            position: absolute;
+            left: 0;
             width: 45%;
         }
+        .signature-right {
+            position: absolute;
+            right: 0;
+            width: 45%;
+            text-align: left;
+        }
         .signature-space {
-            height: 60px;
+            height: 80px; /* Space for signature */
         }
         .right-align {
             text-align: right;
@@ -57,12 +65,12 @@
         <h1>SURAT PENETAPAN</h1>
         <h1>SEBAGAI MITRA PANGAN</h1>
         <h1>PENGADAAN GABAH/BERAS DALAM NEGERI</h1>
-        <p>Nomor: {{ $nomor_surat }}</p>
-        <p>TAHUN {{ date('Y') }}</p>
+        <h1>Nomor: {{ $nomor_surat }}</h1>
+        <h1>TAHUN {{ date('Y') }}</h1>
     </div>
 
     <div class="content">
-        <p>Pada hari ini, {{ $hari }}, tanggal {{ $tanggal }}, berdasarkan Berita Acara Hasil Seleksi Nomor: {{ $nomor_BA }}, maka kepada:</p>
+        <p>Pada hari ini, {{ $hari }} tanggal {{ $tanggal }}, berdasarkan Berita Acara Hasil Seleksi Nomor : {{ $nomor_BA }}, maka kepada :</p>
 
         <table class="data-table">
             <tr>
@@ -98,20 +106,22 @@
         </table>
     </div>
 
-    <div class="content" style="font-size: 13pt; font-weight: bold; text-align: center;">
-        Ditetapkan sebagai Mitra Pangan ADA Gabah/Beras DN Perum BULOG Kantor Cabang Surakarta
+    <div class="content" style="font-size: 12pt; text-align: start;">
+        Ditetapkan sebagai Mitra Pangan ADA Gabah/Beras DN Perum BULOG Kantor Cabang
     </div>
 
     <div class="signature-section">
-        <div class="signature-box">
+        <div class="signature-left">
             <p>Mitra Pangan,</p>
             <div class="signature-space"></div>
-            <p>{{ $mitra->nama_cp }}<br>{{ $mitra->nama_perusahaan }}</p>
+            <p style="margin: 0;">{{ $mitra->nama_cp }}</p>
+            <p style="margin: 0;">{{ $mitra->nama_perusahaan }}</p>
         </div>
-        <div class="signature-box right-align">
+        <div class="signature-right">
             <p>Perum BULOG Kantor Cabang Surakarta</p>
             <div class="signature-space"></div>
-            <p>{{ $karyawan->nama_karyawan }}<br>{{ $karyawan->jabatan }}</p>
+            <p style="margin: 0;">{{ $karyawan->nama_karyawan }}</p>
+            <p style="margin: 0;">{{ $karyawan->jabatan }}</p>
         </div>
     </div>
 </body>
