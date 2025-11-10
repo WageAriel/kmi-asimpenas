@@ -41,31 +41,131 @@ const selectedKlasifikasi = ref(null);
 
 // Classification interpretation table
 const klasifikasiDescriptions = {
-    mesin_pembersih_gabah: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    lantai_jemur: { 1: 'Ada | > 1000m²', 2: 'Ada | 500 - 1000m²', 3: 'Tidak Ada / < 500m²' },
-    mesin_pengering: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    alat_pengering_lainnya: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_pembersih_awal: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_pemecah_kulit: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_pembersih_sekam: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_pemisah_gabah_pecah_kulit: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_pemisah_batu: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_penyosoh: { 1: 'Ada | > 3 | 2', 2: 'Ada | 1 s/d 3 | 1', 3: 'Tidak Ada' },
-    mesin_pengkabut: { 1: 'Ada | > 3 | 2', 2: 'Ada | 1 s/d 3 | 1', 3: 'Tidak Ada' },
-    mesin_pemesah_menir: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_pemisah_katul: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_pemisah_berdasarkan_ukuran: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    mesin_pemisah_berdasarkan_warna: { 1: 'Ada | > 3', 2: 'Ada | 1 s/d 3', 3: 'Tidak Ada' },
-    tangki_penyimpanan: { 1: 'Ada | > 10', 2: 'Ada | ≤ 10', 3: 'Tidak Ada' },
-    mesin_pengemas: { 1: 'Ada | Full Otomatis', 2: 'Ada | Semi Otomatis', 3: 'Tidak Ada' },
-    mesin_jahit: { 1: 'Ada | Full Otomatis', 2: 'Ada | Semi Otomatis', 3: 'Tidak Ada' },
-    gudang_konvensional: { 1: 'Ada | > 3000', 2: 'Ada | < 3000', 3: 'Tidak Ada' },
-    silo_gkg_hopper: { 1: 'Ada | > 2000', 2: 'Ada | < 2000', 3: 'Tidak Ada' },
-    truk: { 1: 'Ada | > 5', 2: 'Ada | ≤ 5', 3: 'Tidak Ada' },
-    mini_lab: { 1: 'Ada', 2: 'Ada | Tidak Lengkap', 3: 'Tidak Ada' },
-    moisture_tester: { 1: 'Ada | Digital', 2: 'Ada | Manual', 3: 'Tidak Ada' },
-    pembanding_derajat_sosoh: { 1: 'Ada', 2: 'Ada | Tidak Lengkap', 3: 'Tidak Ada' },
-    bagian_quality_control: { 1: 'Ada | Tidak Merangkap', 2: 'Ada | Merangkap', 3: 'Tidak Ada' },
+    mesin_pembersih_gabah: {
+        1: 'Ada | > 20',
+        2: 'Ada | ≤ 20 unit',
+        3: 'Tidak Ada',
+    },
+    lantai_jemur: {
+        1: 'Ada | > 10',
+        2: 'Ada | 1 s/d 10',
+        3: 'Tidak ada',
+    },
+    mesin_pengering: {
+        1: 'Ada | > 20',
+        2: 'Ada | ≤ 20',
+        3: 'Tidak ada',
+    },
+    alat_pengering_lainnya: {
+        1: 'Tidak Disyaratkan',
+        2: 'Tidak Disyaratkan',
+        3: 'Ada | ≤ 1',
+    },
+    mesin_pembersih_awal: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemecah_kulit: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pembersih_sekam: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_gabah_pecah_kulit: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_batu: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_penyosoh: {
+        1: 'Ada | > 3 | 2',
+        2: 'Ada | 1 s/d 3 | 1',
+        3: 'Tidak ada',
+    },
+    mesin_pengkabut: {
+        1: 'Ada | > 3 | 2',
+        2: 'Ada | 1 s/d 3 | 1',
+        3: 'Tidak ada',
+    },
+    mesin_pemesah_menir: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_katul: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_berdasarkan_ukuran: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    mesin_pemisah_berdasarkan_warna: {
+        1: 'Ada | > 3',
+        2: 'Ada | 1 s/d 3',
+        3: 'Tidak ada',
+    },
+    tangki_penyimpanan: {
+        1: 'Ada | > 10',
+        2: 'Ada | ≤ 10',
+        3: 'Tidak ada',
+    },
+    mesin_pengemas: {
+        1: 'Ada | Full Otomatis',
+        2: 'Ada | Semi Otomatis',
+        3: 'Tidak ada',
+    },
+    mesin_jahit: {
+        1: 'Ada | Full Otomatis',
+        2: 'Ada | Semi Otomatis',
+        3: 'Tidak ada',
+    },
+    gudang_konvensional: {
+        1: 'Ada | > 3000',
+        2: 'Ada | < 3000',
+        3: 'Tidak ada',
+    },
+    silo_gkg_hopper: {
+        1: 'Ada | > 2000',
+        2: 'Ada | < 2000',
+        3: 'Tidak ada',
+    },
+    truk: {
+        1: 'Ada | > 5',
+        2: 'Ada | 1 s/d 5',
+        3: 'Tidak ada',
+    },
+    mini_lab: {
+        1: 'Ada | Ruang Khusus',
+        2: 'Ada | Tidak Khusus',
+        3: 'Tidak ada',
+    },
+    moisture_tester: {
+        1: 'Ada | Berfungsi',
+        2: 'Ada | Tidak Berfungsi',
+        3: 'Tidak ada',
+    },
+    pembanding_derajat_sosoh: {
+        1: 'Ada | Sesuai Standar',
+        2: 'Ada | Tidak Sesuai Standar',
+        3: 'Tidak ada',
+    },
+    bagian_quality_control: {
+        1: 'Ada | Tidak Merangkap',
+        2: 'Ada | Merangkap',
+        3: 'Tidak ada',
+    },
 };
 
 const interpretClassification = (field, value) => {
@@ -303,6 +403,13 @@ const selectedKaryawan = ref('');
 const karyawanList = ref([]);
 const isGeneratingPdf = ref(false);
 
+// Add new refs for BA Klasifikasi
+const showBaPdfModal = ref(false);
+const selectedItemForBaPdf = ref(null);
+const selectedPelaksana = ref('');
+const selectedPengetahui = ref('');
+const isGeneratingBaPdf = ref(false);
+
 // Add new function to handle PDF modal
 const showPdfDownloadModal = async (item) => {
     selectedItemForPdf.value = item;
@@ -348,6 +455,58 @@ const generatePdf = async () => {
         showPdfModal.value = false;
         selectedItemForPdf.value = null;
         selectedKaryawan.value = '';
+    }
+};
+
+// Add new function for BA Klasifikasi modal
+const showBaPdfDownloadModal = async (item) => {
+    selectedItemForBaPdf.value = item;
+    showBaPdfModal.value = true;
+    try {
+        const response = await axios.get('/api/karyawan');
+        karyawanList.value = response.data;
+    } catch (error) {
+        console.error('Error fetching karyawan:', error);
+    }
+};
+
+// Add generateBaPdf function
+const generateBaPdf = async () => {
+    if (!selectedPelaksana.value || !selectedPengetahui.value) {
+        alert('Silakan pilih pelaksana dan pengetahui terlebih dahulu');
+        return;
+    }
+
+    isGeneratingBaPdf.value = true;
+    try {
+        const response = await axios.get(
+            `/admin/klasifikasi-mitra/${selectedItemForBaPdf.value.id_klasifikasi_mitra}/berita-acara`,
+            {
+                params: { 
+                    id_pelaksana: selectedPelaksana.value,
+                    id_pengetahui: selectedPengetahui.value
+                },
+                responseType: 'blob'
+            }
+        );
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `BA-klasifikasi-${selectedItemForBaPdf.value.mitra?.nama_perusahaan}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error generating BA PDF:', error);
+        alert('Terjadi kesalahan saat generate PDF');
+    } finally {
+        isGeneratingBaPdf.value = false;
+        showBaPdfModal.value = false;
+        selectedItemForBaPdf.value = null;
+        selectedPelaksana.value = '';
+        selectedPengetahui.value = '';
     }
 };
 
@@ -436,7 +595,8 @@ const generatePdf = async () => {
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Download</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Berita Acara</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Surat Penetapan</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -458,15 +618,29 @@ const generatePdf = async () => {
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <button
-                                        @click="showPdfDownloadModal(item)"
-                                        class="inline-flex items-center text-green-600 hover:text-green-900 text-xs mr-3"
+                                        @click="showBaPdfDownloadModal(item)"
+                                        class="inline-flex items-center text-blue-600 hover:text-blue-900 text-xs"
                                     >
-                                        Download PDF
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Download
+                                    </button>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <button
+                                        @click="showPdfDownloadModal(item)"
+                                        class="inline-flex items-center text-green-600 hover:text-green-900 text-xs"
+                                    >
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Download
                                     </button>
                                 </td>
                             </tr>
                             <tr v-if="filteredKlasifikasiMitras.length === 0">
-                                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="6" class="px-4 py-6 text-center text-gray-500">
                                     {{ searchQuery ? 'Tidak ada klasifikasi mitra yang sesuai dengan pencarian Anda.' : 'Belum ada data klasifikasi mitra.' }}
                                 </td>
                             </tr>
@@ -757,7 +931,7 @@ const generatePdf = async () => {
                         <p class="text-sm font-semibold text-blue-800 mb-2">Contoh Penilaian Kriteria:</p>
                         <div class="text-xs text-blue-700 space-y-1">
                             <p>• <strong>Mesin Pembersih Gabah:</strong> 1 = Ada & >3 unit, 2 = Ada & 1-3 unit, 3 = Tidak Ada</p>
-                            <p>• <strong>Lantai Jemur:</strong> 1 = Ada & >1000m², 2 = Ada & 500-1000m², 3 = Tidak Ada / <500m²</p>
+                            <p>• <strong>Lantai Jemur:</strong> 1 = Ada & >1000m², 2 = Ada & 500-1000m², 3 = Tidak Ada / </p>
                             <p>• <strong>Tangki Penyimpanan:</strong> 1 = Ada & >10 unit, 2 = Ada & ≤10 unit, 3 = Tidak Ada</p>
                             <p class="mt-2 italic">* Lihat template Excel untuk detail lengkap semua kriteria</p>
                         </div>
@@ -868,6 +1042,75 @@ const generatePdf = async () => {
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         {{ isGeneratingPdf ? 'Generating...' : 'Generate PDF' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add BA Klasifikasi PDF Modal -->
+        <div v-if="showBaPdfModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
+                <button @click="showBaPdfModal = false; selectedPelaksana = ''; selectedPengetahui = '';" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <h2 class="text-xl font-bold mb-6">Generate Berita Acara Klasifikasi</h2>
+
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Pelaksana Klasifikasi
+                        </label>
+                        <select 
+                            v-model="selectedPelaksana"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        >
+                            <option value="">Pilih Pelaksana</option>
+                            <option v-for="karyawan in karyawanList" 
+                                    :key="'pelaksana-' + karyawan.id_karyawan" 
+                                    :value="karyawan.id_karyawan">
+                                {{ karyawan.nama_karyawan }} - {{ karyawan.jabatan }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Mengetahui (Pemimpin)
+                        </label>
+                        <select 
+                            v-model="selectedPengetahui"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        >
+                            <option value="">Pilih Pengetahui</option>
+                            <option v-for="karyawan in karyawanList" 
+                                    :key="'pengetahui-' + karyawan.id_karyawan" 
+                                    :value="karyawan.id_karyawan">
+                                {{ karyawan.nama_karyawan }} - {{ karyawan.jabatan }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button 
+                        @click="showBaPdfModal = false; selectedPelaksana = ''; selectedPengetahui = '';"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium text-sm"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="generateBaPdf"
+                        :disabled="!selectedPelaksana || !selectedPengetahui || isGeneratingBaPdf"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    >
+                        <svg v-if="isGeneratingBaPdf" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isGeneratingBaPdf ? 'Generating...' : 'Generate PDF' }}
                     </button>
                 </div>
             </div>

@@ -217,6 +217,24 @@ class PdfGeneratorController extends Controller
         return $romans[$month];
     }
 
+    private function toRoman($num) 
+    {
+        $map = [
+            'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400,
+            'C' => 100, 'XC' => 90, 'L' => 50, 'XL' => 40,
+            'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1
+        ];
+        
+        $result = '';
+        foreach ($map as $roman => $value) {
+            $matches = intval($num / $value);
+            $result .= str_repeat($roman, $matches);
+            $num = $num % $value;
+        }
+        
+        return $result;
+    }
+
     public function generateBeritaAcara($id, Request $request)
     {
         try {
@@ -226,14 +244,68 @@ class PdfGeneratorController extends Controller
             
             $today = now();
             
+            // Hitung urutan hasil seleksi untuk mitra ini
+            $urutanHasilSeleksi = HasilSeleksiMitra::where('id_mitra', $hasilSeleksi->id_mitra)
+                ->where('id_hasil_seleksi_mitra', '<=', $hasilSeleksi->id_hasil_seleksi_mitra)
+                ->orderBy('id_hasil_seleksi_mitra', 'asc')
+                ->count();
+            
+            // Ambil tahun dari created_at hasil seleksi
+            $tahunPengajuan = $hasilSeleksi->created_at->year;
+            
+            // Konversi id_seleksi_mitra ke angka romawi
+            $idSeleksiRomawi = $this->toRoman($hasilSeleksi->id_seleksi_mitra);
+            
+            // Format nomor surat: {id_hasil_seleksi}/11030/BA/SELEKSI/{id_seleksi_romawi}/{tahun}
+            $nomorSurat = sprintf(
+                "%d/11030/BA/SELEKSI/%s/%s",
+                $hasilSeleksi->id_hasil_seleksi_mitra,
+                $idSeleksiRomawi,
+                $tahunPengajuan
+            );
+            
+            // Siapkan detail dokumen (sudah auto-cast ke array oleh model)
+            $dokumenAda = $hasilSeleksi->dokumen_ada_valid ?: [];
+            $dokumenTidakAda = $hasilSeleksi->dokumen_tidak_ada ?: [];
+            
+            $keteranganDokumen = '';
+            if (!empty($dokumenAda)) {
+                $keteranganDokumen .= "Dokumen Ada dan Valid : " . implode(', ', $dokumenAda);
+            }
+            if (!empty($dokumenTidakAda)) {
+                if ($keteranganDokumen) $keteranganDokumen .= "\n\n";
+                $keteranganDokumen .= "Dokumen Belum Lengkap : " . implode(', ', $dokumenTidakAda);
+            }
+            
+            // Siapkan detail sarana pengeringan
+            $pengeringanAda = $hasilSeleksi->sarana_pengeringan_ada ?: [];
+            $pengeringanTidakAda = $hasilSeleksi->sarana_pengeringan_tidak_ada ?: [];
+            
+            $keteranganPengeringan = '';
+            if (!empty($pengeringanAda)) {
+                $keteranganPengeringan .= "Sarana Ada : " . implode(', ', $pengeringanAda);
+            }
+            if (!empty($pengeringanTidakAda)) {
+                if ($keteranganPengeringan) $keteranganPengeringan .= "\n\n";
+                $keteranganPengeringan .= "Sarana Tidak Memenuhi : " . implode(', ', $pengeringanTidakAda);
+            }
+            
+            // Siapkan detail sarana penggilingan
+            $penggilinganAda = $hasilSeleksi->sarana_penggilingan_ada ?: [];
+            $penggilinganTidakAda = $hasilSeleksi->sarana_penggilingan_tidak_ada ?: [];
+            
+            $keteranganPenggilingan = '';
+            if (!empty($penggilinganAda)) {
+                $keteranganPenggilingan .= "Sarana Ada : " . implode(', ', $penggilinganAda);
+            }
+            if (!empty($penggilinganTidakAda)) {
+                if ($keteranganPenggilingan) $keteranganPenggilingan .= "\n\n";
+                $keteranganPenggilingan .= "Sarana Tidak Memenuhi : " . implode(', ', $penggilinganTidakAda);
+            }
+            
             $data = [
-                'nomor_surat' => sprintf(
-                    "%d/11030/BA/SELEKSI/%s/%s",
-                    $id,
-                    $this->getRomanMonth($today->month),
-                    $today->year
-                ),
-                'tahun' => $today->year,
+                'nomor_surat' => $nomorSurat,
+                'tahun' => $tahunPengajuan,
                 'hari' => $today->locale('id')->isoFormat('dddd'),
                 'tanggal' => sprintf(
                     "%s bulan %s tahun %s (%s)",
@@ -242,20 +314,23 @@ class PdfGeneratorController extends Controller
                     'Dua Ribu Dua Puluh Lima',
                     $today->format('d-m-Y')
                 ),
-                'nomor_urut_seleksi' => sprintf("%03d", $hasilSeleksi->seleksiMitra->id_seleksi_mitra),
+                'nomor_urut_seleksi' => sprintf("%d", $urutanHasilSeleksi),
                 'tanggal_seleksi' => $hasilSeleksi->created_at->isoFormat('D MMMM Y'),
                 'nomor_entitas_bulog' => '11030',
                 'unit_pelaksana' => 'SURAKARTA',
                 'nama_perusahaan' => $hasilSeleksi->mitra->nama_perusahaan,
                 'badan_usaha' => $hasilSeleksi->mitra->badan_hukum_usaha,
                 'alamat' => $hasilSeleksi->mitra->alamat_perusahaan,
-                'status_mitra' => $hasilSeleksi->mitra->status ?? 'Penggilingan',
+                'status_mitra' => $hasilSeleksi->mitra->status_perusahaan ?? 'Penggilingan',
                 'hasil_seleksi' => $hasilSeleksi,
                 'hasil_akhir' => strtoupper($hasilSeleksi->kesimpulan_akhir),
                 'nama_pj_mitra' => $hasilSeleksi->mitra->nama_cp,
                 'nama_pj_bulog' => $pengetahui->nama_karyawan,
                 'pelaksana' => $pelaksana,
-                'pengetahui' => $pengetahui
+                'pengetahui' => $pengetahui,
+                'keterangan_dokumen' => $keteranganDokumen,
+                'keterangan_pengeringan' => $keteranganPengeringan,
+                'keterangan_penggilingan' => $keteranganPenggilingan
             ];
 
             $pdf = PDF::loadView('pdf.berita-acara-hasil-seleksi', $data);
@@ -272,6 +347,143 @@ class PdfGeneratorController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function generateBeritaAcaraKlasifikasi($id, Request $request)
+    {
+        try {
+            $klasifikasi = KlasifikasiMitra::with('mitra')->findOrFail($id);
+            $pelaksana = Karyawan::findOrFail($request->id_pelaksana);
+            $pengetahui = Karyawan::findOrFail($request->id_pengetahui);
+            
+            $today = now();
+            
+            // Hitung urutan klasifikasi untuk mitra ini
+            $urutanKlasifikasi = KlasifikasiMitra::where('id_mitra', $klasifikasi->id_mitra)
+                ->where('id_klasifikasi_mitra', '<=', $klasifikasi->id_klasifikasi_mitra)
+                ->orderBy('id_klasifikasi_mitra', 'asc')
+                ->count();
+            
+            // Ambil tahun dari created_at klasifikasi
+            $tahunPengajuan = $klasifikasi->created_at->year;
+            
+            // Konversi id_klasifikasi ke angka romawi
+            $idKlasifikasiRomawi = $this->toRoman($klasifikasi->id_klasifikasi_mitra);
+            
+            // Format nomor surat: {id_klasifikasi}/11030/BA/KLASIFIKASI/{id_klasifikasi_romawi}/{tahun}
+            $nomorSurat = sprintf(
+                "%d/11030/BA/KLASIFIKASI/%s/%s",
+                $klasifikasi->id_klasifikasi_mitra,
+                $idKlasifikasiRomawi,
+                $tahunPengajuan
+            );
+            
+            // Mapping hasil untuk setiap komponen
+            $hasilMapping = [
+                'mesin_pembersih_gabah' => $this->getKlasifikasiHasil('mesin_pembersih_gabah', $klasifikasi->mesin_pembersih_gabah),
+                'lantai_jemur' => $this->getKlasifikasiHasil('lantai_jemur', $klasifikasi->lantai_jemur),
+                'mesin_pengering' => $this->getKlasifikasiHasil('mesin_pengering', $klasifikasi->mesin_pengering),
+                'alat_pengering_lainnya' => $this->getKlasifikasiHasil('alat_pengering_lainnya', $klasifikasi->alat_pengering_lainnya),
+                'mesin_pembersih_awal' => $this->getKlasifikasiHasil('mesin_pembersih_awal', $klasifikasi->mesin_pembersih_awal),
+                'mesin_pemecah_kulit' => $this->getKlasifikasiHasil('mesin_pemecah_kulit', $klasifikasi->mesin_pemecah_kulit),
+                'mesin_pembersih_sekam' => $this->getKlasifikasiHasil('mesin_pembersih_sekam', $klasifikasi->mesin_pembersih_sekam),
+                'mesin_pemisah_gabah_pecah_kulit' => $this->getKlasifikasiHasil('mesin_pemisah_gabah_pecah_kulit', $klasifikasi->mesin_pemisah_gabah_pecah_kulit),
+                'mesin_pemisah_batu' => $this->getKlasifikasiHasil('mesin_pemisah_batu', $klasifikasi->mesin_pemisah_batu),
+                'mesin_penyosoh' => $this->getKlasifikasiHasil('mesin_penyosoh', $klasifikasi->mesin_penyosoh),
+                'mesin_pengkabut' => $this->getKlasifikasiHasil('mesin_pengkabut', $klasifikasi->mesin_pengkabut),
+                'mesin_pemesah_menir' => $this->getKlasifikasiHasil('mesin_pemesah_menir', $klasifikasi->mesin_pemesah_menir),
+                'mesin_pemisah_katul' => $this->getKlasifikasiHasil('mesin_pemisah_katul', $klasifikasi->mesin_pemisah_katul),
+                'mesin_pemisah_berdasarkan_ukuran' => $this->getKlasifikasiHasil('mesin_pemisah_berdasarkan_ukuran', $klasifikasi->mesin_pemisah_berdasarkan_ukuran),
+                'mesin_pemisah_berdasarkan_warna' => $this->getKlasifikasiHasil('mesin_pemisah_berdasarkan_warna', $klasifikasi->mesin_pemisah_berdasarkan_warna),
+                'tangki_penyimpanan' => $this->getKlasifikasiHasil('tangki_penyimpanan', $klasifikasi->tangki_penyimpanan),
+                'mesin_pengemas' => $this->getKlasifikasiHasil('mesin_pengemas', $klasifikasi->mesin_pengemas),
+                'mesin_jahit' => $this->getKlasifikasiHasil('mesin_jahit', $klasifikasi->mesin_jahit),
+                'gudang_konvensional' => $this->getKlasifikasiHasil('gudang_konvensional', $klasifikasi->gudang_konvensional),
+                'silo_gkg_hopper' => $this->getKlasifikasiHasil('silo_gkg_hopper', $klasifikasi->silo_gkg_hopper),
+                'truk' => $this->getKlasifikasiHasil('truk', $klasifikasi->truk),
+                'mini_lab' => $this->getKlasifikasiHasil('mini_lab', $klasifikasi->mini_lab),
+                'moisture_tester' => $this->getKlasifikasiHasil('moisture_tester', $klasifikasi->moisture_tester),
+                'pembanding_derajat_sosoh' => $this->getKlasifikasiHasil('pembanding_derajat_sosoh', $klasifikasi->pembanding_derajat_sosoh),
+                'bagian_quality_control' => $this->getKlasifikasiHasil('bagian_quality_control', $klasifikasi->bagian_quality_control),
+            ];
+            
+            $data = [
+                'nomor_surat' => $nomorSurat,
+                'tahun' => $tahunPengajuan,
+                'hari' => $today->locale('id')->isoFormat('dddd'),
+                'tanggal' => sprintf(
+                    "%s bulan %s tahun %s (%s)",
+                    $this->terbilang($today->day),
+                    $this->bulanIndo($today->month),
+                    'Dua Ribu Dua Puluh Lima',
+                    $today->format('d-m-Y')
+                ),
+                'nomor_urut' => sprintf("%d", $urutanKlasifikasi),
+                'tanggal_klasifikasi' => $klasifikasi->created_at->isoFormat('D MMMM Y'),
+                'nomor_entitas' => '11030',
+                'unit_pelaksana' => 'SURAKARTA',
+                'nama_perusahaan' => $klasifikasi->mitra->nama_perusahaan,
+                'badan_usaha' => $klasifikasi->mitra->badan_hukum_usaha,
+                'alamat' => $klasifikasi->mitra->alamat_perusahaan,
+                'status' => $klasifikasi->mitra->status_perusahaan ?? 'Penggilingan',
+                'nama_cp' => $klasifikasi->mitra->nama_cp,
+                'klasifikasi' => $klasifikasi,
+                'hasil' => $hasilMapping,
+                'pelaksana' => $pelaksana,
+                'pengetahui' => $pengetahui
+            ];
+
+            $pdf = PDF::loadView('pdf.berita-acara-klasifikasi', $data);
+            $pdf->setPaper('A4', 'portrait');
+            
+            $filename = sprintf(
+                'BA-KLASIFIKASI-%s-%s.pdf',
+                str_replace(' ', '-', $klasifikasi->mitra->nama_perusahaan),
+                $today->format('dmY')
+            );
+
+            return $pdf->download($filename);
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    private function getKlasifikasiHasil($field, $value)
+    {
+        $mapping = [
+            'mesin_pembersih_gabah' => [1 => 'Ada | > 20', 2 => 'Ada | < 20 ', 3 => 'Tidak Ada'],
+            'lantai_jemur' => [1 => 'Ada | > 10', 2 => 'Ada | 1 s/d 10', 3 => 'Tidak ada'],
+            'mesin_pengering' => [1 => 'Ada | > 20', 2 => 'Ada | ≤ 20', 3 => 'Tidak ada'],
+            'alat_pengering_lainnya' => [1 => 'Tidak Disyaratkan', 2 => 'Tidak Disyaratkan', 3 => 'Ada | < 1'],
+            'mesin_pembersih_awal' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'mesin_pemecah_kulit' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'mesin_pembersih_sekam' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'mesin_pemisah_gabah_pecah_kulit' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'mesin_pemisah_batu' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'mesin_penyosoh' => [1 => 'Ada | > 3 | 2', 2 => 'Ada | 1 s/d 3 | 1', 3 => 'Tidak ada'],
+            'mesin_pengkabut' => [1 => 'Ada | > 3 | 2', 2 => 'Ada | 1 s/d 3 | 1', 3 => 'Tidak ada'],
+            'mesin_pemesah_menir' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'mesin_pemisah_katul' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'mesin_pemisah_berdasarkan_ukuran' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'mesin_pemisah_berdasarkan_warna' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
+            'tangki_penyimpanan' => [1 => 'Ada | > 10', 2 => 'Ada | < 10', 3 => 'Tidak ada'],
+            'mesin_pengemas' => [1 => 'Ada | Full Otomatis', 2 => 'Ada | Semi Otomatis', 3 => 'Tidak ada'],
+            'mesin_jahit' => [1 => 'Ada | Full Otomatis', 2 => 'Ada | Semi Otomatis', 3 => 'Tidak ada'],
+            'gudang_konvensional' => [1 => 'Ada | > 3000', 2 => 'Ada | < 3000', 3 => 'Tidak ada'],
+            'silo_gkg_hopper' => [1 => 'Ada | > 2000', 2 => 'Ada | < 2000', 3 => 'Tidak ada'],
+            'truk' => [1 => 'Ada | > 5', 2 => 'Ada | 1 s/d 5', 3 => 'Tidak ada'],
+            'mini_lab' => [1 => 'Ada | Ruang Khusus', 2 => 'Ada | Tidak Khusus', 3 => 'Tidak ada'],
+            'moisture_tester' => [1 => 'Ada | Berfungsi', 2 => 'Ada | Tidak Berfungsi', 3 => 'Tidak ada'],
+            'pembanding_derajat_sosoh' => [1 => 'Ada | Sesuai Standar', 2 => 'Ada | Tidak Sesuai Standar', 3 => 'Tidak ada'],
+            'bagian_quality_control' => [1 => 'Ada | Tidak Merangkap', 2 => 'Ada | Merangkap', 3 => 'Tidak ada'],
+        ];
+
+        if (isset($mapping[$field][$value])) {
+            return $mapping[$field][$value];
+        }
+
+        return '-';
     }
 
     public function generateSuratPenetapanKlasifikasi($id, Request $request)

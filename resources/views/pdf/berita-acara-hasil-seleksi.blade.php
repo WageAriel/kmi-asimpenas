@@ -5,30 +5,32 @@
     <title>Berita Acara Hasil Seleksi</title>
     <style>
         @page {
-            margin: 2.5cm;
+            margin: 2cm;
         }
         body {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 11pt;
-            line-height: 1.5;
+            font-size: 10.5pt;
+            line-height: 1.35;
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 18px;
         }
         .header h1 {
-            font-size: 14pt;
+            font-size: 12pt;
             font-weight: bold;
             margin: 0;
             padding: 0;
+            line-height: 1.3;
         }
         .content {
             text-align: justify;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
+            font-size: 10pt;
         }
         .data-table {
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .data-table td:first-child {
             width: 200px;
@@ -39,55 +41,56 @@
         .result-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 12px 0;
         }
         .result-table th,
         .result-table td {
             border: 1px solid black;
-            padding: 8px;
+            padding: 6px;
+            vertical-align: top;
         }
         .result-table th {
             background-color: #f5f5f5;
             text-align: center;
             font-weight: bold;
+            font-size: 10pt;
+        }
+        .result-table td {
+            font-size: 9pt;
         }
         .conclusion {
-            margin: 20px 0;
+            margin: 12px 0;
             text-align: justify;
+            font-size: 10pt;
         }
         .signatures {
-            margin-top: 60px;
+            margin-top: 25px;
             width: 100%;
-            position: relative;
-            min-height: 250px;
         }
         .signature-row {
-            position: relative;
+            display: table;
             width: 100%;
-            margin-bottom: 100px;
+            margin-bottom: 25px;
         }
         .signature-box {
-            position: absolute;
-            width: 45%;
-        }
-        .signature-box:first-child {
-            left: 0;
-        }
-        .signature-box:last-child {
-            right: 0;
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+            text-align: center;
         }
         .signature-center {
-            width: 45%;
+            width: 50%;
             margin: 0 auto;
             text-align: center;
-            clear: both;
+            margin-top: 20px;
         }
         .signature-space {
-            height: 80px;
+            height: 60px;
         }
         .signature-text {
             margin: 0;
-            line-height: 1.5;
+            line-height: 1.35;
+            font-size: 10pt;
         }
         .data-info {
         margin-top: 10px;
@@ -99,7 +102,8 @@
         }
         
         .info-table td {
-            padding: 2px 0;
+            padding: 1.5px 0;
+            font-size: 10pt;
         }
         
         .data-table {
@@ -108,12 +112,14 @@
         }
         
         .data-table td {
-            padding: 2px 0;
+            padding: 1.5px 0;
+            font-size: 10pt;
         }
         
         .section-title {
             font-weight: bold;
             margin: 10px 0 5px 0;
+            font-size: 10pt;
         }
     </style>
 </head>
@@ -184,25 +190,25 @@
         <thead>
             <tr>
                 <th width="10%">No</th>
-                <th width="45%">Persyaratan</th>
-                <th width="45%">Keterangan</th>
+                <th width="35%">Persyaratan</th>
+                <th width="55%">Keterangan</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td style="text-align: center;">1</td>
-                <td>Dokumen Perijinan</td>
-                <td>{{ $hasil_seleksi->kesimpulan_dokumen }}</td>
+                <td>Dokumen Perijinan : {{ $hasil_seleksi->kesimpulan_dokumen }}</td>
+                <td style="white-space: pre-line;">{{ $keterangan_dokumen }}</td>
             </tr>
             <tr>
                 <td style="text-align: center;">2</td>
-                <td>Sarana Pengeringan</td>
-                <td>{{ $hasil_seleksi->kesimpulan_sarana_pengeringan }}</td>
+                <td>Sarana Pengeringan : {{ $hasil_seleksi->kesimpulan_sarana_pengeringan }}</td>
+                <td style="white-space: pre-line;">{{ $keterangan_pengeringan }}</td>
             </tr>
             <tr>
                 <td style="text-align: center;">3</td>
-                <td>Sarana Penggilingan</td>
-                <td>{{ $hasil_seleksi->kesimpulan_sarana_penggilingan }}</td>
+                <td>Sarana Penggilingan : {{ $hasil_seleksi->kesimpulan_sarana_penggilingan }}</td>
+                <td style="white-space: pre-line;">{{ $keterangan_penggilingan }}</td>
             </tr>
         </tbody>
     </table>
@@ -215,6 +221,7 @@
         <div class="signature-row">
             <!-- Left signature -->
             <div class="signature-box">
+                <br>
                 <p class="signature-text">Mitra Pangan,</p>
                 <div class="signature-space"></div>
                 <p class="signature-text"><u>{{ $nama_pj_mitra }}</u></p>
@@ -224,6 +231,7 @@
             <!-- Right signature -->
             <div class="signature-box">
                 <p class="signature-text">Perum BULOG Kantor Cabang {{ $unit_pelaksana }}</p>
+                <p class="signature-text">Pelaksana Seleksi,</p>
                 <div class="signature-space"></div>
                 <p class="signature-text"><u>{{ $pelaksana->nama_karyawan }}</u></p>
                 <p class="signature-text">{{ $pelaksana->jabatan }}</p>
