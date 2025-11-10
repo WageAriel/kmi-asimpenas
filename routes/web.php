@@ -88,6 +88,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         ]);
     })->name('klasifikasi-mitra.index');
 
+    //Generate PDF Surat Penetapan Klasifikasi
+    Route::get('/klasifikasi-mitra/{id}/surat-penetapan', [PdfGeneratorController::class, 'generateSuratPenetapanKlasifikasi'])
+    ->name('klasifikasi-mitra.surat-penetapan');
+
     // 6. Daftar Hasil Seleksi Mitra
     Route::get('/hasil-seleksi-mitra', function () {
         $hasilSeleksiMitras = App\Models\HasilSeleksiMitra::with(['mitra', 'seleksiMitra'])

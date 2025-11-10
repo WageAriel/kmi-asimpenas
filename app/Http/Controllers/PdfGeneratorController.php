@@ -273,4 +273,53 @@ class PdfGeneratorController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function generateSuratPenetapanKlasifikasi($id, Request $request)
+    {
+        try {
+            $klasifikasi = KlasifikasiMitra::with('mitra')->findOrFail($id);
+            $karyawan = Karyawan::findOrFail($request->id_karyawan);
+            
+            $today = now();
+            
+            $data = [
+                'nomor_surat' => sprintf(
+                    "%d/11030/SP/KLASIFIKASI/%s/%s",
+                    $id,
+                    $this->getRomanMonth($today->month),
+                    $today->year
+                ),
+                'tahun' => $today->year,
+                'hari' => \Carbon\Carbon::now()->locale('id')->isoFormat('dddd'),
+                'tanggal' => sprintf(
+                    "%s bulan %s tahun %s (%s)",
+                    $this->terbilang($today->day),
+                    $this->bulanIndo($today->month),
+                    'Dua Ribu Dua Puluh Lima',
+                    $today->format('d-m-Y')
+                ),
+                'nomor_BA' => sprintf(
+                    "%d/11030/BA/SELEKSI/%s/%s",
+                    $id,
+                    $this->getRomanMonth($today->month),
+                    $today->year
+                ),
+                'nama_perusahaan' => $klasifikasi->mitra->nama_perusahaan,
+                'badan_usaha' => $klasifikasi->mitra->badan_hukum_usaha,
+                'alamat_perusahaan' => $klasifikasi->mitra->alamat_perusahaan,
+                'status_mitra' => $klasifikasi->mitra->status ?? 'Penggilingan',
+                'nomor_urut_seleksi' => sprintf("%03d", $klasifikasi->id_klasifikasi_mitra),
+                'hasil_klasifikasi' => $klasifikasi->hasil_klasifikasi,
+                'kantor_cabang' => 'Surakarta',
+                'nama_mitra' => $klasifikasi->mitra->nama_cp,
+                'nama_pejabat' => $karyawan->nama_karyawan
+            ];
+
+            $pdf = PDF::loadView('pdf.surat-penetapan-klasifikasi', $data);
+            return $pdf->download('surat-penetapan-klasifikasi-'.$klasifikasi->mitra->nama_perusahaan.'.pdf');
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

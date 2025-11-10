@@ -296,6 +296,61 @@ const exportData = () => {
     window.location.href = '/klasifikasi-mitra/export/data';
 };
 
+// Add new refs
+const showPdfModal = ref(false);
+const selectedItemForPdf = ref(null);
+const selectedKaryawan = ref('');
+const karyawanList = ref([]);
+const isGeneratingPdf = ref(false);
+
+// Add new function to handle PDF modal
+const showPdfDownloadModal = async (item) => {
+    selectedItemForPdf.value = item;
+    showPdfModal.value = true;
+    try {
+        const response = await axios.get('/api/karyawan');
+        karyawanList.value = response.data;
+    } catch (error) {
+        console.error('Error fetching karyawan:', error);
+    }
+};
+
+// Add generatePdf function
+const generatePdf = async () => {
+    if (!selectedKaryawan.value) {
+        alert('Silakan pilih karyawan terlebih dahulu');
+        return;
+    }
+
+    isGeneratingPdf.value = true;
+    try {
+        const response = await axios.get(
+            `/admin/klasifikasi-mitra/${selectedItemForPdf.value.id_klasifikasi_mitra}/surat-penetapan`,
+            {
+                params: { id_karyawan: selectedKaryawan.value },
+                responseType: 'blob'
+            }
+        );
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `surat-penetapan-klasifikasi-${selectedItemForPdf.value.mitra?.nama_perusahaan}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Terjadi kesalahan saat generate PDF');
+    } finally {
+        isGeneratingPdf.value = false;
+        showPdfModal.value = false;
+        selectedItemForPdf.value = null;
+        selectedKaryawan.value = '';
+    }
+};
+
 </script>
 
 <template>
@@ -381,6 +436,7 @@ const exportData = () => {
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Download</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -398,6 +454,14 @@ const exportData = () => {
                                         class="inline-flex items-center text-green-600 hover:text-green-900 text-xs mr-3"
                                     >
                                         Lihat
+                                    </button>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <button
+                                        @click="showPdfDownloadModal(item)"
+                                        class="inline-flex items-center text-green-600 hover:text-green-900 text-xs mr-3"
+                                    >
+                                        Download PDF
                                     </button>
                                 </td>
                             </tr>
@@ -754,6 +818,56 @@ const exportData = () => {
                         </svg>
                         <span v-if="isUploading">Mengupload...</span>
                         <span v-else>Upload & Import</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add PDF Modal -->
+        <div v-if="showPdfModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
+                <button @click="showPdfModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <h2 class="text-xl font-bold mb-6">Generate Surat Penetapan</h2>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Pilih Penandatangan
+                    </label>
+                    <select 
+                        v-model="selectedKaryawan"
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                    >
+                        <option value="">Pilih Karyawan</option>
+                        <option v-for="karyawan in karyawanList" 
+                                :key="karyawan.id_karyawan" 
+                                :value="karyawan.id_karyawan">
+                            {{ karyawan.nama_karyawan }} - {{ karyawan.jabatan }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <button 
+                        @click="showPdfModal = false"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium text-sm"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="generatePdf"
+                        :disabled="!selectedKaryawan || isGeneratingPdf"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    >
+                        <svg v-if="isGeneratingPdf" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isGeneratingPdf ? 'Generating...' : 'Generate PDF' }}
                     </button>
                 </div>
             </div>
