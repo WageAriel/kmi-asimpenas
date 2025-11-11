@@ -523,31 +523,31 @@ class PdfGeneratorController extends Controller
     private function getKlasifikasiHasil($field, $value)
     {
         $mapping = [
-            'mesin_pembersih_gabah' => [1 => 'Ada | > 20', 2 => 'Ada | < 20 ', 3 => 'Tidak Ada'],
-            'lantai_jemur' => [1 => 'Ada | > 10', 2 => 'Ada | 1 s/d 10', 3 => 'Tidak ada'],
-            'mesin_pengering' => [1 => 'Ada | > 20', 2 => 'Ada | ≤ 20', 3 => 'Tidak ada'],
-            'alat_pengering_lainnya' => [1 => 'Tidak Disyaratkan', 2 => 'Tidak Disyaratkan', 3 => 'Ada | < 1'],
-            'mesin_pembersih_awal' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'mesin_pemecah_kulit' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'mesin_pembersih_sekam' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'mesin_pemisah_gabah_pecah_kulit' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'mesin_pemisah_batu' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'mesin_penyosoh' => [1 => 'Ada | > 3 | 2', 2 => 'Ada | 1 s/d 3 | 1', 3 => 'Tidak ada'],
-            'mesin_pengkabut' => [1 => 'Ada | > 3 | 2', 2 => 'Ada | 1 s/d 3 | 1', 3 => 'Tidak ada'],
-            'mesin_pemesah_menir' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'mesin_pemisah_katul' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'mesin_pemisah_berdasarkan_ukuran' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'mesin_pemisah_berdasarkan_warna' => [1 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 3 => 'Tidak ada'],
-            'tangki_penyimpanan' => [1 => 'Ada | > 10', 2 => 'Ada | < 10', 3 => 'Tidak ada'],
-            'mesin_pengemas' => [1 => 'Ada | Full Otomatis', 2 => 'Ada | Semi Otomatis', 3 => 'Tidak ada'],
-            'mesin_jahit' => [1 => 'Ada | Full Otomatis', 2 => 'Ada | Semi Otomatis', 3 => 'Tidak ada'],
-            'gudang_konvensional' => [1 => 'Ada | > 3000', 2 => 'Ada | < 3000', 3 => 'Tidak ada'],
-            'silo_gkg_hopper' => [1 => 'Ada | > 2000', 2 => 'Ada | < 2000', 3 => 'Tidak ada'],
-            'truk' => [1 => 'Ada | > 5', 2 => 'Ada | 1 s/d 5', 3 => 'Tidak ada'],
-            'mini_lab' => [1 => 'Ada | Ruang Khusus', 2 => 'Ada | Tidak Khusus', 3 => 'Tidak ada'],
-            'moisture_tester' => [1 => 'Ada | Berfungsi', 2 => 'Ada | Tidak Berfungsi', 3 => 'Tidak ada'],
-            'pembanding_derajat_sosoh' => [1 => 'Ada | Sesuai Standar', 2 => 'Ada | Tidak Sesuai Standar', 3 => 'Tidak ada'],
-            'bagian_quality_control' => [1 => 'Ada | Tidak Merangkap', 2 => 'Ada | Merangkap', 3 => 'Tidak ada'],
+            'mesin_pembersih_gabah' => [3 => 'Ada | > 20', 2 => 'Ada | < 20 ', 1 => 'Tidak Ada'],
+            'lantai_jemur' => [3 => 'Ada | > 10', 2 => 'Ada | 1 s/d 10', 1 => 'Tidak ada'],
+            'mesin_pengering' => [3 => 'Ada | > 20', 2 => 'Ada | ≤ 20', 1 => 'Tidak ada'],
+            'alat_pengering_lainnya' => [3 => 'Tidak Disyaratkan', 2 => 'Tidak Disyaratkan', 1 => 'Ada | < 1'],
+            'mesin_pembersih_awal' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'mesin_pemecah_kulit' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'mesin_pembersih_sekam' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'mesin_pemisah_gabah_pecah_kulit' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'mesin_pemisah_batu' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'mesin_penyosoh' => [3 => 'Ada | > 3 | 2', 2 => 'Ada | 1 s/d 3 | 1', 1 => 'Tidak ada'],
+            'mesin_pengkabut' => [3 => 'Ada | > 3 | 2', 2 => 'Ada | 1 s/d 3 | 1', 1 => 'Tidak ada'],
+            'mesin_pemesah_menir' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'mesin_pemisah_katul' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'mesin_pemisah_berdasarkan_ukuran' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'mesin_pemisah_berdasarkan_warna' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
+            'tangki_penyimpanan' => [3 => 'Ada | > 10', 2 => 'Ada | < 10', 1 => 'Tidak ada'],
+            'mesin_pengemas' => [3 => 'Ada | Full Otomatis', 2 => 'Ada | Semi Otomatis', 1 => 'Tidak ada'],
+            'mesin_jahit' => [3 => 'Ada | Full Otomatis', 2 => 'Ada | Semi Otomatis', 1 => 'Tidak ada'],
+            'gudang_konvensional' => [3 => 'Ada | > 3000', 2 => 'Ada | < 3000', 1 => 'Tidak ada'],
+            'silo_gkg_hopper' => [3 => 'Ada | > 2000', 2 => 'Ada | < 2000', 1 => 'Tidak ada'],
+            'truk' => [3 => 'Ada | > 5', 2 => 'Ada | 1 s/d 5', 1 => 'Tidak ada'],
+            'mini_lab' => [3 => 'Ada | Ruang Khusus', 2 => 'Ada | Tidak Khusus', 1 => 'Tidak ada'],
+            'moisture_tester' => [3 => 'Ada | Berfungsi', 2 => 'Ada | Tidak Berfungsi', 1 => 'Tidak ada'],
+            'pembanding_derajat_sosoh' => [3 => 'Ada | Sesuai Standar', 2 => 'Ada | Tidak Sesuai Standar', 1 => 'Tidak ada'],
+            'bagian_quality_control' => [3 => 'Ada | Tidak Merangkap', 2 => 'Ada | Merangkap', 1 => 'Tidak ada'],
         ];
 
         if (isset($mapping[$field][$value])) {
@@ -570,11 +570,14 @@ class PdfGeneratorController extends Controller
                 ->orderBy('id_klasifikasi_mitra', 'asc')
                 ->count();
             
+            // Convert urutan to Roman numeral
+            $urutanRoman = $this->toRoman($urutanDataKlasifikasi);
+            
             $data = [
                 'nomor_surat' => sprintf(
                     "%d/11030/SP/KLASIFIKASI/%s/%s",
                     $urutanDataKlasifikasi,
-                    $this->getRomanMonth($today->month),
+                    $urutanRoman,
                     $today->year
                 ),
                 'tahun' => $today->year,
@@ -587,16 +590,16 @@ class PdfGeneratorController extends Controller
                     $today->format('d-m-Y')
                 ),
                 'nomor_BA' => sprintf(
-                    "%d/11030/BA/SELEKSI/%s/%s",
+                    "%d/11030/BA/KLASIFIKASI/%s/%s",
                     $urutanDataKlasifikasi,
-                    $this->getRomanMonth($today->month),
+                    $urutanRoman,
                     $today->year
                 ),
                 'nama_perusahaan' => $klasifikasi->mitra->nama_perusahaan,
                 'badan_usaha' => $klasifikasi->mitra->badan_hukum_usaha,
                 'alamat_perusahaan' => $klasifikasi->mitra->alamat_perusahaan,
                 'status_mitra' => $klasifikasi->mitra->status ?? 'Penggilingan',
-                'nomor_urut_seleksi' => sprintf("%02d", $urutanDataKlasifikasi),
+                'nomor_urut_klasifikasi' => sprintf("%02d", $urutanDataKlasifikasi),
                 'hasil_klasifikasi' => $klasifikasi->hasil_klasifikasi,
                 'kantor_cabang' => 'Surakarta',
                 'nama_mitra' => $klasifikasi->mitra->nama_cp,

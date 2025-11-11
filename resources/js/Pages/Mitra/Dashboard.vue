@@ -213,18 +213,18 @@ const loadBirthdayNotifications = async () => {
         birthdayNotifications.value = birthdays;
         
         // Add today's birthdays to urgent notifications
-        todayBirthdays.forEach(birthday => {
-            console.log('🎂 Adding urgent notification for:', birthday.nama_cp);
-            urgentNotifications.value.push({
-                id: `birthday-${birthday.id_mitra}`,
-                type: 'birthday',
-                title: '🎉 Ulang Tahun Hari Ini!',
-                message: `${birthday.nama_cp} dari ${birthday.nama_perusahaan} berulang tahun ke-${birthday.age} hari ini!`,
-                action: 'Kirim Ucapan',
-                birthday_data: birthday,
-                urgent: true
-            });
-        });
+        // todayBirthdays.forEach(birthday => {
+        //     console.log('🎂 Adding urgent notification for:', birthday.nama_cp);
+        //     urgentNotifications.value.push({
+        //         id: `birthday-${birthday.id_mitra}`,
+        //         type: 'birthday',
+        //         title: '🎉 Ulang Tahun Hari Ini!',
+        //         message: `${birthday.nama_cp} dari ${birthday.nama_perusahaan} berulang tahun ke-${birthday.age} hari ini!`,
+        //         action: 'Kirim Ucapan',
+        //         birthday_data: birthday,
+        //         urgent: true
+        //     });
+        // });
         
         console.log('🎂 Birthday notifications loaded successfully');
     } catch (error) {
@@ -476,12 +476,12 @@ const goToAction = (action) => {
                                 <div class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
                                         <div class="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold">
-                                            {{ birthday.nama_cp ? birthday.nama_cp.charAt(0).toUpperCase() : '?' }}
+                                            {{ birthday.nama_perusahaan ? birthday.nama_perusahaan.charAt(0).toUpperCase() : '?' }}
                                         </div>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">{{ birthday.nama_cp }}</p>
-                                        <p class="text-xs text-gray-500">{{ birthday.nama_perusahaan }}</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ birthday.nama_perusahaan }}</p>
+                                        <p class="text-xs text-gray-500">{{ birthday.nama_cp }}</p>
                                     </div>
                                 </div>
                                 <div class="text-right">
@@ -719,31 +719,7 @@ const goToAction = (action) => {
                     <div class="space-y-6">
                         <!-- Important Announcements -->
                         <div class="bg-white rounded-2xl shadow-sm border border-gray-200">
-                            <div class="px-6 py-5 border-b border-gray-200">
-                                <h3 class="text-lg font-bold text-gray-900">Pengumuman Penting</h3>
-                            </div>
-                            <div class="p-6 space-y-4">
-                                <div class="p-5 bg-yellow-50 border-l-4 border-yellow-400 rounded-xl">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <h4 class="text-base font-semibold text-yellow-800">Deadline Pengajuan 2025</h4>
-                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                                            Urgent
-                                        </span>
-                                    </div>
-                                    <p class="text-sm text-yellow-700 mb-3">Batas waktu pengajuan seleksi mitra 2025 adalah 31 Maret 2025.</p>
-                                    <p class="text-xs text-gray-500">1 Februari 2025</p>
-                                </div>
-                                
-                                <div class="p-5 bg-blue-50 border-l-4 border-blue-400 rounded-xl">
-                                    <h4 class="text-base font-semibold text-blue-800 mb-2">Update Kebijakan Dokumen</h4>
-                                    <p class="text-sm text-blue-700 mb-3">Mulai 2025, diperlukan tambahan dokumen sertifikat ISO untuk pengajuan baru.</p>
-                                    <p class="text-xs text-gray-500">25 Januari 2025</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Contact Info -->
-                        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 shadow-sm">
+                            <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 shadow-sm">
                             <h3 class="text-base font-bold text-gray-900 mb-4">Butuh Bantuan?</h3>
                             <div class="space-y-4">
                                 <div class="flex items-center text-sm text-gray-600">
@@ -761,6 +737,10 @@ const goToAction = (action) => {
                                 </div>
                             </div>
                         </div>
+                        </div>
+
+                        <!-- Contact Info -->
+                        
                     </div>
                 </div>
             </div>

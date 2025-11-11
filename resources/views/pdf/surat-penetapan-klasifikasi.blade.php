@@ -45,12 +45,13 @@
             position: absolute;
             left: 0;
             width: 45%;
+            text-align: center;
         }
         .signature-right {
             position: absolute;
             right: 0;
             width: 45%;
-            text-align: left;
+            text-align: center;
         }
         .signature-space {
             height: 80px;
@@ -67,7 +68,7 @@
     </div>
 
     <div class="content">
-        <p>Pada hari ini {{ $hari }} tanggal {{ $tanggal }}, berdasarkan Berita Acara Hasil Seleksi Nomor : {{ $nomor_BA }}, maka kepada :</p>
+        <p>Pada hari ini {{ $hari }} tanggal {{ $tanggal }}, berdasarkan Berita Acara Hasil Klasifikasi Nomor : {{ $nomor_BA }}, maka kepada :</p>
 
         <table class="data-table">
             <tr>
@@ -93,7 +94,7 @@
             <tr>
                 <td>5. Nomor Urut Klasifikasi</td>
                 <td>:</td>
-                <td>{{ $nomor_urut_seleksi }}</td>
+                <td>{{ $nomor_urut_klasifikasi }}</td>
             </tr>
             <tr>
                 <td>6. Hasil Klasifikasi</td>

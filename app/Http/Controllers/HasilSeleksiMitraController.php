@@ -76,25 +76,34 @@ class HasilSeleksiMitraController extends Controller
             $dokumenAdaValid = [];
             $dokumenTidakAda = [];
             $dokumenLolos = 0;
-            $dokumenTotal = 0;
+            $dokumenTidakLolos = 0;
 
             foreach ($dokumenMapping as $field => $label) {
                 // Cek apakah dokumen ada di data_seleksi_mitra
                 if ($seleksiMitra->$field === 'ada') {
-                    $dokumenTotal++;
                     if (isset($validated[$field])) {
                         if ($validated[$field] === 'Lolos') {
                             $dokumenAdaValid[] = $label;
                             $dokumenLolos++;
                         } else {
                             $dokumenTidakAda[] = $label;
+                            $dokumenTidakLolos++;
                         }
                     }
                 }
             }
 
-            // Tentukan kesimpulan dokumen
-            $kesimpulanDokumen = ($dokumenTotal > 0 && $dokumenLolos === $dokumenTotal) ? 'Lolos' : 'Tidak Lolos';
+            // Tentukan kesimpulan dokumen - Lolos jika yang tidak lolos tidak lebih dari setengah yang sudah divalidasi
+            $dokumenTotalDivalidasi = $dokumenLolos + $dokumenTidakLolos;
+            // Tidak Lolos jika yang tidak lolos lebih dari 50% (lebih dari setengah)
+            Log::info('Dokumen Debug', [
+                'lolos' => $dokumenLolos,
+                'tidak_lolos' => $dokumenTidakLolos,
+                'total' => $dokumenTotalDivalidasi,
+                'calculation' => ($dokumenTidakLolos * 2),
+                'comparison' => ($dokumenTidakLolos * 2 > $dokumenTotalDivalidasi)
+            ]);
+            $kesimpulanDokumen = ($dokumenTotalDivalidasi > 0 && ($dokumenTidakLolos * 2 > $dokumenTotalDivalidasi)) ? 'Tidak Lolos' : 'Lolos';
 
             // Proses sarana pengeringan
             $pengeringanMapping = [
@@ -105,23 +114,25 @@ class HasilSeleksiMitraController extends Controller
             $pengeringanAda = [];
             $pengeringanTidakAda = [];
             $pengeringanLolos = 0;
-            $pengeringanTotal = 0;
+            $pengeringanTidakLolos = 0;
 
             foreach ($pengeringanMapping as $field => $label) {
                 if ($seleksiMitra->$field === 'ada') {
-                    $pengeringanTotal++;
                     if (isset($validated[$field])) {
                         if ($validated[$field] === 'Lolos') {
                             $pengeringanAda[] = $label;
                             $pengeringanLolos++;
                         } else {
                             $pengeringanTidakAda[] = $label;
+                            $pengeringanTidakLolos++;
                         }
                     }
                 }
             }
 
-            $kesimpulanPengeringan = ($pengeringanTotal > 0 && $pengeringanLolos === $pengeringanTotal) ? 'Lolos' : 'Tidak Lolos';
+            // Tentukan kesimpulan pengeringan - Lolos jika yang tidak lolos tidak lebih dari setengah yang sudah divalidasi
+            $pengeringanTotalDivalidasi = $pengeringanLolos + $pengeringanTidakLolos;
+            $kesimpulanPengeringan = ($pengeringanTotalDivalidasi > 0 && ($pengeringanTidakLolos * 2 > $pengeringanTotalDivalidasi)) ? 'Tidak Lolos' : 'Lolos';
 
             // Proses sarana penggilingan
             $penggilinganMapping = [
@@ -134,26 +145,28 @@ class HasilSeleksiMitraController extends Controller
             $penggilinganAda = [];
             $penggilinganTidakAda = [];
             $penggilinganLolos = 0;
-            $penggilinganTotal = 0;
+            $penggilinganTidakLolos = 0;
 
             foreach ($penggilinganMapping as $field => $label) {
                 // Untuk mesin_pemisah_gabah_dengan_beras, cek field mesin_pemisah_gabah
                 $seleksiField = ($field === 'mesin_pemisah_gabah_dengan_beras') ? 'mesin_pemisah_gabah' : $field;
                 
                 if ($seleksiMitra->$seleksiField === 'ada') {
-                    $penggilinganTotal++;
                     if (isset($validated[$field])) {
                         if ($validated[$field] === 'Lolos') {
                             $penggilinganAda[] = $label;
                             $penggilinganLolos++;
                         } else {
                             $penggilinganTidakAda[] = $label;
+                            $penggilinganTidakLolos++;
                         }
                     }
                 }
             }
 
-            $kesimpulanPenggilingan = ($penggilinganTotal > 0 && $penggilinganLolos === $penggilinganTotal) ? 'Lolos' : 'Tidak Lolos';
+            // Tentukan kesimpulan penggilingan - Lolos jika yang tidak lolos tidak lebih dari setengah yang sudah divalidasi
+            $penggilinganTotalDivalidasi = $penggilinganLolos + $penggilinganTidakLolos;
+            $kesimpulanPenggilingan = ($penggilinganTotalDivalidasi > 0 && ($penggilinganTidakLolos * 2 > $penggilinganTotalDivalidasi)) ? 'Tidak Lolos' : 'Lolos';
 
             // Tentukan kesimpulan akhir
             $kesimpulanAkhir = ($kesimpulanDokumen === 'Lolos' && 
@@ -266,23 +279,25 @@ class HasilSeleksiMitraController extends Controller
             $dokumenAdaValid = [];
             $dokumenTidakAda = [];
             $dokumenLolos = 0;
-            $dokumenTotal = 0;
+            $dokumenTidakLolos = 0;
 
             foreach ($dokumenMapping as $field => $label) {
                 if ($seleksiMitra->$field === 'ada') {
-                    $dokumenTotal++;
                     if (isset($validated[$field])) {
                         if ($validated[$field] === 'Lolos') {
                             $dokumenAdaValid[] = $label;
                             $dokumenLolos++;
                         } else {
                             $dokumenTidakAda[] = $label;
+                            $dokumenTidakLolos++;
                         }
                     }
                 }
             }
 
-            $kesimpulanDokumen = ($dokumenTotal > 0 && $dokumenLolos === $dokumenTotal) ? 'Lolos' : 'Tidak Lolos';
+            // Tentukan kesimpulan dokumen - Lolos jika yang tidak lolos tidak lebih dari setengah yang sudah divalidasi
+            $dokumenTotalDivalidasi = $dokumenLolos + $dokumenTidakLolos;
+            $kesimpulanDokumen = ($dokumenTotalDivalidasi > 0 && ($dokumenTidakLolos * 2 > $dokumenTotalDivalidasi)) ? 'Tidak Lolos' : 'Lolos';
 
             // Proses sarana pengeringan
             $pengeringanMapping = [
@@ -293,23 +308,25 @@ class HasilSeleksiMitraController extends Controller
             $pengeringanAda = [];
             $pengeringanTidakAda = [];
             $pengeringanLolos = 0;
-            $pengeringanTotal = 0;
+            $pengeringanTidakLolos = 0;
 
             foreach ($pengeringanMapping as $field => $label) {
                 if ($seleksiMitra->$field === 'ada') {
-                    $pengeringanTotal++;
                     if (isset($validated[$field])) {
                         if ($validated[$field] === 'Lolos') {
                             $pengeringanAda[] = $label;
                             $pengeringanLolos++;
                         } else {
                             $pengeringanTidakAda[] = $label;
+                            $pengeringanTidakLolos++;
                         }
                     }
                 }
             }
 
-            $kesimpulanPengeringan = ($pengeringanTotal > 0 && $pengeringanLolos === $pengeringanTotal) ? 'Lolos' : 'Tidak Lolos';
+            // Tentukan kesimpulan pengeringan - Lolos jika yang tidak lolos tidak lebih dari setengah yang sudah divalidasi
+            $pengeringanTotalDivalidasi = $pengeringanLolos + $pengeringanTidakLolos;
+            $kesimpulanPengeringan = ($pengeringanTotalDivalidasi > 0 && ($pengeringanTidakLolos * 2 > $pengeringanTotalDivalidasi)) ? 'Tidak Lolos' : 'Lolos';
 
             // Proses sarana penggilingan
             $penggilinganMapping = [
@@ -322,25 +339,27 @@ class HasilSeleksiMitraController extends Controller
             $penggilinganAda = [];
             $penggilinganTidakAda = [];
             $penggilinganLolos = 0;
-            $penggilinganTotal = 0;
+            $penggilinganTidakLolos = 0;
 
             foreach ($penggilinganMapping as $field => $label) {
                 $seleksiField = ($field === 'mesin_pemisah_gabah_dengan_beras') ? 'mesin_pemisah_gabah' : $field;
                 
                 if ($seleksiMitra->$seleksiField === 'ada') {
-                    $penggilinganTotal++;
                     if (isset($validated[$field])) {
                         if ($validated[$field] === 'Lolos') {
                             $penggilinganAda[] = $label;
                             $penggilinganLolos++;
                         } else {
                             $penggilinganTidakAda[] = $label;
+                            $penggilinganTidakLolos++;
                         }
                     }
                 }
             }
 
-            $kesimpulanPenggilingan = ($penggilinganTotal > 0 && $penggilinganLolos === $penggilinganTotal) ? 'Lolos' : 'Tidak Lolos';
+            // Tentukan kesimpulan penggilingan - Lolos jika yang tidak lolos tidak lebih dari setengah yang sudah divalidasi
+            $penggilinganTotalDivalidasi = $penggilinganLolos + $penggilinganTidakLolos;
+            $kesimpulanPenggilingan = ($penggilinganTotalDivalidasi > 0 && ($penggilinganTidakLolos * 2 > $penggilinganTotalDivalidasi)) ? 'Tidak Lolos' : 'Lolos';
 
             // Tentukan kesimpulan akhir
             $kesimpulanAkhir = ($kesimpulanDokumen === 'Lolos' && 

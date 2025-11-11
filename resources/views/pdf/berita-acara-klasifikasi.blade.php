@@ -324,6 +324,7 @@
         <div class="signature-row">
             <!-- Left signature -->
             <div class="signature-box">
+                <br>
                 <p class="signature-text">Mitra Pangan,</p>
                 <div class="signature-space"></div>
                 <p class="signature-text"><u>{{ $nama_cp }}</u></p>

@@ -156,25 +156,23 @@ public function mySeleksi()
 
         $dokumenAdaValid = [];
         $dokumenTidakAda = [];
-        $dokumenLolos = 0;
-        $dokumenTotal = 0;
 
         foreach ($dokumenMapping as $field => $label) {
+            // Proses semua dokumen, baik yang "ada" maupun "tidak ada"
             if ($seleksimitra->$field === 'ada') {
-                $dokumenTotal++;
                 if ($status === 'lolos') {
                     $dokumenAdaValid[] = $label;
-                    $dokumenLolos++;
                 } else {
-                    $dokumenAdaValid[] = $label;
+                    $dokumenTidakAda[] = $label;
                 }
             } elseif ($seleksimitra->$field === 'tidak ada') {
+                // Yang "tidak ada" otomatis masuk ke "tidak lolos"
                 $dokumenTidakAda[] = $label;
-                $dokumenTotal++;
             }
         }
 
-        $kesimpulanDokumen = ($dokumenTotal > 0 && $dokumenLolos === $dokumenTotal) ? 'Lolos' : 'Tidak Lolos';
+        // Kesimpulan dokumen sama dengan status keseluruhan
+        $kesimpulanDokumen = ($status === 'lolos') ? 'Lolos' : 'Tidak Lolos';
 
         // Proses sarana pengeringan
         $pengeringanMapping = [
@@ -184,25 +182,22 @@ public function mySeleksi()
 
         $pengeringanAda = [];
         $pengeringanTidakAda = [];
-        $pengeringanLolos = 0;
-        $pengeringanTotal = 0;
 
         foreach ($pengeringanMapping as $field => $label) {
             if ($seleksimitra->$field === 'ada') {
-                $pengeringanTotal++;
                 if ($status === 'lolos') {
                     $pengeringanAda[] = $label;
-                    $pengeringanLolos++;
                 } else {
-                    $pengeringanAda[] = $label;
+                    $pengeringanTidakAda[] = $label;
                 }
             } elseif ($seleksimitra->$field === 'tidak ada') {
+                // Yang "tidak ada" otomatis masuk ke "tidak lolos"
                 $pengeringanTidakAda[] = $label;
-                $pengeringanTotal++;
             }
         }
 
-        $kesimpulanPengeringan = ($pengeringanTotal > 0 && $pengeringanLolos === $pengeringanTotal) ? 'Lolos' : 'Tidak Lolos';
+        // Kesimpulan pengeringan sama dengan status keseluruhan
+        $kesimpulanPengeringan = ($status === 'lolos') ? 'Lolos' : 'Tidak Lolos';
 
         // Proses sarana penggilingan
         $penggilinganMapping = [
@@ -214,34 +209,31 @@ public function mySeleksi()
 
         $penggilinganAda = [];
         $penggilinganTidakAda = [];
-        $penggilinganLolos = 0;
-        $penggilinganTotal = 0;
 
         foreach ($penggilinganMapping as $field => $label) {
             // Untuk mesin_pemisah_gabah_dengan_beras, cek field mesin_pemisah_gabah
             $seleksiField = ($field === 'mesin_pemisah_gabah_dengan_beras') ? 'mesin_pemisah_gabah' : $field;
             
             if ($seleksimitra->$seleksiField === 'ada') {
-                $penggilinganTotal++;
                 if ($status === 'lolos') {
                     $penggilinganAda[] = $label;
-                    $penggilinganLolos++;
                 } else {
-                    $penggilinganAda[] = $label;
+                    $penggilinganTidakAda[] = $label;
                 }
             } elseif ($seleksimitra->$seleksiField === 'tidak ada') {
+                // Yang "tidak ada" otomatis masuk ke "tidak lolos"
                 $penggilinganTidakAda[] = $label;
-                $penggilinganTotal++;
             }
         }
 
-        $kesimpulanPenggilingan = ($penggilinganTotal > 0 && $penggilinganLolos === $penggilinganTotal) ? 'Lolos' : 'Tidak Lolos';
+        // Kesimpulan penggilingan sama dengan status keseluruhan
+        $kesimpulanPenggilingan = ($status === 'lolos') ? 'Lolos' : 'Tidak Lolos';
         
         $data = [
             'id_seleksi_mitra' => $seleksimitra->id_seleksi_mitra,
             'id_mitra' => $seleksimitra->id_mitra,
             'kesimpulan_akhir' => $kesimpulanAkhir,
-            // Set all individual fields based on availability and status
+            // Yang "ada" ikut status keseluruhan, yang "tidak ada" = "Tidak Lolos"
             'surat_permohonan' => $seleksimitra->surat_permohonan === 'ada' ? $kesimpulanAkhir : ($seleksimitra->surat_permohonan === 'tidak ada' ? 'Tidak Lolos' : null),
             'akta_notaris' => $seleksimitra->akta_notaris === 'ada' ? $kesimpulanAkhir : ($seleksimitra->akta_notaris === 'tidak ada' ? 'Tidak Lolos' : null),
             'nib' => $seleksimitra->nib === 'ada' ? $kesimpulanAkhir : ($seleksimitra->nib === 'tidak ada' ? 'Tidak Lolos' : null),

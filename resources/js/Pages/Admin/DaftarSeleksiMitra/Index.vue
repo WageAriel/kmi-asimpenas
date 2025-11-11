@@ -70,6 +70,10 @@ const fetchHasilSeleksi = async (idSeleksiMitra) => {
     try {
         const response = await axios.get(`/hasil-seleksi-mitra/by-seleksi/${idSeleksiMitra}`);
         hasilSeleksi.value = response.data;
+        console.log('Hasil Seleksi Data:', response.data);
+        console.log('Dokumen Tidak Ada:', response.data.dokumen_tidak_ada);
+        console.log('Pengeringan Tidak Ada:', response.data.sarana_pengeringan_tidak_ada);
+        console.log('Penggilingan Tidak Ada:', response.data.sarana_penggilingan_tidak_ada);
     } catch (error) {
         // Jika 404, berarti belum ada hasil seleksi
         if (error.response?.status === 404) {
@@ -1022,10 +1026,10 @@ const exportData = () => {
                         
                         <!-- Detail Dokumen -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Dokumen Ada & Valid -->
+                            <!-- Dokumen Ada & Valid (Lolos) -->
                             <div v-if="hasilSeleksi.dokumen_ada_valid && hasilSeleksi.dokumen_ada_valid.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Dokumen Valid</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Dokumen Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_ada_valid" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1037,10 +1041,10 @@ const exportData = () => {
                                 </ul>
                             </div>
                             
-                            <!-- Dokumen Tidak Ada -->
+                            <!-- Dokumen Tidak Lolos -->
                             <div v-if="hasilSeleksi.dokumen_tidak_ada && hasilSeleksi.dokumen_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Dokumen Tidak Ada</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Dokumen Tidak Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1052,10 +1056,10 @@ const exportData = () => {
                                 </ul>
                             </div>
                             
-                            <!-- Sarana Pengeringan Ada -->
+                            <!-- Sarana Pengeringan Lolos -->
                             <div v-if="hasilSeleksi.sarana_pengeringan_ada && hasilSeleksi.sarana_pengeringan_ada.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Pengeringan Tersedia</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Pengeringan Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_ada" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1067,10 +1071,10 @@ const exportData = () => {
                                 </ul>
                             </div>
                             
-                            <!-- Sarana Pengeringan Tidak Ada -->
+                            <!-- Sarana Pengeringan Tidak Lolos -->
                             <div v-if="hasilSeleksi.sarana_pengeringan_tidak_ada && hasilSeleksi.sarana_pengeringan_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Pengeringan Tidak Tersedia</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Pengeringan Tidak Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1082,10 +1086,10 @@ const exportData = () => {
                                 </ul>
                             </div>
                             
-                            <!-- Sarana Penggilingan Ada -->
+                            <!-- Sarana Penggilingan Lolos -->
                             <div v-if="hasilSeleksi.sarana_penggilingan_ada && hasilSeleksi.sarana_penggilingan_ada.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Penggilingan Tersedia</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Penggilingan Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_ada" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1097,10 +1101,10 @@ const exportData = () => {
                                 </ul>
                             </div>
                             
-                            <!-- Sarana Penggilingan Tidak Ada -->
+                            <!-- Sarana Penggilingan Tidak Lolos -->
                             <div v-if="hasilSeleksi.sarana_penggilingan_tidak_ada && hasilSeleksi.sarana_penggilingan_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Penggilingan Tidak Tersedia</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Penggilingan Tidak Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">

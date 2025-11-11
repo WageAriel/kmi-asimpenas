@@ -219,6 +219,20 @@ const getStatusColor = (status) => {
     }
 };
 
+const downloadKlasifikasi = () => {
+    if (dataKlasifikasi.value.length > 0) {
+        const klasifikasiId = dataKlasifikasi.value[0].id_klasifikasi_mitra;
+        window.location.href = `/mitra/klasifikasi/${klasifikasiId}/download`;
+    }
+};
+
+const downloadSeleksi = () => {
+    if (dataSeleksi.value.length > 0) {
+        const seleksiId = dataSeleksi.value[0].id_seleksi_mitra;
+        window.location.href = `/mitra/pengajuan-seleksi/${seleksiId}/download`;
+    }
+};
+
 onMounted(() => {
     fetchData();
 });
@@ -422,7 +436,7 @@ onMounted(() => {
                 <!-- Sidebar -->
                 <div class="space-y-6">
                     <!-- Quick Info -->
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <!-- <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                         <div class="p-6">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">Informasi Cepat</h3>
                             
@@ -447,7 +461,7 @@ onMounted(() => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Contact Info -->
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -490,7 +504,7 @@ onMounted(() => {
                             <div class="space-y-3">
                                 <button 
                                     v-if="dataSeleksi.length > 0"
-                                    @click="$inertia.visit(`/mitra/pengajuan-seleksi/${dataSeleksi[0].id_seleksi_mitra}/download`)"
+                                    @click="downloadSeleksi"
                                     class="w-full flex items-center justify-between p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                                     <div class="flex items-center">
                                         <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -505,6 +519,7 @@ onMounted(() => {
 
                                 <button 
                                     v-if="dataKlasifikasi.length > 0"
+                                    @click="downloadKlasifikasi"
                                     class="w-full flex items-center justify-between p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                                     <div class="flex items-center">
                                         <svg class="w-5 h-5 text-blue-500 mr-3" fill="currentColor" viewBox="0 0 20 20">

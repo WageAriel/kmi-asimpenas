@@ -14,7 +14,7 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
         .header h1 {
             font-size: 14pt;
@@ -23,19 +23,19 @@
             padding: 0;
         }
         .header p {
-            margin: 5px 0;
+            margin: 3px 0;
             font-size: 12pt;
             font-weight: bold;
         }
         .info-section {
-            margin-bottom: 20px;
+            
         }
         .info-table {
             width: 100%;
             margin-bottom: 15px;
         }
         .info-table td {
-            padding: 3px 0;
+            padding: 2px 0;
             vertical-align: top;
         }
         .info-table td:first-child {
@@ -48,11 +48,10 @@
         .main-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
         }
         .main-table th, .main-table td {
             border: 1px solid #000;
-            padding: 6px;
+            padding: 2px;
             text-align: left;
             font-size: 11pt;
         }
@@ -74,7 +73,7 @@
             color: #000;
         }
         .signature-section {
-            margin-top: 30px;
+            
         }
         .signature-box {
             float: right;
@@ -82,7 +81,7 @@
             text-align: center;
         }
         .signature-space {
-            height: 60px;
+            height: 50px;
         }
         .check-mark {
         font-family: 'Arial', sans-serif;
@@ -130,8 +129,8 @@
             </tr>
         </table>
 
-            <div style="margin-top: 20px;">
-            <p style="font-weight: bold; margin-bottom: 10px;">DATA MITRA KERJA:</p>
+            <!-- <div style="margin-top: 8px;"> -->
+            <p style="font-weight: bold;">DATA MITRA KERJA:</p>
             <table class="info-table">
                 <tr>
                     <td>1. Nama Perusahaan</td>
@@ -161,7 +160,7 @@
         <thead>
             <tr>
                 <th rowspan="2" width="40">No</th>
-                <th rowspan="2" width="250">Komponen</th>
+                <th rowspan="2" width="200">Komponen</th>
                 <th rowspan="2" width="80">Satuan</th>
                 <th colspan="3">Klasifikasi</th>
             </tr>
@@ -174,7 +173,12 @@
         <tbody>
             <!-- PENGERINGAN -->
             <tr>
-                <td colspan="6" class="section-header">I. PENGERINGAN</td>
+                <td class="section-header" style="text-align: center;">I</td>
+                <td class="section-header">PENGERINGAN</td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
             </tr>
             @php $no = 1; @endphp
             @foreach([
@@ -184,15 +188,15 @@
                 ['name' => 'Alat Pengering Lainnya', 'field' => 'alat_pengering_lainnya', 'unit' => 'ton/hari']
             ] as $item)
             <tr>
-                <td class="text-center" >{{ $no++ }}</td>
+                <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['3', '2', '1'] as $value)
+                @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @else
-                        -
+                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
                 </td>
                 @endforeach
@@ -201,7 +205,12 @@
 
             <!-- PENGGILINGAN -->
             <tr>
-                <td colspan="6" class="section-header">II. PENGGILINGAN (RMP)</td>
+                <td class="section-header" style="text-align: center;">II</td>
+                <td class="section-header">PENGGILINGAN (RMP)</td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
             </tr>
             @php $no = 1; @endphp
             @foreach([
@@ -221,15 +230,15 @@
                 ['name' => 'Mesin Jahit', 'field' => 'mesin_jahit', 'unit' => 'unit']
             ] as $item)
             <tr>
-                <td class="text-center">{{ $no++ }}</td>
+                <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['3', '2', '1'] as $value)
+                @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @else
-                        -
+                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
                 </td>
                 @endforeach
@@ -238,7 +247,12 @@
 
             <!-- SARANA PENYIMPANAN -->
             <tr>
-                <td colspan="6" class="section-header">III. SARANA PENYIMPANAN</td>
+                <td class="section-header" style="text-align: center;">III</td>
+                <td class="section-header">SARANA PENYIMPANAN</td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
             </tr>
             @php $no = 1; @endphp
             @foreach([
@@ -247,15 +261,15 @@
 
             ] as $item)
             <tr>
-                <td class="text-center">{{ $no++ }}</td>
+                <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['3', '2', '1'] as $value)
+                @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @else
-                        -
+                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
                 </td>
                 @endforeach
@@ -264,22 +278,27 @@
 
             <!-- SARANA ANGKUTAN -->
             <tr>
-                <td colspan="6" class="section-header">IV. SARANA ANGKUTAN</td>
+                <td class="section-header" style="text-align: center;">IV</td>
+                <td class="section-header">SARANA ANGKUTAN</td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
             </tr>
             @php $no = 1; @endphp
             @foreach([
                 ['name' => 'Truk', 'field' => 'truk', 'unit' => 'unit']
             ] as $item)
             <tr>
-                <td class="text-center">{{ $no++ }}</td>
+                <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['3', '2', '1'] as $value)
+                @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @else
-                        -
+                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
                 </td>
                 @endforeach
@@ -288,7 +307,12 @@
 
             <!-- KELENGKAPAN PEMERIKSAAN -->
             <tr>
-                <td colspan="6" class="section-header">V. KELENGKAPAN PEMERIKSAAN</td>
+                <td class="section-header" style="text-align: center;">V</td>
+                <td class="section-header">KELENGKAPAN PEMERIKSAAN</td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
             </tr>
             @php $no = 1; @endphp
             @foreach([
@@ -297,15 +321,15 @@
                 ['name' => 'Pembanding Derajat Sosoh', 'field' => 'pembanding_derajat_sosoh', 'unit' => 'unit']
             ] as $item)
             <tr>
-                <td class="text-center">{{ $no++ }}</td>
+                <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['3', '2', '1'] as $value)
+                @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @else
-                        -
+                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
                 </td>
                 @endforeach
@@ -314,22 +338,27 @@
 
             <!-- ORGANISASI -->
             <tr>
-                <td colspan="6" class="section-header">VI. ORGANISASI</td>
+                <td class="section-header" style="text-align: center;">VI</td>
+                <td class="section-header">ORGANISASI</td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
+                <td class="section-header"></td>
             </tr>
             @php $no = 1; @endphp
             @foreach([
                 ['name' => 'Bagian Quality Control', 'field' => 'bagian_quality_control', 'unit' => 'orang']
             ] as $item)
             <tr>
-                <td class="text-center">{{ $no++ }}</td>
+                <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['3', '2', '1'] as $value)
+                @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @else
-                        -
+                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
                 </td>
                 @endforeach
