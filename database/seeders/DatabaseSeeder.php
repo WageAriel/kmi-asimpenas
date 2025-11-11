@@ -38,5 +38,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'super admin',
             'password' => bcrypt('password'),
         ]);
+
+        $this->call(KaryawanSeeder::class);
     }
 }

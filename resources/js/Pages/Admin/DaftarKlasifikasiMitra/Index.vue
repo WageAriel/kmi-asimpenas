@@ -595,7 +595,7 @@ const generateBaPdf = async () => {
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Berita Acara</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Surat Penetapan</th>
                             </tr>
                         </thead>
