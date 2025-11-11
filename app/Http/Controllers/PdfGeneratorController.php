@@ -31,8 +31,13 @@ class PdfGeneratorController extends Controller
                 ->orderBy('created_at', 'asc')
                 ->count();
             
-            // Format nomor urut seleksi (3 digit)
-            $nomorUrutSeleksi = sprintf("%03d", $id);
+            // Calculate sequential order number (urutan data keberapa di database)
+            $urutanData = DataSeleksiMitra::where('id_seleksi_mitra', '<=', $id)
+                ->orderBy('id_seleksi_mitra', 'asc')
+                ->count();
+            
+            // Format nomor urut seleksi (2 digit)
+            $nomorUrutSeleksi = sprintf("%02d", $urutanData);
             
             // Fixed values as requested
             $nomorEntitasBulog = '11030';
@@ -81,22 +86,32 @@ class PdfGeneratorController extends Controller
             $klasifikasi = KlasifikasiMitra::with('mitra')->findOrFail($id);
             $mitra = $klasifikasi->mitra;
             
-            $tahun = $klasifikasi->tahun ?? date('Y');
+            // Ambil tahun dari created_at klasifikasi
+            $tahun = $klasifikasi->created_at->year;
             
+            // Hitung klasifikasi keberapa untuk mitra ini
             $klasifikasiKe = KlasifikasiMitra::where('id_mitra', $mitra->id_mitra)
                 ->where('id_klasifikasi_mitra', '<=', $id)
                 ->orderBy('created_at', 'asc')
                 ->count();
             
-            $nomorUrutKlasifikasi = sprintf("%03d", $id);
+            // Calculate sequential order number (urutan data keberapa di database)
+            $urutanDataKlasifikasi = KlasifikasiMitra::where('id_klasifikasi_mitra', '<=', $id)
+                ->orderBy('id_klasifikasi_mitra', 'asc')
+                ->count();
+            
+            // Konversi klasifikasi keberapa ke romawi
+            $klasifikasiKeRomawi = $this->toRoman($klasifikasiKe);
+            
+            $nomorUrutKlasifikasi = sprintf("%02d", $urutanDataKlasifikasi);
             $nomorEntitasBulog = '11030';
             $unitPelaksana = 'KANTOR CABANG SURAKARTA';
             
-            // Format nomor lengkap: No urut klasifikasi/No Entitas Bulog/B/KLASIFIKASI/klasifikasi ke berapa/tahun
-            $nomorLengkap = sprintf("%s/%s/B/KLASIFIKASI/%d/%s", 
+            // Format nomor lengkap: No urut klasifikasi/No Entitas Bulog/B/KLASIFIKASI/klasifikasi ke berapa romawi/tahun
+            $nomorLengkap = sprintf("%s/%s/B/KLASIFIKASI/%s/%s", 
                 $nomorUrutKlasifikasi,
                 $nomorEntitasBulog,
-                $klasifikasiKe,
+                $klasifikasiKeRomawi,
                 $tahun
             );
             
@@ -104,10 +119,15 @@ class PdfGeneratorController extends Controller
                 'klasifikasi' => $klasifikasi,
                 'mitra' => $mitra,
                 'nomor' => $nomorLengkap,
+                'tahun' => $tahun,
                 'tanggal' => now()->format('d/m/Y'),
                 'nomor_entitas' => $nomorEntitasBulog,
                 'unit_pelaksana' => $unitPelaksana,
                 'klasifikasi_ke' => $klasifikasiKe,
+                'nomor_urut_klasifikasi' => $nomorUrutKlasifikasi,
+                'getKlasifikasiHasil' => function($field, $value) {
+                    return $this->getKlasifikasiHasil($field, $value);
+                },
                 'komponen_pengeringan' => [
                     ['name' => 'Mesin Pembersih Gabah', 'unit' => 'ton/hari', 'field' => 'mesin_pembersih_gabah'],
                     ['name' => 'Lantai Jemur', 'unit' => 'ton/hari', 'field' => 'lantai_jemur'],
@@ -142,16 +162,34 @@ class PdfGeneratorController extends Controller
     private function terbilang($angka) {
         $angka = abs($angka);
         $baca = array(
-            '', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh'
+            '', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'
         );
         
-        return $baca[$angka];
+        if ($angka < 12) {
+            return $baca[$angka];
+        } elseif ($angka < 20) {
+            return $baca[$angka - 10] . ' Belas';
+        } elseif ($angka < 100) {
+            return $baca[intval($angka / 10)] . ' Puluh' . ($angka % 10 != 0 ? ' ' . $baca[$angka % 10] : '');
+        } else {
+            return $angka; // Fallback untuk angka >= 100
+        }
     }
 
     private function bulanIndo($bulan) {
         $arrBulan = array(
-            1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            1 => 'Januari', 
+            2 => 'Februari', 
+            3 => 'Maret', 
+            4 => 'April', 
+            5 => 'Mei', 
+            6 => 'Juni',
+            7 => 'Juli', 
+            8 => 'Agustus', 
+            9 => 'September', 
+            10 => 'Oktober', 
+            11 => 'November', 
+            12 => 'Desember'
         );
         
         return $arrBulan[$bulan];
@@ -163,6 +201,23 @@ class PdfGeneratorController extends Controller
             $karyawan = Karyawan::findOrFail($request->id_karyawan);
             
             $today = now();
+            
+            // Calculate sequential order number (urutan data seleksi keberapa di database)
+            $urutanDataSeleksi = DataSeleksiMitra::where('id_seleksi_mitra', '<=', $id)
+                ->orderBy('id_seleksi_mitra', 'asc')
+                ->count();
+            
+            // Hitung seleksi keberapa untuk mitra ini
+            $seleksiKe = DataSeleksiMitra::where('id_mitra', $seleksi->id_mitra)
+                ->where('id_seleksi_mitra', '<=', $id)
+                ->orderBy('id_seleksi_mitra', 'asc')
+                ->count();
+            
+            // Konversi seleksi ke berapa ke angka romawi
+            $seleksiKeRomawi = $this->toRoman($seleksiKe);
+            
+            // Ambil tahun dari seleksi
+            $tahunSeleksi = $seleksi->created_at->year;
             
             $data = [
                 'seleksi' => $seleksi,
@@ -177,17 +232,18 @@ class PdfGeneratorController extends Controller
                     $today->format('d-m-Y')
                 ),
                 'nomor_surat' => sprintf(
-                    "%d/11030/SP/MITRAPANGAN/%s/%s",
-                    $id,
-                    $this->getRomanMonth($today->month),
-                    $today->year
+                    "%02d/11030/SP/MITRAPANGAN/%s/%s",
+                    $urutanDataSeleksi,
+                    $seleksiKeRomawi,
+                    $tahunSeleksi
                 ),
                 'nomor_BA' => sprintf(
-                    "%d/11030/BA/SELEKSI/%s/%s",
-                    $id,
-                    $this->getRomanMonth($today->month),
-                    $today->year
+                    "%02d/11030/BA/SELEKSI/%s/%s",
+                    $urutanDataSeleksi,
+                    $seleksiKeRomawi,
+                    $tahunSeleksi
                 ),
+                'nomor_urut_seleksi' => sprintf("%02d", $urutanDataSeleksi),
             ];
             
             $pdf = PDF::loadView('pdf.surat-penetapan-mitra', $data);
@@ -244,23 +300,33 @@ class PdfGeneratorController extends Controller
             
             $today = now();
             
-            // Hitung urutan hasil seleksi untuk mitra ini
+            // Hitung urutan hasil seleksi untuk mitra ini (hasil seleksi keberapa dari mitra tersebut)
             $urutanHasilSeleksi = HasilSeleksiMitra::where('id_mitra', $hasilSeleksi->id_mitra)
                 ->where('id_hasil_seleksi_mitra', '<=', $hasilSeleksi->id_hasil_seleksi_mitra)
                 ->orderBy('id_hasil_seleksi_mitra', 'asc')
                 ->count();
             
+            // Calculate sequential order number hasil seleksi (urutan data keberapa di database hasil_seleksi_mitra)
+            $urutanDataHasilSeleksi = HasilSeleksiMitra::where('id_hasil_seleksi_mitra', '<=', $hasilSeleksi->id_hasil_seleksi_mitra)
+                ->orderBy('id_hasil_seleksi_mitra', 'asc')
+                ->count();
+            
+            // Calculate sequential order number seleksi (urutan data keberapa di database data_seleksi_mitra)
+            $urutanDataSeleksi = DataSeleksiMitra::where('id_seleksi_mitra', '<=', $hasilSeleksi->id_seleksi_mitra)
+                ->orderBy('id_seleksi_mitra', 'asc')
+                ->count();
+            
             // Ambil tahun dari created_at hasil seleksi
             $tahunPengajuan = $hasilSeleksi->created_at->year;
             
-            // Konversi id_seleksi_mitra ke angka romawi
-            $idSeleksiRomawi = $this->toRoman($hasilSeleksi->id_seleksi_mitra);
+            // Konversi urutan hasil seleksi mitra ke angka romawi
+            $urutanHasilSeleksiRomawi = $this->toRoman($urutanHasilSeleksi);
             
-            // Format nomor surat: {id_hasil_seleksi}/11030/BA/SELEKSI/{id_seleksi_romawi}/{tahun}
+            // Format nomor surat: {urutan_data}/11030/BA/SELEKSI/{urutan_hasil_seleksi_romawi}/{tahun}
             $nomorSurat = sprintf(
-                "%d/11030/BA/SELEKSI/%s/%s",
-                $hasilSeleksi->id_hasil_seleksi_mitra,
-                $idSeleksiRomawi,
+                "%02d/11030/BA/SELEKSI/%s/%s",
+                $urutanDataHasilSeleksi,
+                $urutanHasilSeleksiRomawi,
                 $tahunPengajuan
             );
             
@@ -314,7 +380,7 @@ class PdfGeneratorController extends Controller
                     'Dua Ribu Dua Puluh Lima',
                     $today->format('d-m-Y')
                 ),
-                'nomor_urut_seleksi' => sprintf("%d", $urutanHasilSeleksi),
+                'nomor_urut_seleksi' => sprintf("%02d", $urutanDataSeleksi),
                 'tanggal_seleksi' => $hasilSeleksi->created_at->isoFormat('D MMMM Y'),
                 'nomor_entitas_bulog' => '11030',
                 'unit_pelaksana' => 'SURAKARTA',
@@ -364,16 +430,21 @@ class PdfGeneratorController extends Controller
                 ->orderBy('id_klasifikasi_mitra', 'asc')
                 ->count();
             
+            // Calculate sequential order number (urutan data keberapa di database)
+            $urutanDataKlasifikasi = KlasifikasiMitra::where('id_klasifikasi_mitra', '<=', $klasifikasi->id_klasifikasi_mitra)
+                ->orderBy('id_klasifikasi_mitra', 'asc')
+                ->count();
+            
             // Ambil tahun dari created_at klasifikasi
             $tahunPengajuan = $klasifikasi->created_at->year;
             
             // Konversi id_klasifikasi ke angka romawi
             $idKlasifikasiRomawi = $this->toRoman($klasifikasi->id_klasifikasi_mitra);
             
-            // Format nomor surat: {id_klasifikasi}/11030/BA/KLASIFIKASI/{id_klasifikasi_romawi}/{tahun}
+            // Format nomor surat: {urutan_data}/11030/BA/KLASIFIKASI/{id_klasifikasi_romawi}/{tahun}
             $nomorSurat = sprintf(
-                "%d/11030/BA/KLASIFIKASI/%s/%s",
-                $klasifikasi->id_klasifikasi_mitra,
+                "%02d/11030/BA/KLASIFIKASI/%s/%s",
+                $urutanDataKlasifikasi,
                 $idKlasifikasiRomawi,
                 $tahunPengajuan
             );
@@ -494,10 +565,15 @@ class PdfGeneratorController extends Controller
             
             $today = now();
             
+            // Calculate sequential order number (urutan data keberapa di database)
+            $urutanDataKlasifikasi = KlasifikasiMitra::where('id_klasifikasi_mitra', '<=', $id)
+                ->orderBy('id_klasifikasi_mitra', 'asc')
+                ->count();
+            
             $data = [
                 'nomor_surat' => sprintf(
                     "%d/11030/SP/KLASIFIKASI/%s/%s",
-                    $id,
+                    $urutanDataKlasifikasi,
                     $this->getRomanMonth($today->month),
                     $today->year
                 ),
@@ -512,7 +588,7 @@ class PdfGeneratorController extends Controller
                 ),
                 'nomor_BA' => sprintf(
                     "%d/11030/BA/SELEKSI/%s/%s",
-                    $id,
+                    $urutanDataKlasifikasi,
                     $this->getRomanMonth($today->month),
                     $today->year
                 ),
@@ -520,7 +596,7 @@ class PdfGeneratorController extends Controller
                 'badan_usaha' => $klasifikasi->mitra->badan_hukum_usaha,
                 'alamat_perusahaan' => $klasifikasi->mitra->alamat_perusahaan,
                 'status_mitra' => $klasifikasi->mitra->status ?? 'Penggilingan',
-                'nomor_urut_seleksi' => sprintf("%03d", $klasifikasi->id_klasifikasi_mitra),
+                'nomor_urut_seleksi' => sprintf("%02d", $urutanDataKlasifikasi),
                 'hasil_klasifikasi' => $klasifikasi->hasil_klasifikasi,
                 'kantor_cabang' => 'Surakarta',
                 'nama_mitra' => $klasifikasi->mitra->nama_cp,

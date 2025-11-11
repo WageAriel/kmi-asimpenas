@@ -102,7 +102,7 @@
         <p>KLASIFIKASI MITRA PANGAN</p>
         <p>PENGADAAN GABAH/BERAS DALAM NEGERI</p>
         <p>Nomor: {{ $nomor }}</p>
-        <p>TAHUN {{ date('Y') }}</p>
+        <p>TAHUN {{ $tahun }}</p>
     </div>
 
     <!-- Data section with proper spacing -->
@@ -111,7 +111,7 @@
             <tr>
                 <td>NOMOR URUT SELEKSI</td>
                 <td>:</td>
-                <td>{{ sprintf("%03d", $klasifikasi->id_klasifikasi_mitra) }}</td>
+                <td>{{ $nomor_urut_klasifikasi }}</td>
             </tr>
             <tr>
                 <td>TANGGAL KLASIFIKASI</td>
@@ -188,10 +188,12 @@
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td style="text-align: center;">
-                    <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
-                        V
-                    </span>
+                <td style="text-align: center; font-size: 8pt;">
+                    @if($klasifikasi->{$item['field']} === $value)
+                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                    @else
+                        -
+                    @endif
                 </td>
                 @endforeach
             </tr>
@@ -223,10 +225,12 @@
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td style="text-align: center;">
-                    <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
-                        V
-                    </span>
+                <td style="text-align: center; font-size: 8pt;">
+                    @if($klasifikasi->{$item['field']} === $value)
+                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                    @else
+                        -
+                    @endif
                 </td>
                 @endforeach
             </tr>
@@ -247,10 +251,12 @@
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td style="text-align: center;">
-                    <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
-                        V
-                    </span>
+                <td style="text-align: center; font-size: 8pt;">
+                    @if($klasifikasi->{$item['field']} === $value)
+                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                    @else
+                        -
+                    @endif
                 </td>
                 @endforeach
             </tr>
@@ -269,10 +275,12 @@
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td style="text-align: center;">
-                    <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
-                        V
-                    </span>
+                <td style="text-align: center; font-size: 8pt;">
+                    @if($klasifikasi->{$item['field']} === $value)
+                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                    @else
+                        -
+                    @endif
                 </td>
                 @endforeach
             </tr>
@@ -293,10 +301,12 @@
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td style="text-align: center;">
-                    <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
-                        V
-                    </span>
+                <td style="text-align: center; font-size: 8pt;">
+                    @if($klasifikasi->{$item['field']} === $value)
+                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                    @else
+                        -
+                    @endif
                 </td>
                 @endforeach
             </tr>
@@ -315,10 +325,12 @@
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
                 @foreach(['3', '2', '1'] as $value)
-                <td style="text-align: center;">
-                    <span class="check-mark {{ $klasifikasi->{$item['field']} === $value ? 'selected' : 'not-selected' }}">
-                        V
-                    </span>
+                <td style="text-align: center; font-size: 8pt;">
+                    @if($klasifikasi->{$item['field']} === $value)
+                        {{ $getKlasifikasiHasil($item['field'], $value) }}
+                    @else
+                        -
+                    @endif
                 </td>
                 @endforeach
             </tr>
@@ -331,7 +343,7 @@
                 <div class="signature-box">
                     <p>Mitra Pangan,</p>
                     <div class="signature-space"></div>
-                    <p><u>{{ $klasifikasi->mitra->nama_pemilik }}</u><br>
+                    <p><u>{{ $klasifikasi->mitra->nama_cp }}</u><br>
                     {{ $klasifikasi->mitra->nama_perusahaan }}</p>
                 </div>
             </div>

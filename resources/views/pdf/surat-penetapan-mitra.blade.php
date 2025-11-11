@@ -40,17 +40,19 @@
         margin-top: 40px;
         width: 100%;
         position: relative;
+        
         }
         .signature-left {
             position: absolute;
             left: 0;
             width: 45%;
+            text-align: center;
         }
         .signature-right {
             position: absolute;
             right: 0;
             width: 45%;
-            text-align: left;
+            text-align: center;
         }
         .signature-space {
             height: 80px; /* Space for signature */
@@ -96,7 +98,7 @@
             <tr>
                 <td>5. Nomor Urut Seleksi</td>
                 <td>:</td>
-                <td>{{ sprintf("%03d", $seleksi->id_seleksi_mitra) }}</td>
+                <td>{{ $nomor_urut_seleksi }}</td>
             </tr>
             <tr>
                 <td>6. Hasil Seleksi</td>

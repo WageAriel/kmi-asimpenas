@@ -14,18 +14,18 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 18px;
+            margin-bottom: 10px;
         }
         .header h1 {
             font-size: 12pt;
             font-weight: bold;
             margin: 0;
             padding: 0;
-            line-height: 1.3;
+            line-height: 1.2;
         }
         .content {
             text-align: justify;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-size: 10pt;
         }
         .data-table {
@@ -41,7 +41,7 @@
         .result-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 12px 0;
+            margin: 8px 0;
         }
         .result-table th,
         .result-table td {
@@ -59,18 +59,18 @@
             font-size: 9pt;
         }
         .conclusion {
-            margin: 12px 0;
+            margin: 0;
             text-align: justify;
             font-size: 10pt;
         }
         .signatures {
-            margin-top: 25px;
+            margin-top: 15px;
             width: 100%;
         }
         .signature-row {
             display: table;
             width: 100%;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
         .signature-box {
             display: table-cell;
@@ -82,10 +82,10 @@
             width: 50%;
             margin: 0 auto;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .signature-space {
-            height: 60px;
+            height: 50px;
         }
         .signature-text {
             margin: 0;
@@ -93,12 +93,12 @@
             font-size: 10pt;
         }
         .data-info {
-        margin-top: 10px;
-        margin-bottom: 10px;
+        margin-top: 5px;
+        margin-bottom: 5px;
         }
         .info-table {
             border-spacing: 0;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .info-table td {
@@ -118,7 +118,7 @@
         
         .section-title {
             font-weight: bold;
-            margin: 10px 0 5px 0;
+            margin: 5px 0 3px 0;
             font-size: 10pt;
         }
     </style>
@@ -189,9 +189,9 @@
     <table class="result-table">
         <thead>
             <tr>
-                <th width="10%">No</th>
-                <th width="35%">Persyaratan</th>
-                <th width="55%">Keterangan</th>
+                <th width="5%">No</th>
+                <th width="30%">Persyaratan</th>
+                <th width="65%">Keterangan</th>
             </tr>
         </thead>
         <tbody>
