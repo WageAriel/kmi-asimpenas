@@ -112,13 +112,13 @@
         <div class="signature-left">
             <p>Mitra Pangan,</p>
             <div class="signature-space"></div>
-            <p style="margin: 0;">{{ $nama_mitra }}</p>
+            <p style="margin: 0; font-weight: bold;"><u>{{ $nama_mitra }}</u></p>
             <p style="margin: 0;">{{ $nama_perusahaan }}</p>
         </div>
         <div class="signature-right">
             <p>Perum BULOG Kantor Cabang {{ $kantor_cabang }}</p>
             <div class="signature-space"></div>
-            <p style="margin: 0;">{{ $nama_pejabat }}</p>
+            <p style="margin: 0; font-weight: bold;"><u>{{ $nama_pejabat }}</u></p>
             <p style="margin: 0;">Ketua</p>
         </div>
     </div>

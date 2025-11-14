@@ -248,49 +248,85 @@
             <td>Surat Permohonan</td>
             <td style="text-align: center;">@if($seleksi->surat_permohonan === 'ada')<strong>V</strong>@endif</td>
             <td style="text-align: center;">@if($seleksi->surat_permohonan !== 'ada')<strong>V</strong>@endif</td>
-            <td class="masa-berlaku">{{ $seleksi->mb_surat_permohonan ?? '-' }}</td>
+            <td class="masa-berlaku">
+                @if($seleksi->mb_surat_permohonan)
+                    {{ date('d-m-Y', strtotime($seleksi->mb_surat_permohonan)) }}
+                @else
+                    -
+                @endif
+            </td>
         </tr>
         <tr>
             <td style="text-align: center;">2</td>
             <td>Akta Notaris</td>
             <td style="text-align: center;">@if($seleksi->akta_notaris === 'ada')<strong>V</strong>@endif</td>
             <td style="text-align: center;">@if($seleksi->akta_notaris !== 'ada')<strong>V</strong>@endif</td>
-            <td class="masa-berlaku">{{ $seleksi->mb_akta_notaris ?? '-' }}</td>
+            <td class="masa-berlaku">
+                @if($seleksi->mb_akta_notaris)
+                    {{ date('d-m-Y', strtotime($seleksi->mb_akta_notaris)) }}
+                @else
+                    -
+                @endif
+            </td>
         </tr>
         <tr>
             <td style="text-align: center;">3</td>
             <td>NIB</td>
             <td style="text-align: center;">@if($seleksi->nib === 'ada')<strong>V</strong>@endif</td>
             <td style="text-align: center;">@if($seleksi->nib !== 'ada')<strong>V</strong>@endif</td>
-            <td class="masa-berlaku">{{ $seleksi->mb_nib ?? '-' }}</td>
+            <td class="masa-berlaku">
+                @if($seleksi->mb_nib)
+                    {{ date('d-m-Y', strtotime($seleksi->mb_nib)) }}
+                @else
+                    -
+                @endif
+            </td>
         </tr>
         <tr>
             <td style="text-align: center;">4</td>
             <td>KTP</td>
             <td style="text-align: center;">@if($seleksi->ktp === 'ada')<strong>V</strong>@endif</td>
             <td style="text-align: center;">@if($seleksi->ktp !== 'ada')<strong>V</strong>@endif</td>
-            <td class="masa-berlaku">{{ $seleksi->mb_ktp ?? '-' }}</td>
+            <td class="masa-berlaku">Seumur Hidup</td>
         </tr>
         <tr>
             <td style="text-align: center;">5</td>
             <td>No Rekening</td>
             <td style="text-align: center;">@if($seleksi->no_rekening === 'ada')<strong>V</strong>@endif</td>
             <td style="text-align: center;">@if($seleksi->no_rekening !== 'ada')<strong>V</strong>@endif</td>
-            <td class="masa-berlaku">{{ $seleksi->mb_no_rekening ?? '-' }}</td>
+            <td class="masa-berlaku">
+                @if($seleksi->mb_no_rekening)
+                    {{ date('d-m-Y', strtotime($seleksi->mb_no_rekening)) }}
+                @else
+                    -
+                @endif
+            </td>
         </tr>
         <tr>
             <td style="text-align: center;">6</td>
             <td>NPWP</td>
             <td style="text-align: center;">@if($seleksi->npwp === 'ada')<strong>V</strong>@endif</td>
             <td style="text-align: center;">@if($seleksi->npwp !== 'ada')<strong>V</strong>@endif</td>
-            <td class="masa-berlaku">{{ $seleksi->mb_npwp ?? '-' }}</td>
+            <td class="masa-berlaku">
+                @if($seleksi->mb_npwp)
+                    {{ date('d-m-Y', strtotime($seleksi->mb_npwp)) }}
+                @else
+                    -
+                @endif
+            </td>
         </tr>
         <tr>
             <td style="text-align: center;">7</td>
             <td>Surat Kuasa</td>
             <td style="text-align: center;">@if($seleksi->surat_kuasa === 'ada')<strong>V</strong>@endif</td>
             <td style="text-align: center;">@if($seleksi->surat_kuasa !== 'ada')<strong>V</strong>@endif</td>
-            <td class="masa-berlaku">{{ $seleksi->mb_surat_kuasa ?? '-' }}</td>
+            <td class="masa-berlaku">
+                @if($seleksi->mb_surat_kuasa)
+                    {{ date('d-m-Y', strtotime($seleksi->mb_surat_kuasa)) }}
+                @else
+                    -
+                @endif
+            </td>
         </tr>
     </table>
 
@@ -366,7 +402,7 @@
             <div class="signature-content">
                 <p>Calon Mitra Pangan,</p>
                 <div class="signature-space"></div>
-                <p><strong>{{ $mitra->nama_cp }}</strong><br>{{ $mitra->nama_perusahaan }}</p>
+                <p><strong><u>{{ $mitra->nama_cp }}</u></strong><br>{{ $mitra->nama_perusahaan }}</p>
             </div>
             <div class="clear"></div>
         </div>

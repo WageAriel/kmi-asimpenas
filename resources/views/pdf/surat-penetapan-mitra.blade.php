@@ -116,13 +116,13 @@
         <div class="signature-left">
             <p>Mitra Pangan,</p>
             <div class="signature-space"></div>
-            <p style="margin: 0;">{{ $mitra->nama_cp }}</p>
+            <p style="margin: 0; font-weight: bold;"><u>{{ $mitra->nama_cp }}</u></p>
             <p style="margin: 0;">{{ $mitra->nama_perusahaan }}</p>
         </div>
         <div class="signature-right">
             <p>Perum BULOG Kantor Cabang Surakarta</p>
             <div class="signature-space"></div>
-            <p style="margin: 0;">{{ $karyawan->nama_karyawan }}</p>
+            <p style="margin: 0; font-weight: bold;"><u>{{ $karyawan->nama_karyawan }}</u></p>
             <p style="margin: 0;">{{ $karyawan->jabatan }}</p>
         </div>
     </div>

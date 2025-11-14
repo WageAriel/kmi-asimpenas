@@ -327,7 +327,7 @@
                 <br>
                 <p class="signature-text">Mitra Pangan,</p>
                 <div class="signature-space"></div>
-                <p class="signature-text"><u>{{ $nama_cp }}</u></p>
+                <p class="signature-text" style="font-weight: bold;"><u>{{ $nama_cp }}</u></p>
                 <p class="signature-text">{{ $nama_perusahaan }}</p>
             </div>
 
@@ -336,7 +336,7 @@
                 <p class="signature-text">Perum BULOG Kantor Cabang {{ $unit_pelaksana }}</p>
                 <p class="signature-text">Pelaksana Klasifikasi,</p>
                 <div class="signature-space"></div>
-                <p class="signature-text"><u>{{ $pelaksana->nama_karyawan }}</u></p>
+                <p class="signature-text" style="font-weight: bold;"><u>{{ $pelaksana->nama_karyawan }}</u></p>
                 <p class="signature-text">{{ $pelaksana->jabatan }}</p>
             </div>
         </div>
@@ -345,7 +345,7 @@
         <div class="signature-center">
             <p class="signature-text">Mengetahui,</p>
             <div class="signature-space"></div>
-            <p class="signature-text"><u>{{ $pengetahui->nama_karyawan }}</u></p>
+            <p class="signature-text" style="font-weight: bold;"><u>{{ $pengetahui->nama_karyawan }}</u></p>
             <p class="signature-text">{{ $pengetahui->jabatan }}</p>
         </div>
     </div>

@@ -194,7 +194,7 @@
                 @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
                     @else
                         {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
@@ -236,7 +236,7 @@
                 @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
                     @else
                         {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
@@ -267,7 +267,7 @@
                 @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
                     @else
                         {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
@@ -296,7 +296,7 @@
                 @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
                     @else
                         {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
@@ -327,7 +327,7 @@
                 @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
                     @else
                         {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
@@ -356,7 +356,7 @@
                 @foreach(['1', '2', '3'] as $value)
                 <td style="text-align: center; font-size: 8pt;">
                     @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}.</strong> {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
                     @else
                         {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
                     @endif
@@ -372,7 +372,7 @@
                 <div class="signature-box">
                     <p>Mitra Pangan,</p>
                     <div class="signature-space"></div>
-                    <p><u>{{ $klasifikasi->mitra->nama_cp }}</u><br>
+                    <p><u style="font-weight: bold;">{{ $klasifikasi->mitra->nama_cp }}</u><br>
                     {{ $klasifikasi->mitra->nama_perusahaan }}</p>
                 </div>
             </div>
