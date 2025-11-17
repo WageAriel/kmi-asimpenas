@@ -152,6 +152,14 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
         return Inertia::render('Mitra/InputDataMitra');
     })->name('input-data-mitra');
 
+    // Generate PDF Surat Permohonan MPP
+    Route::get('/data-mitra/{id}/surat-permohonan', [PdfGeneratorController::class, 'generateSuratPermohonanPdf'])
+        ->name('data-mitra.surat-permohonan');
+
+    // Generate PDF Surat Pernyataan Non PKP
+    Route::get('/data-mitra/{id}/surat-pernyataan-non-pkp', [PdfGeneratorController::class, 'generateSuratPernyataanNonPkp'])
+        ->name('data-mitra.surat-pernyataan-non-pkp');
+
     //untuk mengakses form pengajuan seleksi
     Route::get('/pengajuan-seleksi/form', function () {
         return Inertia::render('Mitra/PengajuanSeleksi/Form');
