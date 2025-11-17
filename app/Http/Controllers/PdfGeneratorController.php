@@ -9,6 +9,7 @@ use App\Models\HasilSeleksiMitra;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class PdfGeneratorController extends Controller
 {
@@ -610,6 +611,59 @@ class PdfGeneratorController extends Controller
             return $pdf->download('surat-penetapan-klasifikasi-'.$klasifikasi->mitra->nama_perusahaan.'.pdf');
             
         } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function generateSuratPermohonanPdf($id)
+    {
+        try {
+            $mitra = DataMitra::where('id_mitra', $id)
+                            ->where('user_id', auth()->id()) // Use user_id as per your model
+                            ->firstOrFail();
+            
+            $data = [
+                'tanggal_permohonan' => \Carbon\Carbon::now()->locale('id')->isoFormat('D MMMM Y'),
+                'tahun' => date('Y'),
+                'nama_cp' => $mitra->nama_cp,
+                'alamat_perusahaan' => $mitra->alamat_perusahaan,
+                'jabatan' => 'Direktur', // You can add this field to your mitra table if needed
+                'nama_perusahaan' => $mitra->nama_perusahaan
+            ];
+
+            $pdf = PDF::loadView('pdf.surat-permohonan-mpp', $data);
+            $pdf->setPaper('A4', 'portrait');
+            
+            return $pdf->download('Surat-Permohonan-MPP-' . str_replace(' ', '-', $mitra->nama_perusahaan) . '.pdf');
+            
+        } catch (\Exception $e) {
+            Log::error('Surat Permohonan PDF Generation Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function generateSuratPernyataanNonPkp($id)
+    {
+        try {
+            $mitra = DataMitra::where('id_mitra', $id)
+                            ->where('user_id', auth()->id())
+                            ->firstOrFail();
+            
+            $data = [
+                'tanggal' => Carbon::now()->locale('id')->isoFormat('D MMMM Y'),
+                'nama_cp' => $mitra->nama_cp,
+                'alamat_perusahaan' => $mitra->alamat_perusahaan,
+                'jabatan' => 'Direktur', // You can modify this as needed
+                'nama_perusahaan' => $mitra->nama_perusahaan
+            ];
+
+            $pdf = PDF::loadView('pdf.surat-pernyataan-non-pkp', $data);
+            $pdf->setPaper('A4', 'portrait');
+            
+            return $pdf->download('Surat-Pernyataan-Non-PKP-' . str_replace(' ', '-', $mitra->nama_perusahaan) . '.pdf');
+            
+        } catch (\Exception $e) {
+            Log::error('Surat Pernyataan Non PKP PDF Generation Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

@@ -221,6 +221,66 @@ const submitForm = async () => {
     isSubmitting.value = false;
   }
 };
+
+const generateSuratPermohonanPdf = async () => {
+    if (!mitraId.value) {
+        errorMessage.value = "Silakan simpan data mitra terlebih dahulu sebelum generate PDF";
+        return;
+    }
+
+    isSubmitting.value = true;
+    try {
+        const response = await axios.get(`/mitra/data-mitra/${mitraId.value}/surat-permohonan`, {
+            responseType: 'blob'
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Surat-Permohonan-MPP-${form.value.nama_perusahaan}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        showNotification('success', 'Berhasil!', 'PDF Surat Permohonan berhasil diunduh');
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showNotification('error', 'Gagal!', 'Terjadi kesalahan saat generate PDF');
+    } finally {
+        isSubmitting.value = false;
+    }
+};
+
+const generateSuratPernyataanNonPkpPdf = async () => {
+    if (!mitraId.value) {
+        errorMessage.value = "Silakan simpan data mitra terlebih dahulu sebelum generate PDF";
+        return;
+    }
+
+    isSubmitting.value = true;
+    try {
+        const response = await axios.get(`/mitra/data-mitra/${mitraId.value}/surat-pernyataan-non-pkp`, {
+            responseType: 'blob'
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Surat-Pernyataan-Non-PKP-${form.value.nama_perusahaan}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        showNotification('success', 'Berhasil!', 'PDF Surat Pernyataan Non PKP berhasil diunduh');
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showNotification('error', 'Gagal!', 'Terjadi kesalahan saat generate PDF');
+    } finally {
+        isSubmitting.value = false;
+    }
+};
 </script>
 
 <template>
@@ -769,7 +829,39 @@ const submitForm = async () => {
         </div>
         
         <!-- Submit Button -->
-        <div class="flex justify-end pt-6 border-t border-gray-200">
+        <div class="flex justify-between pt-6 border-t border-gray-200">
+          <button 
+              type="button" 
+              @click="generateSuratPermohonanPdf"
+              :disabled="!mitraId || isSubmitting"
+              :class="[
+                'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                mitraId && !isSubmitting
+                  ? 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              ]"
+          >
+              <span v-if="isSubmitting">Generating...</span>
+              <span v-else-if="!mitraId">Simpan Data Dulu</span>
+              <span v-else>Surat Permohonan</span>
+          </button>
+
+          <button 
+              type="button" 
+              @click="generateSuratPernyataanNonPkpPdf"
+              :disabled="!mitraId || isSubmitting"
+              :class="[
+                'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                mitraId && !isSubmitting
+                  ? 'bg-purple-600 text-white hover:bg-purple-700 cursor-pointer'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              ]"
+          >
+              <span v-if="isSubmitting">Generating...</span>
+              <span v-else-if="!mitraId">Simpan Data Dulu</span>
+              <span v-else>Surat Non PKP</span>
+          </button>
+
           <button 
             type="submit" 
             :disabled="!isFormValid || isSubmitting"
