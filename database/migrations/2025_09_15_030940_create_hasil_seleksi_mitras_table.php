@@ -56,6 +56,7 @@ return new class extends Migration
 
             // Kolom rekap array (JSON)
             $table->json('dokumen_ada_valid')->nullable();
+            $table->json('dokumen_ada_tidak_valid')->nullable();
             $table->json('dokumen_tidak_ada')->nullable();
             $table->json('sarana_pengeringan_ada')->nullable();
             $table->json('sarana_pengeringan_tidak_ada')->nullable();

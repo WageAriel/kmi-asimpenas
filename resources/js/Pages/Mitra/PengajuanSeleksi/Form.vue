@@ -162,14 +162,14 @@ onMounted(async () => {
         isEditMode.value = true;
         // Fetch data yang ingin diedit
         try {
-            const res = await axios.get(`/data-seleksi-mitra/${editId.value}`); // pastikan ada route GET buat detail data
+            const res = await axios.get(`/data-seleksi-mitra/${editId.value}`); // pastikan Ada route GET buat detail data
             Object.assign(form, res.data); // autoset ke state form, pastikan field sama
         } catch (e) {
             alert('Gagal mengambil data untuk edit!');
         }
     }
 
-    // (opsional) ambil data mitra juga jika tidak edit (untuk mode tambah)
+    // (opsional) ambil data mitra juga jika Tidak edit (untuk mode tambah)
 });
 
 const validateForm = () => {
@@ -224,8 +224,8 @@ const statusOptions = [
 ];
 
 const optionChoices = [
-    { value: 'ada', label: 'Ada' },
-    { value: 'tidak ada', label: 'Tidak Ada' }
+    { value: 'Ada', label: 'Ada' },
+    { value: 'Tidak Ada', label: 'Tidak Ada' }
 ];
 
 const currentStep = ref(1);
@@ -236,7 +236,7 @@ const nextStep = () => {
         if (isCurrentStepValid()) {
             currentStep.value++;
         } else {
-            showNotification('warning', 'Data Belum Lengkap', 'Silakan pilih semua opsi pada step ini sebelum melanjutkan.');
+            showNotification('warning', 'Data Belum Lengkap', 'Silakan pilih semua opsi pAda step ini sebelum melanjutkan.');
         }
     }
 };
@@ -266,7 +266,7 @@ onMounted(async () => {
                 }
             );
         } else {
-            // Case 1: Data mitra tidak ditemukan (response sukses tapi data kosong)
+            // Case 1: Data mitra Tidak ditemukan (response sukses tapi data kosong)
             showNotification(
                 'warning', 
                 'Data Mitra Tidak Ditemukan', 
@@ -284,7 +284,7 @@ onMounted(async () => {
         const errorMessage = error.response?.data?.message || error.message;
         
         // Case 2: Cek jenis error berdasarkan message atau status
-        if (errorMessage.toLowerCase().includes('data mitra tidak ditemukan')) {
+        if (errorMessage.toLowerCase().includes('data mitra Tidak ditemukan')) {
             window.location.href = route('input-data-mitra');
             
         } else if (error.response?.status === 401 || error.response?.status === 403 || errorMessage.toLowerCase().includes('unauthenticated') || errorMessage.toLowerCase().includes('unauthorized')) {
@@ -305,7 +305,7 @@ onMounted(async () => {
             showNotification(
                 'error', 
                 'Kesalahan Server', 
-                'Terjadi kesalahan pada server. Silakan coba lagi atau hubungi administrator.',
+                'Terjadi kesalahan pAda server. Silakan coba lagi atau hubungi administrator.',
                 {
                     text: 'Coba Lagi',
                     action: () => {
@@ -503,7 +503,7 @@ const submit = async () => {
 
                         <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                            <!-- Primary Action Button (jika ada) -->
+                            <!-- Primary Action Button (jika Ada) -->
                             <button
                                 v-if="notification.showButton"
                                 @click="handleNotificationButton"
@@ -575,12 +575,12 @@ const submit = async () => {
                                     </div>
                                     <div class="flex space-x-4">
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.surat_permohonan" value="ada"
+                                            <input type="radio" v-model="form.surat_permohonan" value="Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Ada</span>
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.surat_permohonan" value="tidak ada"
+                                            <input type="radio" v-model="form.surat_permohonan" value="Tidak Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                         </label>
@@ -599,12 +599,12 @@ const submit = async () => {
                                     </div>
                                     <div class="flex space-x-4">
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.akta_notaris" value="ada"
+                                            <input type="radio" v-model="form.akta_notaris" value="Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Ada</span>
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.akta_notaris" value="tidak ada"
+                                            <input type="radio" v-model="form.akta_notaris" value="Tidak Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                         </label>
@@ -623,12 +623,12 @@ const submit = async () => {
                                     </div>
                                     <div class="flex space-x-4">
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.nib" value="ada"
+                                            <input type="radio" v-model="form.nib" value="Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Ada</span>
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.nib" value="tidak ada"
+                                            <input type="radio" v-model="form.nib" value="Tidak Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                         </label>
@@ -647,12 +647,12 @@ const submit = async () => {
                                     </div>
                                     <div class="flex space-x-4">
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.ktp" value="ada"
+                                            <input type="radio" v-model="form.ktp" value="Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Ada</span>
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.ktp" value="tidak ada"
+                                            <input type="radio" v-model="form.ktp" value="Tidak Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                         </label>
@@ -669,12 +669,12 @@ const submit = async () => {
                                     </div>
                                     <div class="flex space-x-4">
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.no_rekening" value="ada"
+                                            <input type="radio" v-model="form.no_rekening" value="Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Ada</span>
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.no_rekening" value="tidak ada"
+                                            <input type="radio" v-model="form.no_rekening" value="Tidak Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                         </label>
@@ -693,12 +693,12 @@ const submit = async () => {
                                     </div>
                                     <div class="flex space-x-4">
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.npwp" value="ada"
+                                            <input type="radio" v-model="form.npwp" value="Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Ada</span>
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.npwp" value="tidak ada"
+                                            <input type="radio" v-model="form.npwp" value="Tidak Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                         </label>
@@ -717,12 +717,12 @@ const submit = async () => {
                                     </div>
                                     <div class="flex space-x-4">
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.surat_kuasa" value="ada"
+                                            <input type="radio" v-model="form.surat_kuasa" value="Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Ada</span>
                                         </label>
                                         <label class="flex items-center">
-                                            <input type="radio" v-model="form.surat_kuasa" value="tidak ada"
+                                            <input type="radio" v-model="form.surat_kuasa" value="Tidak Ada"
                                                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                             <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                         </label>
@@ -750,7 +750,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.lantai_jemur"
-                                            value="ada"
+                                            value="Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-2 text-sm text-gray-700">Ada</span>
@@ -759,7 +759,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.lantai_jemur"
-                                            value="tidak ada"
+                                            value="Tidak Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
@@ -778,7 +778,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.sarana_lainnya"
-                                            value="ada"
+                                            value="Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-2 text-sm text-gray-700">Ada</span>
@@ -787,7 +787,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.sarana_lainnya"
-                                            value="tidak ada"
+                                            value="Tidak Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
@@ -810,12 +810,12 @@ const submit = async () => {
                                 </div>
                                 <div class="flex space-x-4">
                                     <label class="flex items-center">
-                                        <input type="radio" v-model="form.mesin_memecah_kulit" value="ada"
+                                        <input type="radio" v-model="form.mesin_memecah_kulit" value="Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                         <span class="ml-2 text-sm text-gray-700">Ada</span>
                                     </label>
                                     <label class="flex items-center">
-                                        <input type="radio" v-model="form.mesin_memecah_kulit" value="tidak ada"
+                                        <input type="radio" v-model="form.mesin_memecah_kulit" value="Tidak Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                         <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                     </label>
@@ -830,12 +830,12 @@ const submit = async () => {
                                 </div>
                                 <div class="flex space-x-4">
                                     <label class="flex items-center">
-                                        <input type="radio" v-model="form.mesin_pemisah_gabah" value="ada"
+                                        <input type="radio" v-model="form.mesin_pemisah_gabah" value="Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                         <span class="ml-2 text-sm text-gray-700">Ada</span>
                                     </label>
                                     <label class="flex items-center">
-                                        <input type="radio" v-model="form.mesin_pemisah_gabah" value="tidak ada"
+                                        <input type="radio" v-model="form.mesin_pemisah_gabah" value="Tidak Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                         <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                     </label>
@@ -850,12 +850,12 @@ const submit = async () => {
                                 </div>
                                 <div class="flex space-x-4">
                                     <label class="flex items-center">
-                                        <input type="radio" v-model="form.mesin_penyosoh" value="ada"
+                                        <input type="radio" v-model="form.mesin_penyosoh" value="Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                         <span class="ml-2 text-sm text-gray-700">Ada</span>
                                     </label>
                                     <label class="flex items-center">
-                                        <input type="radio" v-model="form.mesin_penyosoh" value="tidak ada"
+                                        <input type="radio" v-model="form.mesin_penyosoh" value="Tidak Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                         <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                     </label>
@@ -870,12 +870,12 @@ const submit = async () => {
                                 </div>
                                 <div class="flex space-x-4">
                                     <label class="flex items-center">
-                                        <input type="radio" v-model="form.alat_pemisah_beras" value="ada"
+                                        <input type="radio" v-model="form.alat_pemisah_beras" value="Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                         <span class="ml-2 text-sm text-gray-700">Ada</span>
                                     </label>
                                     <label class="flex items-center">
-                                        <input type="radio" v-model="form.alat_pemisah_beras" value="tidak ada"
+                                        <input type="radio" v-model="form.alat_pemisah_beras" value="Tidak Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
                                         <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                                     </label>
@@ -896,44 +896,44 @@ const submit = async () => {
                                             <span class="text-gray-600">Surat Permohonan:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.surat_permohonan === 'ada'
+                                                form.surat_permohonan === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.surat_permohonan === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.surat_permohonan === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-gray-600">Akta Notaris:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.akta_notaris === 'ada'
+                                                form.akta_notaris === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.akta_notaris === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.akta_notaris === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-gray-600">NIB:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.nib === 'ada'
+                                                form.nib === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.nib === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.nib === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-gray-600">KTP:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.ktp === 'ada'
+                                                form.ktp === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.ktp === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.ktp === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                     </div>
@@ -942,33 +942,33 @@ const submit = async () => {
                                             <span class="text-gray-600">No Rekening:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.no_rekening === 'ada'
+                                                form.no_rekening === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.no_rekening === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.no_rekening === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-gray-600">NPWP:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.npwp === 'ada'
+                                                form.npwp === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.npwp === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.npwp === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-gray-600">Surat Kuasa:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.surat_kuasa === 'ada'
+                                                form.surat_kuasa === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.surat_kuasa === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.surat_kuasa === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                     </div>
@@ -983,22 +983,22 @@ const submit = async () => {
                                         <span class="text-gray-600">Lantai Jemur:</span>
                                         <span :class="[
                                             'px-2 py-1 rounded-full text-xs font-medium',
-                                            form.lantai_jemur === 'ada'
+                                            form.lantai_jemur === 'Ada'
                                                 ? 'bg-green-100 text-green-800'
                                                 : 'bg-gray-100 text-gray-600'
                                         ]">
-                                            {{ form.lantai_jemur === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                            {{ form.lantai_jemur === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                         </span>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <span class="text-gray-600">Sarana Lainnya:</span>
                                         <span :class="[
                                             'px-2 py-1 rounded-full text-xs font-medium',
-                                            form.sarana_lainnya === 'ada'
+                                            form.sarana_lainnya === 'Ada'
                                                 ? 'bg-green-100 text-green-800'
                                                 : 'bg-gray-100 text-gray-600'
                                         ]">
-                                            {{ form.sarana_lainnya === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                            {{ form.sarana_lainnya === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                         </span>
                                     </div>
                                 </div>
@@ -1013,22 +1013,22 @@ const submit = async () => {
                                             <span class="text-gray-600">Mesin Pemecah Kulit:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.mesin_memecah_kulit === 'ada'
+                                                form.mesin_memecah_kulit === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.mesin_memecah_kulit === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.mesin_memecah_kulit === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-gray-600">Mesin Pemisah Gabah:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.mesin_pemisah_gabah === 'ada'
+                                                form.mesin_pemisah_gabah === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.mesin_pemisah_gabah === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.mesin_pemisah_gabah === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                     </div>
@@ -1037,22 +1037,22 @@ const submit = async () => {
                                             <span class="text-gray-600">Mesin Penyosoh:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.mesin_penyosoh === 'ada'
+                                                form.mesin_penyosoh === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.mesin_penyosoh === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.mesin_penyosoh === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-gray-600">Alat Pemisah Beras:</span>
                                             <span :class="[
                                                 'px-2 py-1 rounded-full text-xs font-medium',
-                                                form.alat_pemisah_beras === 'ada'
+                                                form.alat_pemisah_beras === 'Ada'
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-600'
                                             ]">
-                                                {{ form.alat_pemisah_beras === 'ada' ? '✓ Ada' : '○ Tidak Ada' }}
+                                                {{ form.alat_pemisah_beras === 'Ada' ? '✓ Ada' : '○ Tidak Ada' }}
                                             </span>
                                         </div>
                                     </div>
@@ -1065,29 +1065,29 @@ const submit = async () => {
                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                                     <div class="text-center">
                                         <div class="text-lg font-bold text-green-600">
-                                            {{ Math.round(([form.surat_permohonan, form.akta_notaris, form.nib, form.ktp, form.no_rekening, form.npwp, form.surat_kuasa].filter(doc => doc === 'ada').length / 7) * 100) }}%
+                                            {{ Math.round(([form.surat_permohonan, form.akta_notaris, form.nib, form.ktp, form.no_rekening, form.npwp, form.surat_kuasa].filter(doc => doc === 'Ada').length / 7) * 100) }}%
                                         </div>
                                         <div class="text-green-700">Dokumen</div>
                                         <div class="text-xs text-green-600">
-                                            {{ [form.surat_permohonan, form.akta_notaris, form.nib, form.ktp, form.no_rekening, form.npwp, form.surat_kuasa].filter(doc => doc === 'ada').length }}/7 Ada
+                                            {{ [form.surat_permohonan, form.akta_notaris, form.nib, form.ktp, form.no_rekening, form.npwp, form.surat_kuasa].filter(doc => doc === 'Ada').length }}/7 Ada
                                         </div>
                                     </div>
                                     <div class="text-center">
                                         <div class="text-lg font-bold text-orange-600">
-                                            {{ Math.round(([form.lantai_jemur, form.sarana_lainnya].filter(sarana => sarana === 'ada').length / 2) * 100) }}%
+                                            {{ Math.round(([form.lantai_jemur, form.sarana_lainnya].filter(sarana => sarana === 'Ada').length / 2) * 100) }}%
                                         </div>
                                         <div class="text-orange-700">Pengeringan</div>
                                         <div class="text-xs text-orange-600">
-                                            {{ [form.lantai_jemur, form.sarana_lainnya].filter(sarana => sarana === 'ada').length }}/2 Ada
+                                            {{ [form.lantai_jemur, form.sarana_lainnya].filter(sarana => sarana === 'Ada').length }}/2 Ada
                                         </div>
                                     </div>
                                     <div class="text-center">
                                         <div class="text-lg font-bold text-purple-600">
-                                            {{ Math.round(([form.mesin_memecah_kulit, form.mesin_pemisah_gabah, form.mesin_penyosoh, form.alat_pemisah_beras].filter(mesin => mesin === 'ada').length / 4) * 100) }}%
+                                            {{ Math.round(([form.mesin_memecah_kulit, form.mesin_pemisah_gabah, form.mesin_penyosoh, form.alat_pemisah_beras].filter(mesin => mesin === 'Ada').length / 4) * 100) }}%
                                         </div>
                                         <div class="text-purple-700">Penggilingan</div>
                                         <div class="text-xs text-purple-600">
-                                            {{ [form.mesin_memecah_kulit, form.mesin_pemisah_gabah, form.mesin_penyosoh, form.alat_pemisah_beras].filter(mesin => mesin === 'ada').length }}/4 Ada
+                                            {{ [form.mesin_memecah_kulit, form.mesin_pemisah_gabah, form.mesin_penyosoh, form.alat_pemisah_beras].filter(mesin => mesin === 'Ada').length }}/4 Ada
                                         </div>
                                     </div>
                                 </div>
@@ -1106,7 +1106,7 @@ const submit = async () => {
                                     <div class="mt-2 text-sm text-red-700">
                                         <p>Pastikan semua data yang diisi sudah benar. Pilih "Ada" atau "Tidak Ada"
                                             untuk setiap item sesuai dengan kondisi sebenarnya. Setelah mengirim
-                                            pengajuan, data tidak dapat diubah.</p>
+                                            pengajuan, data Tidak dapat diubah.</p>
                                     </div>
                                 </div>
                             </div>

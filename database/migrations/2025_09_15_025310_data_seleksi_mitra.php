@@ -14,27 +14,27 @@ return new class extends Migration
         Schema::create('data_seleksi_mitra', function (Blueprint $table) {
             $table->bigIncrements('id_seleksi_mitra');
             $table->unsignedBigInteger('id_mitra'); 
-            $table->enum('surat_permohonan', ['ada', 'tidak ada'])->nullable();
+            $table->enum('surat_permohonan', ['Ada', 'Tidak Ada'])->nullable();
             $table->date('mb_surat_permohonan')->nullable();
-            $table->enum('akta_notaris', ['ada', 'tidak ada'])->nullable();
+            $table->enum('akta_notaris', ['Ada', 'Tidak Ada'])->nullable();
             $table->date('mb_akta_notaris')->nullable();
-            $table->enum('nib', ['ada', 'tidak ada'])->nullable();
+            $table->enum('nib', ['Ada', 'Tidak Ada'])->nullable();
             $table->date('mb_nib')->nullable();
-            $table->enum('ktp', ['ada', 'tidak ada'])->nullable();
-            $table->string('mb_ktp')->nullable()->default('seumur hidup');
-            $table->enum('no_rekening', ['ada', 'tidak ada'])->nullable();
+            $table->enum('ktp', ['Ada', 'Tidak Ada'])->nullable();
+            $table->string('mb_ktp')->nullable()->default('Seumur Hidup');
+            $table->enum('no_rekening', ['Ada', 'Tidak Ada'])->nullable();
             $table->date('mb_no_rekening')->nullable();
-            $table->enum('npwp', ['ada', 'tidak ada'])->nullable();
+            $table->enum('npwp', ['Ada', 'Tidak Ada'])->nullable();
             $table->date('mb_npwp')->nullable();
-            $table->enum('surat_kuasa', ['ada', 'tidak ada'])->nullable();
+            $table->enum('surat_kuasa', ['Ada', 'Tidak Ada'])->nullable();
             $table->date('mb_surat_kuasa')->nullable();
-            $table->enum('lantai_jemur', ['ada', 'tidak ada'])->nullable();
-            $table->enum('sarana_lainnya', ['ada', 'tidak ada'])->nullable();
-            $table->enum('mesin_memecah_kulit', ['ada', 'tidak ada'])->nullable();
-            $table->enum('mesin_pemisah_gabah', ['ada', 'tidak ada'])->nullable();
-            $table->enum('mesin_penyosoh', ['ada', 'tidak ada'])->nullable();
-            $table->enum('alat_pemisah_beras', ['ada', 'tidak ada'])->nullable();
-            $table->enum('status_seleksi', ['pending', 'lolos', 'tidak lolos'])->nullable()->default('pending');
+            $table->enum('lantai_jemur', ['Ada', 'Tidak Ada'])->nullable();
+            $table->enum('sarana_lainnya', ['Ada', 'Tidak Ada'])->nullable();
+            $table->enum('mesin_memecah_kulit', ['Ada', 'Tidak Ada'])->nullable();
+            $table->enum('mesin_pemisah_gabah', ['Ada', 'Tidak Ada'])->nullable();
+            $table->enum('mesin_penyosoh', ['Ada', 'Tidak Ada'])->nullable();
+            $table->enum('alat_pemisah_beras', ['Ada', 'Tidak Ada'])->nullable();
+            $table->enum('status_seleksi', ['pending', 'lolos', 'Tidak lolos'])->nullable()->default('pending');
             $table->timestamps();
 
             $table->foreign('id_mitra')

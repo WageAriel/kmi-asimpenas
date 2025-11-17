@@ -94,7 +94,7 @@
     <div class="header">
         <h2>FORM - A</h2>
         <p>SELEKSI PENERIMAAN MITRA PANGAN</p>
-        <p>PENGADAAN GABAH/BERAS DALAM NEGERI</p>
+        <p>PENGAdaAN GABAH/BERAS DALAM NEGERI</p>
         <p>Nomor: {{ $nomor }}</p>
         <p>TAHUN {{ $tahun }}</p>
     </div>
@@ -246,8 +246,8 @@
         <tr>
             <td style="text-align: center;">1</td>
             <td>Surat Permohonan</td>
-            <td style="text-align: center;">@if($seleksi->surat_permohonan === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->surat_permohonan !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->surat_permohonan === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->surat_permohonan !== 'Ada')<strong>V</strong>@endif</td>
             <td class="masa-berlaku">
                 @if($seleksi->mb_surat_permohonan)
                     {{ date('d-m-Y', strtotime($seleksi->mb_surat_permohonan)) }}
@@ -259,8 +259,8 @@
         <tr>
             <td style="text-align: center;">2</td>
             <td>Akta Notaris</td>
-            <td style="text-align: center;">@if($seleksi->akta_notaris === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->akta_notaris !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->akta_notaris === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->akta_notaris !== 'Ada')<strong>V</strong>@endif</td>
             <td class="masa-berlaku">
                 @if($seleksi->mb_akta_notaris)
                     {{ date('d-m-Y', strtotime($seleksi->mb_akta_notaris)) }}
@@ -272,8 +272,8 @@
         <tr>
             <td style="text-align: center;">3</td>
             <td>NIB</td>
-            <td style="text-align: center;">@if($seleksi->nib === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->nib !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->nib === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->nib !== 'Ada')<strong>V</strong>@endif</td>
             <td class="masa-berlaku">
                 @if($seleksi->mb_nib)
                     {{ date('d-m-Y', strtotime($seleksi->mb_nib)) }}
@@ -285,15 +285,15 @@
         <tr>
             <td style="text-align: center;">4</td>
             <td>KTP</td>
-            <td style="text-align: center;">@if($seleksi->ktp === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->ktp !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->ktp === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->ktp !== 'Ada')<strong>V</strong>@endif</td>
             <td class="masa-berlaku">Seumur Hidup</td>
         </tr>
         <tr>
             <td style="text-align: center;">5</td>
             <td>No Rekening</td>
-            <td style="text-align: center;">@if($seleksi->no_rekening === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->no_rekening !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->no_rekening === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->no_rekening !== 'Ada')<strong>V</strong>@endif</td>
             <td class="masa-berlaku">
                 @if($seleksi->mb_no_rekening)
                     {{ date('d-m-Y', strtotime($seleksi->mb_no_rekening)) }}
@@ -305,8 +305,8 @@
         <tr>
             <td style="text-align: center;">6</td>
             <td>NPWP</td>
-            <td style="text-align: center;">@if($seleksi->npwp === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->npwp !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->npwp === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->npwp !== 'Ada')<strong>V</strong>@endif</td>
             <td class="masa-berlaku">
                 @if($seleksi->mb_npwp)
                     {{ date('d-m-Y', strtotime($seleksi->mb_npwp)) }}
@@ -318,8 +318,8 @@
         <tr>
             <td style="text-align: center;">7</td>
             <td>Surat Kuasa</td>
-            <td style="text-align: center;">@if($seleksi->surat_kuasa === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->surat_kuasa !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->surat_kuasa === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->surat_kuasa !== 'Ada')<strong>V</strong>@endif</td>
             <td class="masa-berlaku">
                 @if($seleksi->mb_surat_kuasa)
                     {{ date('d-m-Y', strtotime($seleksi->mb_surat_kuasa)) }}
@@ -345,14 +345,14 @@
         <tr>
             <td style="text-align: center;">1</td>
             <td>Lantai Jemur</td>
-            <td style="text-align: center;">@if($seleksi->lantai_jemur === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->lantai_jemur !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->lantai_jemur === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->lantai_jemur !== 'Ada')<strong>V</strong>@endif</td>
         </tr>
         <tr>
             <td style="text-align: center;">2</td>
             <td>Sarana Lainnya</td>
-            <td style="text-align: center;">@if($seleksi->sarana_lainnya === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->sarana_lainnya !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->sarana_lainnya === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->sarana_lainnya !== 'Ada')<strong>V</strong>@endif</td>
         </tr>
     </table>
 
@@ -371,32 +371,32 @@
         <tr>
             <td style="text-align: center;">1</td>
             <td>Mesin Pemecah Kulit</td>
-            <td style="text-align: center;">@if($seleksi->mesin_memecah_kulit === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->mesin_memecah_kulit !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_memecah_kulit === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_memecah_kulit !== 'Ada')<strong>V</strong>@endif</td>
         </tr>
         <tr>
             <td style="text-align: center;">2</td>
             <td>Mesin Pemisah Gabah</td>
-            <td style="text-align: center;">@if($seleksi->mesin_pemisah_gabah === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->mesin_pemisah_gabah !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_pemisah_gabah === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_pemisah_gabah !== 'Ada')<strong>V</strong>@endif</td>
         </tr>
         <tr>
             <td style="text-align: center;">3</td>
             <td>Mesin Penyosoh</td>
-            <td style="text-align: center;">@if($seleksi->mesin_penyosoh === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->mesin_penyosoh !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_penyosoh === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->mesin_penyosoh !== 'Ada')<strong>V</strong>@endif</td>
         </tr>
         <tr>
             <td style="text-align: center;">4</td>
             <td>Alat Pemisah Beras</td>
-            <td style="text-align: center;">@if($seleksi->alat_pemisah_beras === 'ada')<strong>V</strong>@endif</td>
-            <td style="text-align: center;">@if($seleksi->alat_pemisah_beras !== 'ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->alat_pemisah_beras === 'Ada')<strong>V</strong>@endif</td>
+            <td style="text-align: center;">@if($seleksi->alat_pemisah_beras !== 'Ada')<strong>V</strong>@endif</td>
         </tr>
     </table>
 
     <!-- Bagian Penutup -->
     <div style="margin-top: 20px;">
-        <p>Dengan ini, kami menyatakan bahwa data dan/atau informasi yang kami berikan adalah benar.</p>
+        <p>Dengan ini, kami menyatakan bahwa data dan/atau informasi yang kami berikan Adalah benar.</p>
         
         <div class="signature">
             <div class="signature-content">

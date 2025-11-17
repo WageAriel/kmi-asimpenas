@@ -21,41 +21,41 @@ const form = reactive({
     
     // Fasilitas & Mesin Produksi (Step 2)
     id_mitra: '3',
-    mesin_pembersih_gabah: '3',
-    lantai_jemur: '3',
-    mesin_pengering: '3',
-    alat_pengering_lainnya: '3',
+    mesin_pembersih_gabah: '3. Ada | > 20',
+    lantai_jemur: '3. Ada | > 10',
+    mesin_pengering: '3. Ada | > 20',
+    alat_pengering_lainnya: '3. Tidak Disyaratkan',
     
     // Mesin Penggilingan (Step 3)
-    mesin_pembersih_awal: '3',
-    mesin_pemecah_kulit: '3',
-    mesin_pembersih_sekam: '3',
-    mesin_pemisah_gabah_pecah_kulit: '3',
-    mesin_pemisah_batu: '3',
-    mesin_penyosoh: '3',
-    mesin_pengkabut: '3',
-    mesin_pemesah_menir: '3',
-    mesin_pemisah_katul: '3',
-    mesin_pemisah_berdasarkan_ukuran: '3',
-    mesin_pemisah_berdasarkan_warna: '3',
-    tangki_penyimpanan: '3',
-    mesin_pengemas: '3',
-    mesin_jahit: '3',
+    mesin_pembersih_awal: '3. Ada | > 3',
+    mesin_pemecah_kulit: '3. Ada | > 3',
+    mesin_pembersih_sekam: '3. Ada | > 3',
+    mesin_pemisah_gabah_pecah_kulit: '3. Ada | > 3',
+    mesin_pemisah_batu: '3. Ada | > 3',
+    mesin_penyosoh: '3. Ada | > 3 | 2',
+    mesin_pengkabut: '3. Ada | > 3 | 2',
+    mesin_pemesah_menir: '3. Ada | > 3',
+    mesin_pemisah_katul: '3. Ada | > 3',
+    mesin_pemisah_berdasarkan_ukuran: '3. Ada | > 3',
+    mesin_pemisah_berdasarkan_warna: '3. Ada | > 3',
+    tangki_penyimpanan: '3. Ada | > 10',
+    mesin_pengemas: '3. Ada | Full Otomatis',
+    mesin_jahit: '3. Ada | Full Otomatis',
     
     // Penyimpanan (Step 4)
-    gudang_konvensional: '3',
-    silo_gkg_hopper: '3',
+    gudang_konvensional: '3. Ada | > 3000',
+    silo_gkg_hopper: '3. Ada | > 2000',
 
     // Transportasi (Step 5)
-    truk: '3',
+    truk: '3. Ada | > 5',
 
     // Kelengkapan Pemeriksaan (Step 6)
-    mini_lab: '3',
-    moisture_tester: '3',
-    pembanding_derajat_sosoh: '3',
+    mini_lab: '3. Ada | Ruang Khusus',
+    moisture_tester: '3. Ada | Lengkap | Berfungsi',
+    pembanding_derajat_sosoh: '3. Ada | Sesuai Standar',
 
     // Organisasi (Step 7)
-    bagian_quality_control: '3',
+    bagian_quality_control: '3. Ada | Tidak Merangkap',
 });
 
 const notification = ref({
@@ -602,7 +602,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_gabah"
-                                            value="3"
+                                            value="3. Ada | > 20"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -614,7 +614,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_gabah"
-                                            value="2"
+                                            value="2. Ada | ≤ 20"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -626,7 +626,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_gabah"
-                                            value="1"
+                                            value="1. Tidak Ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -647,7 +647,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.lantai_jemur"
-                                            value="3"
+                                            value="3. Ada | > 10"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -659,7 +659,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.lantai_jemur"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 10"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -671,7 +671,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.lantai_jemur"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -692,7 +692,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengering"
-                                            value="3"
+                                            value="3. Ada | > 20"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -704,7 +704,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengering"
-                                            value="2"
+                                            value="2. Ada | ≤ 20"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -716,7 +716,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengering"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -737,7 +737,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.alat_pengering_lainnya"
-                                            value="3"
+                                            value="3. Tidak Disyaratkan"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -748,7 +748,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.alat_pengering_lainnya"
-                                            value="2"
+                                            value="2. Tidak Disyaratkan"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -759,7 +759,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.alat_pengering_lainnya"
-                                            value="1"
+                                            value="1. Ada | ≤ 1"
                                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -789,7 +789,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_awal"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -801,7 +801,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_awal"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -813,7 +813,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_awal"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -834,7 +834,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemecah_kulit"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -846,7 +846,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemecah_kulit"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -858,7 +858,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemecah_kulit"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -879,7 +879,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_sekam"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -891,7 +891,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_sekam"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -903,7 +903,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pembersih_sekam"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -924,7 +924,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_gabah_pecah_kulit"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -936,7 +936,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_gabah_pecah_kulit"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -948,7 +948,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_gabah_pecah_kulit"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -969,7 +969,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_batu"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -981,7 +981,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_batu"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -993,7 +993,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_batu"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1014,7 +1014,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_penyosoh"
-                                            value="3"
+                                            value="3. Ada | > 3 | 2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1026,7 +1026,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_penyosoh"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3 | 1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1038,11 +1038,11 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_penyosoh"
-                                            value="1"
+                                            value="1. Ada | ≤ 1 | 1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
-                                            <span class="font-medium text-gray-900">C. Tidak Ada</span>
+                                            <span class="font-medium text-gray-900">C. Ada | ≤ 1 | 1</span>
                                         </span>
                                     </label>
                                 </div>
@@ -1059,7 +1059,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengkabut"
-                                            value="3"
+                                            value="3. Ada | > 3 | 2"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1071,7 +1071,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengkabut"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3 | 1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1083,11 +1083,11 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengkabut"
-                                            value="1"
+                                            value="1. Ada | ≤ 1 | 1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
-                                            <span class="font-medium text-gray-900">C. Tidak Ada</span>
+                                            <span class="font-medium text-gray-900">C. Ada | ≤ 1 | 1</span>
                                         </span>
                                     </label>
                                 </div>
@@ -1104,7 +1104,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemesah_menir"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1116,7 +1116,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemesah_menir"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1128,7 +1128,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemesah_menir"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1149,7 +1149,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_katul"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1161,7 +1161,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_katul"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1173,7 +1173,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_katul"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1194,7 +1194,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_berdasarkan_ukuran"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1206,7 +1206,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_berdasarkan_ukuran"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1218,11 +1218,11 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_berdasarkan_ukuran"
-                                            value="1"
+                                            value="1. Ada | ≤ 1"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
-                                            <span class="font-medium text-gray-900">C. Tidak Ada</span>
+                                            <span class="font-medium text-gray-900">C. Ada | ≤ 1</span>
                                         </span>
                                     </label>
                                 </div>
@@ -1239,7 +1239,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_berdasarkan_warna"
-                                            value="3"
+                                            value="3. Ada | > 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1251,7 +1251,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_berdasarkan_warna"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 3"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1263,7 +1263,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pemisah_berdasarkan_warna"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1284,7 +1284,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.tangki_penyimpanan"
-                                            value="3"
+                                            value="3. Ada | > 10"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1296,7 +1296,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.tangki_penyimpanan"
-                                            value="2"
+                                            value="2. Ada | ≤ 10"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1308,7 +1308,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.tangki_penyimpanan"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1329,7 +1329,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengemas"
-                                            value="3"
+                                            value="3. Ada | Full Otomatis"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1341,7 +1341,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengemas"
-                                            value="2"
+                                            value="2. Ada | Semi Otomatis"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1353,7 +1353,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_pengemas"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1374,7 +1374,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_jahit"
-                                            value="3"
+                                            value="3. Ada | Full Otomatis"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1386,7 +1386,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_jahit"
-                                            value="2"
+                                            value="2. Ada | Semi Otomatis"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1398,7 +1398,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mesin_jahit"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1427,7 +1427,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.gudang_konvensional"
-                                            value="3"
+                                            value="3. Ada | > 3000"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1439,7 +1439,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.gudang_konvensional"
-                                            value="2"
+                                            value="2. Ada | < 3000"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1451,7 +1451,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.gudang_konvensional"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1472,7 +1472,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.silo_gkg_hopper"
-                                            value="3"
+                                            value="3. Ada | > 2000"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1484,19 +1484,18 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.silo_gkg_hopper"
-                                            value="2"
+                                            value="2. Tidak Ada"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
-                                            <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600"> | &lt; 2000</span>
+                                            <span class="font-medium text-gray-900">B. Tidak Ada</span>
                                         </span>
                                     </label>
                                     <label class="flex items-center">
                                         <input
                                             type="radio"
                                             v-model="form.silo_gkg_hopper"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1525,7 +1524,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.truk"
-                                            value="3"
+                                            value="3. Ada | > 5"
                                             class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1537,7 +1536,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.truk"
-                                            value="2"
+                                            value="2. Ada | 1 s/d 5"
                                             class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1549,7 +1548,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.truk"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1578,7 +1577,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mini_lab"
-                                            value="3"
+                                            value="3. Ada | Ruang Khusus"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1590,7 +1589,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mini_lab"
-                                            value="2"
+                                            value="2. Ada | Tidak Khusus"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1602,7 +1601,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.mini_lab"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1623,11 +1622,23 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.moisture_tester"
-                                            value="3"
+                                            value="3. Ada | Lengkap | Berfungsi"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
                                             <span class="font-medium text-gray-900">A. Ada</span>
+                                            <span class="text-gray-600"> | Lengkap | Berfungsi</span>
+                                        </span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input
+                                            type="radio"
+                                            v-model="form.moisture_tester"
+                                            value="2. Ada | Berfungsi"
+                                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                        />
+                                        <span class="ml-3 text-sm">
+                                            <span class="font-medium text-gray-900">B. Ada</span>
                                             <span class="text-gray-600"> | Berfungsi</span>
                                         </span>
                                     </label>
@@ -1635,19 +1646,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.moisture_tester"
-                                            value="2"
-                                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                                        />
-                                        <span class="ml-3 text-sm">
-                                            <span class="font-medium text-gray-900">B. Ada</span>
-                                            <span class="text-gray-600"> | Tidak Berfungsi</span>
-                                        </span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input
-                                            type="radio"
-                                            v-model="form.moisture_tester"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1668,7 +1667,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.pembanding_derajat_sosoh"
-                                            value="3"
+                                            value="3. Ada | Sesuai Standar"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1680,7 +1679,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.pembanding_derajat_sosoh"
-                                            value="2"
+                                            value="2. Ada | Tidak Sesuai"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1692,7 +1691,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.pembanding_derajat_sosoh"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1722,7 +1721,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.bagian_quality_control"
-                                            value="3"
+                                            value="3. Ada | Tidak Merangkap"
                                             class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1734,7 +1733,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.bagian_quality_control"
-                                            value="2"
+                                            value="2. Ada | Merangkap"
                                             class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">
@@ -1746,7 +1745,7 @@ const submit = async () => {
                                         <input
                                             type="radio"
                                             v-model="form.bagian_quality_control"
-                                            value="1"
+                                            value="1. Tidak ada"
                                             class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
                                         />
                                         <span class="ml-3 text-sm">

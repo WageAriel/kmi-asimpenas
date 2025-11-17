@@ -189,9 +189,16 @@ const fetchData = async () => {
             axios.get('/hasil-seleksi-mitra/my')
         ]);
 
-        dataSeleksi.value = seleksiRes.data;
-        dataKlasifikasi.value = klasifikasiRes.data;
-        dataHasilSeleksi.value = hasilRes.data;
+        // Urutkan data dari terbaru ke terlama berdasarkan created_at
+        dataSeleksi.value = seleksiRes.data.sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+        );
+        dataKlasifikasi.value = klasifikasiRes.data.sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+        );
+        dataHasilSeleksi.value = hasilRes.data.sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+        );
     } catch (err) {
         console.error('Error fetching data:', err);
         error.value = 'Gagal memuat data. Silakan refresh halaman.';

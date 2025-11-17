@@ -25,9 +25,10 @@ class HasilSeleksiMitra extends Model
         'mesin_pemisah_gabah_dengan_beras',
         'mesin_penyosoh',
         'alat_pemisah_beras',
-        'kesimpulan_dokumen',
-        'dokumen_ada_valid',
-        'dokumen_tidak_ada',
+    'kesimpulan_dokumen',
+    'dokumen_ada_valid',
+    'dokumen_ada_tidak_valid',
+    'dokumen_tidak_ada',
         'kesimpulan_sarana_pengeringan',
         'sarana_pengeringan_ada',
         'sarana_pengeringan_tidak_ada',
@@ -40,6 +41,7 @@ class HasilSeleksiMitra extends Model
     // JSON casting untuk kolom array
     protected $casts = [
         'dokumen_ada_valid' => 'array',
+        'dokumen_ada_tidak_valid' => 'array',
         'dokumen_tidak_ada' => 'array',
         'sarana_pengeringan_ada' => 'array',
         'sarana_pengeringan_tidak_ada' => 'array',

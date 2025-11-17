@@ -40,25 +40,57 @@ onMounted(async () => {
       nama_perusahaan: item.mitra?.nama_perusahaan ?? '-',
       year: getYear(item),
       status_seleksi: item.status_seleksi ?? item.status ?? 'pending',
-      // Pakai yang dari backend kalau ada; jika tidak, akan diisi heuristik
+      // Pakai yang dari backend kalau Ada; jika tidak, akan diisi heuristik
       type: item.type ?? item.jenis ?? (item.is_renewal ? 'renewal' : undefined),
     }));
 
-    submissions.value = applyTypeHeuristics(mapped);
+    // Urutkan dari terbaru ke terlama berdasarkan created_at
+    const sorted = applyTypeHeuristics(mapped).sort((a, b) => 
+      new Date(b.created_at) - new Date(a.created_at)
+    );
+
+    submissions.value = sorted;
   } catch (e) {
     console.error('Gagal memuat data pengajuan:', e);
     submissions.value = [];
   }
 });
 
+// Cek apakah ada pengajuan tahun ini yang masih pending atau lolos
+const hasCurrentYearApprovedOrPending = computed(() =>
+  submissions.value.some((s) => 
+    (s.year || currentYear) === currentYear && 
+    (s.status_seleksi === 'lolos' || s.status_seleksi === 'pending')
+  )
+);
+
+// Cek apakah ada pengajuan tahun ini yang tidak lolos
+const hasCurrentYearRejected = computed(() =>
+  submissions.value.some((s) => 
+    (s.year || currentYear) === currentYear && 
+    s.status_seleksi === 'tidak lolos'
+  )
+);
+
+// Cek apakah sudah ada submission baru setelah yang ditolak
+const hasNewerSubmissionAfterRejection = (submission) => {
+  // Jika submission ini bukan "tidak lolos", return false
+  if (submission.status_seleksi !== 'tidak lolos') return false;
+  
+  // Cek apakah ada submission lain di tahun yang sama yang dibuat setelah submission ini
+  const newerSubmissions = submissions.value.filter(s => 
+    (s.year || currentYear) === (submission.year || currentYear) &&
+    s.id !== submission.id &&
+    new Date(s.created_at) > new Date(submission.created_at)
+  );
+  
+  return newerSubmissions.length > 0;
+};
+
 // Boleh membuat registrasi ulang jika:
 // - Ada pengajuan "lolos" di tahun-tahun sebelumnya
 // - Selisih minimal 1 tahun dari tahun "lolos" terakhir
-// - Belum ada pengajuan untuk tahun berjalan
-const hasCurrentYearSubmission = computed(() =>
-  submissions.value.some((s) => (s.year || currentYear) === currentYear)
-);
-
+// - Belum Ada pengajuan untuk tahun berjalan yang lolos/pending
 const canRenew = computed(() => {
   const approved = submissions.value
     .filter((s) => s.status_seleksi === 'lolos')
@@ -68,7 +100,36 @@ const canRenew = computed(() => {
   if (!lastApproved) return false;
 
   const eligibleByYear = (currentYear - (lastApproved.year || 0)) >= 1;
-  return eligibleByYear && !hasCurrentYearSubmission.value;
+  return eligibleByYear && !hasCurrentYearApprovedOrPending.value;
+});
+
+// Boleh membuat pengajuan baru jika:
+// 1. Belum pernah ada pengajuan yang lolos (bukan renewal)
+// 2. Ada pengajuan tahun ini yang tidak lolos (bisa mengajukan ulang) DAN belum ada submission yang lebih baru
+// 3. TIDAK memenuhi syarat renewal
+const canCreateNew = computed(() => {
+  // Jika memenuhi syarat renewal, jangan tampilkan tombol pengajuan baru
+  if (canRenew.value) return false;
+  
+  // Jika tidak ada pengajuan approved/pending tahun ini
+  if (!hasCurrentYearApprovedOrPending.value) {
+    return true;
+  }
+  
+  // Jika ada pengajuan yang ditolak, cek apakah masih yang terbaru
+  if (hasCurrentYearRejected.value) {
+    // Ambil submission tahun ini yang paling baru
+    const currentYearSubmissions = submissions.value
+      .filter(s => (s.year || currentYear) === currentYear)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    const latestSubmission = currentYearSubmissions[0];
+    
+    // Hanya boleh buat baru jika submission terbaru statusnya "tidak lolos"
+    return latestSubmission && latestSubmission.status_seleksi === 'tidak lolos';
+  }
+  
+  return false;
 });
 
 // Helper functions
@@ -77,6 +138,7 @@ const getStatusClass = (status) => {
     case 'pending': return 'bg-yellow-100 text-yellow-800';
     case 'lolos': return 'bg-green-100 text-green-800';
     case 'tidak lolos': return 'bg-red-100 text-red-800';
+    case 'Tidak lolos': return 'bg-red-100 text-red-800';
     case 'draft': return 'bg-gray-100 text-gray-800';
     default: return 'bg-gray-100 text-gray-800';
   }
@@ -87,6 +149,7 @@ const getStatusText = (status) => {
     case 'pending': return 'Menunggu Review';
     case 'lolos': return 'Disetujui';
     case 'tidak lolos': return 'Ditolak';
+    case 'Tidak lolos': return 'Ditolak';
     case 'draft': return 'Draft';
     default: return 'Pending';
   }
@@ -100,7 +163,7 @@ const calculateCompletionPercentage = (submission) => {
     submission.mesin_memecah_kulit, submission.mesin_pemisah_gabah,
     submission.mesin_penyosoh, submission.alat_pemisah_beras
   ];
-  const adaCount = fields.filter((field) => field === 'ada').length;
+  const adaCount = fields.filter((field) => field === 'Ada').length;
   return Math.round((adaCount / fields.length) * 100);
 };
 
@@ -177,24 +240,26 @@ const editSubmission = (submission) => {
           <div class="mb-4 md:mb-0">
             <h3 class="text-xl font-bold text-white mb-2">Pengajuan Seleksi</h3>
             <p class="text-blue-100">
-              <span v-if="hasCurrentYearSubmission">Anda sudah memiliki pengajuan untuk tahun ini</span>
-              <span v-else>Belum ada pengajuan untuk tahun ini</span>
+              <span v-if="canRenew">Anda dapat melakukan registrasi ulang untuk tahun {{ currentYear }}</span>
+              <span v-else-if="hasCurrentYearApprovedOrPending">Anda sudah memiliki pengajuan untuk tahun ini</span>
+              <span v-else-if="hasCurrentYearRejected">Pengajuan tahun ini tidak lolos, Anda dapat mengajukan ulang</span>
+              <span v-else>Belum Ada pengajuan untuk tahun ini</span>
             </p>
           </div>
           <div class="flex flex-col sm:flex-row gap-3">
             <button
-              v-if="!hasCurrentYearSubmission"
+              v-if="canCreateNew"
               @click="goToForm('new')"
               class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white transition-colors"
             >
               <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
               </svg>
-              Pengajuan Baru 
+              {{ hasCurrentYearRejected ? 'Ajukan Ulang' : 'Pengajuan Baru' }}
             </button>
             
             <button
-              v-if="canRenew && !hasCurrentYearSubmission"
+              v-if="canRenew"
               @click="goToForm('renewal')"
               class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
             >
@@ -204,7 +269,7 @@ const editSubmission = (submission) => {
               Registrasi Ulang {{ currentYear }}
             </button>
 
-            <div v-if="hasCurrentYearSubmission" class="flex items-center px-4 py-2 bg-white/20 rounded-lg">
+            <div v-if="hasCurrentYearApprovedOrPending && !canRenew" class="flex items-center px-4 py-2 bg-white/20 rounded-lg">
               <svg class="w-5 h-5 text-white mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
               </svg>
@@ -213,7 +278,6 @@ const editSubmission = (submission) => {
           </div>
         </div>
       </div>
-
       <!-- History Table -->
       <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200">
@@ -284,18 +348,13 @@ const editSubmission = (submission) => {
                       Lihat
                     </button>
                     <button 
-                      v-if="submission.status_seleksi === 'draft'"
+                      v-if="submission.status_seleksi === 'draft' || (submission.status_seleksi === 'tidak lolos' && !hasNewerSubmissionAfterRejection(submission))"
                       @click="editSubmission(submission)"
                       class="text-green-600 hover:text-green-900 transition-colors"
                     >
-                      Lanjutkan
+                      {{ submission.status_seleksi === 'tidak lolos' ? 'Ajukan Ulang' : 'Lanjutkan' }}
                     </button>
-                    <button 
-                      v-if="submission.status_seleksi === 'lolos'"
-                      class="text-purple-600 hover:text-purple-900 transition-colors"
-                    >
-                      Sertifikat
-                    </button>
+            
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -319,7 +378,7 @@ const editSubmission = (submission) => {
           <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
             <path d="M34 40h10v-4a6 6 0 00-10.712-3.714M34 40H14m20 0v-4a9.971 9.971 0 00-.712-3.714M14 40H4v-4a6 6 0 0110.713-3.714M14 40v-4c0-1.313.253-2.566.713-3.714m0 0A10.003 10.003 0 0124 26c4.21 0 7.813 2.602 9.288 6.286M30 14a6 6 0 11-12 0 6 6 0 0112 0zm12 6a4 4 0 11-8 0 4 4 0 018 0zm-28 0a4 4 0 11-8 0 4 4 0 018 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada pengajuan</h3>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Belum Ada pengajuan</h3>
           <p class="mt-1 text-sm text-gray-500">Mulai dengan membuat pengajuan seleksi mitra baru.</p>
           <div class="mt-6">
             <button 
@@ -337,8 +396,8 @@ const editSubmission = (submission) => {
     </div>
 
     <!-- Modal Detail Pengajuan -->
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div class="bg-white rounded-xl shadow-lg max-w-xl w-full h-auto p-6 relative max-h-[80vh] flex flex-col">
+    <div v-if="showModal" @click="closeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div @click="stop" class="bg-white rounded-xl shadow-lg max-w-xl w-full h-auto p-6 relative max-h-[80vh] flex flex-col">
         <button @click="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

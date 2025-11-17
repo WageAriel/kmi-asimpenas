@@ -46,6 +46,12 @@ const successMessage = ref(null);
 const hasilSeleksi = ref(null);
 const loadingHasilSeleksi = ref(false);
 
+// Ref untuk kesimpulan kriteria
+const kesimpulanDokumen = ref('Lolos');
+const kesimpulanSaranaPengeringan = ref('Lolos');
+const kesimpulanSaranaPenggilingan = ref('Lolos');
+const kesimpulanAkhir = ref('Lolos');
+
 // Format the date values
 const formatDate = (dateString) => {
     if (!dateString) return '-';
@@ -57,7 +63,7 @@ const formatDate = (dateString) => {
 };
 
 const getStatusBadge = (val) => {
-    return val === 'ada'
+    return val === 'Ada'
         ? 'bg-green-100 text-green-800'
         : 'bg-red-100 text-red-800';
 };
@@ -74,10 +80,29 @@ const fetchHasilSeleksi = async (idSeleksiMitra) => {
         console.log('Dokumen Tidak Ada:', response.data.dokumen_tidak_ada);
         console.log('Pengeringan Tidak Ada:', response.data.sarana_pengeringan_tidak_ada);
         console.log('Penggilingan Tidak Ada:', response.data.sarana_penggilingan_tidak_ada);
+        
+        // PENTING: Update ref kesimpulan dengan data yang sudah tersimpan
+        if (response.data) {
+            kesimpulanDokumen.value = response.data.kesimpulan_dokumen || 'Lolos';
+            kesimpulanSaranaPengeringan.value = response.data.kesimpulan_sarana_pengeringan || 'Lolos';
+            kesimpulanSaranaPenggilingan.value = response.data.kesimpulan_sarana_penggilingan || 'Lolos';
+            kesimpulanAkhir.value = response.data.kesimpulan_akhir || 'Lolos';
+            
+            console.log('=== KESIMPULAN DI-LOAD DARI DATABASE ===');
+            console.log('Dokumen:', kesimpulanDokumen.value);
+            console.log('Pengeringan:', kesimpulanSaranaPengeringan.value);
+            console.log('Penggilingan:', kesimpulanSaranaPenggilingan.value);
+            console.log('Akhir:', kesimpulanAkhir.value);
+        }
     } catch (error) {
-        // Jika 404, berarti belum ada hasil seleksi
+        // Jika 404, berarti belum Ada hasil seleksi
         if (error.response?.status === 404) {
             hasilSeleksi.value = null;
+            // Reset ke default jika belum ada hasil
+            kesimpulanDokumen.value = 'Lolos';
+            kesimpulanSaranaPengeringan.value = 'Lolos';
+            kesimpulanSaranaPenggilingan.value = 'Lolos';
+            kesimpulanAkhir.value = 'Lolos';
         } else {
             console.error('Error fetching hasil seleksi:', error);
         }
@@ -102,6 +127,100 @@ const closeModal = () => {
     showModal.value = false;
     selectedItem.value = null;
     hasilSeleksi.value = null;
+    // Reset kesimpulan
+    kesimpulanDokumen.value = 'Lolos';
+    kesimpulanSaranaPengeringan.value = 'Lolos';
+    kesimpulanSaranaPenggilingan.value = 'Lolos';
+    kesimpulanAkhir.value = 'Lolos';
+};
+
+// Function to save validation results
+const saveValidation = async () => {
+    if (!selectedItem.value || isLoading.value) return;
+    
+    isLoading.value = true;
+    errorMessage.value = null;
+    successMessage.value = null;
+    
+    try {
+        const validationData = {
+            id_seleksi_mitra: selectedItem.value.id_seleksi_mitra,
+            kesimpulan_dokumen: kesimpulanDokumen.value,
+            kesimpulan_sarana_pengeringan: kesimpulanSaranaPengeringan.value,
+            kesimpulan_sarana_penggilingan: kesimpulanSaranaPenggilingan.value,
+            kesimpulan_akhir: kesimpulanAkhir.value,
+        };
+
+        // Add individual item validations if they exist
+        if (selectedItem.value.status_surat_permohonan) {
+            validationData.surat_permohonan = selectedItem.value.status_surat_permohonan === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_akta_notaris) {
+            validationData.akta_notaris = selectedItem.value.status_akta_notaris === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_nib) {
+            validationData.nib = selectedItem.value.status_nib === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_ktp) {
+            validationData.ktp = selectedItem.value.status_ktp === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_no_rekening) {
+            validationData.no_rekening = selectedItem.value.status_no_rekening === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_npwp) {
+            validationData.npwp = selectedItem.value.status_npwp === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_surat_kuasa) {
+            validationData.surat_kuasa = selectedItem.value.status_surat_kuasa === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_lantai_jemur) {
+            validationData.lantai_jemur = selectedItem.value.status_lantai_jemur === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_sarana_lainnya) {
+            validationData.sarana_lainnya = selectedItem.value.status_sarana_lainnya === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_mesin_memecah_kulit) {
+            validationData.mesin_memecah_kulit = selectedItem.value.status_mesin_memecah_kulit === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_mesin_pemisah_gabah) {
+            validationData.mesin_pemisah_gabah_dengan_beras = selectedItem.value.status_mesin_pemisah_gabah === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_mesin_penyosoh) {
+            validationData.mesin_penyosoh = selectedItem.value.status_mesin_penyosoh === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+        if (selectedItem.value.status_alat_pemisah_beras) {
+            validationData.alat_pemisah_beras = selectedItem.value.status_alat_pemisah_beras === 'lolos' ? 'Lolos' : 'Tidak Lolos';
+        }
+
+        // Check if hasil seleksi exists (update) or create new
+        if (hasilSeleksi.value) {
+            await axios.put(`/hasil-seleksi-mitra/${hasilSeleksi.value.id_hasil_seleksi_mitra}`, validationData);
+            successMessage.value = 'Hasil validasi berhasil diperbarui!';
+        } else {
+            await axios.post('/hasil-seleksi-mitra', validationData);
+            successMessage.value = 'Hasil validasi berhasil disimpan!';
+        }
+        
+        // Update status seleksi based on kesimpulan akhir
+        const statusSeleksi = kesimpulanAkhir.value === 'Lolos' ? 'lolos' : 'tidak lolos';
+        
+        await axios.put(`/data-seleksi-mitra/${selectedItem.value.id_seleksi_mitra}`, {
+            id_mitra: selectedItem.value.id_mitra,
+            status_seleksi: statusSeleksi
+        });
+        
+        // Close modal and reload after delay
+        setTimeout(() => {
+            closeModal();
+            window.location.reload();
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Error saving validation:', error);
+        errorMessage.value = error.response?.data?.message || 'Gagal menyimpan validasi. Silakan coba lagi.';
+    } finally {
+        isLoading.value = false;
+    }
 };
 
 // Add new refs
@@ -324,7 +443,7 @@ const uploadFile = async () => {
                 const errorDetails = data.failures.slice(0, 5).map(f => 
                     `Baris ${f.row}: ${f.errors.join(', ')}`
                 ).join('\n');
-                uploadError.value = `Terdapat error pada file:\n${errorDetails}`;
+                uploadError.value = `Terdapat error pAda file:\n${errorDetails}`;
                 
                 if (data.failures.length > 5) {
                     uploadError.value += `\n... dan ${data.failures.length - 5} error lainnya`;
@@ -372,7 +491,7 @@ const exportData = () => {
                     <div>
                         <h3 class="text-xl font-bold text-white mb-2">Daftar Seleksi Mitra</h3>
                         <p class="text-white">
-                            Berikut adalah daftar mitra yang melakukan seleksi di sistem ASIMPENAS.
+                            Berikut Adalah daftar mitra yang melakukan seleksi di sistem ASIMPENAS.
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
@@ -460,7 +579,7 @@ const exportData = () => {
                             <td class="px-4 py-3 whitespace-nowrap">{{ item.mitra?.nama_perusahaan || '-' }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.surat_permohonan)]">
-                                    {{ item.surat_permohonan === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.surat_permohonan === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -468,7 +587,7 @@ const exportData = () => {
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.akta_notaris)]">
-                                    {{ item.akta_notaris === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.akta_notaris === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -476,7 +595,7 @@ const exportData = () => {
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.nib)]">
-                                    {{ item.nib === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.nib === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -484,12 +603,12 @@ const exportData = () => {
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.ktp)]">
-                                    {{ item.ktp === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.ktp === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.no_rekening)]">
-                                    {{ item.no_rekening === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.no_rekening === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -497,7 +616,7 @@ const exportData = () => {
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.npwp)]">
-                                    {{ item.npwp === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.npwp === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -505,7 +624,7 @@ const exportData = () => {
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.surat_kuasa)]">
-                                    {{ item.surat_kuasa === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.surat_kuasa === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -513,32 +632,32 @@ const exportData = () => {
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.lantai_jemur)]">
-                                    {{ item.lantai_jemur === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.lantai_jemur === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.sarana_lainnya)]">
-                                    {{ item.sarana_lainnya === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.sarana_lainnya === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.mesin_memecah_kulit)]">
-                                    {{ item.mesin_memecah_kulit === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.mesin_memecah_kulit === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.mesin_pemisah_gabah)]">
-                                    {{ item.mesin_pemisah_gabah === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.mesin_pemisah_gabah === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.mesin_penyosoh)]">
-                                    {{ item.mesin_penyosoh === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.mesin_penyosoh === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.alat_pemisah_beras)]">
-                                    {{ item.alat_pemisah_beras === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                    {{ item.alat_pemisah_beras === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -572,7 +691,7 @@ const exportData = () => {
                         </tr>
                         <tr v-if="filteredSeleksiMitras.length === 0">
                             <td colspan="22" class="px-4 py-6 text-center text-gray-500">
-                                {{ searchQuery ? 'Tidak ada data seleksi mitra yang sesuai dengan pencarian.' : 'Belum ada data seleksi mitra.' }}
+                                {{ searchQuery ? 'Tidak Ada data seleksi mitra yang sesuai dengan pencarian.' : 'Belum Ada data seleksi mitra.' }}
                             </td>
                         </tr>
                     </tbody>
@@ -581,8 +700,8 @@ const exportData = () => {
         </div>
 
         <!-- Detail Seleksi Modal -->
-        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full h-auto p-6 relative max-h-[90vh] overflow-y-auto">
+        <div v-if="showModal" @click="closeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-4xl w-full h-auto p-6 relative max-h-[90vh] overflow-y-auto">
                 <button @click="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -613,7 +732,7 @@ const exportData = () => {
                         </div>
                     </div>
                     
-                    <!-- Form Seleksi - Hanya tampil jika belum ada hasil validasi -->
+                    <!-- Form Seleksi - Hanya tampil jika belum Ada hasil validasi -->
                     <template v-if="!hasilSeleksi && !loadingHasilSeleksi">
                     <!-- Dokumen Perizinan -->
                     <div class="border-b border-gray-200 pb-5">
@@ -625,8 +744,8 @@ const exportData = () => {
                                     <p class="text-sm text-gray-500">Surat Permohonan</p>
                                     <div class="flex items-center mt-1">
                                         <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                            selectedItem.surat_permohonan === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                            {{ selectedItem.surat_permohonan === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                            selectedItem.surat_permohonan === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                            {{ selectedItem.surat_permohonan === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                         </span>
                                         <span class="ml-2 text-xs text-gray-500">
                                             {{ selectedItem.mb_surat_permohonan ? formatDate(selectedItem.mb_surat_permohonan) : '-' }}
@@ -653,8 +772,8 @@ const exportData = () => {
                                     <p class="text-sm text-gray-500">Akta Notaris</p>
                                     <div class="flex items-center mt-1">
                                         <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                            selectedItem.akta_notaris === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                            {{ selectedItem.akta_notaris === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                            selectedItem.akta_notaris === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                            {{ selectedItem.akta_notaris === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                         </span>
                                         <span class="ml-2 text-xs text-gray-500">
                                             {{ selectedItem.mb_akta_notaris ? formatDate(selectedItem.mb_akta_notaris) : '-' }}
@@ -681,8 +800,8 @@ const exportData = () => {
                                     <p class="text-sm text-gray-500">NIB</p>
                                     <div class="flex items-center mt-1">
                                         <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                            selectedItem.nib === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                            {{ selectedItem.nib === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                            selectedItem.nib === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                            {{ selectedItem.nib === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                         </span>
                                         <span class="ml-2 text-xs text-gray-500">
                                             {{ selectedItem.mb_nib ? formatDate(selectedItem.mb_nib) : '-' }}
@@ -709,8 +828,8 @@ const exportData = () => {
                                     <p class="text-sm text-gray-500">KTP</p>
                                     <div class="flex items-center mt-1">
                                         <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                            selectedItem.ktp === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                            {{ selectedItem.ktp === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                            selectedItem.ktp === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                            {{ selectedItem.ktp === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                         </span>
                                     </div>
                                 </div>
@@ -734,8 +853,8 @@ const exportData = () => {
                                     <p class="text-sm text-gray-500">No Rekening</p>
                                     <div class="flex items-center mt-1">
                                         <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                            selectedItem.no_rekening === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                            {{ selectedItem.no_rekening === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                            selectedItem.no_rekening === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                            {{ selectedItem.no_rekening === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                         </span>
                                         <span class="ml-2 text-xs text-gray-500">
                                             {{ selectedItem.mb_no_rekening ? formatDate(selectedItem.mb_no_rekening) : '-' }}
@@ -762,8 +881,8 @@ const exportData = () => {
                                     <p class="text-sm text-gray-500">NPWP</p>
                                     <div class="flex items-center mt-1">
                                         <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                            selectedItem.npwp === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                            {{ selectedItem.npwp === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                            selectedItem.npwp === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                            {{ selectedItem.npwp === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                         </span>
                                         <span class="ml-2 text-xs text-gray-500">
                                             {{ selectedItem.mb_npwp ? formatDate(selectedItem.mb_npwp) : '-' }}
@@ -790,8 +909,8 @@ const exportData = () => {
                                     <p class="text-sm text-gray-500">Surat Kuasa</p>
                                     <div class="flex items-center mt-1">
                                         <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                            selectedItem.surat_kuasa === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                            {{ selectedItem.surat_kuasa === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                            selectedItem.surat_kuasa === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                            {{ selectedItem.surat_kuasa === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                         </span>
                                         <span class="ml-2 text-xs text-gray-500">
                                             {{ selectedItem.mb_surat_kuasa ? formatDate(selectedItem.mb_surat_kuasa) : '-' }}
@@ -823,8 +942,8 @@ const exportData = () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Lantai Jemur</p>
                                     <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                        selectedItem.lantai_jemur === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                        {{ selectedItem.lantai_jemur === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                        selectedItem.lantai_jemur === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                        {{ selectedItem.lantai_jemur === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                     </span>
                                 </div>
                                 <div>
@@ -846,8 +965,8 @@ const exportData = () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Sarana Lainnya</p>
                                     <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                        selectedItem.sarana_lainnya === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                        {{ selectedItem.sarana_lainnya === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                        selectedItem.sarana_lainnya === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                        {{ selectedItem.sarana_lainnya === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                     </span>
                                 </div>
                                 <div>
@@ -875,8 +994,8 @@ const exportData = () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Mesin Pemecah Kulit</p>
                                     <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                        selectedItem.mesin_memecah_kulit === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                        {{ selectedItem.mesin_memecah_kulit === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                        selectedItem.mesin_memecah_kulit === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                        {{ selectedItem.mesin_memecah_kulit === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                     </span>
                                 </div>
                                 <div>
@@ -897,8 +1016,8 @@ const exportData = () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Mesin Pemisah Gabah</p>
                                     <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                        selectedItem.mesin_pemisah_gabah === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                        {{ selectedItem.mesin_pemisah_gabah === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                        selectedItem.mesin_pemisah_gabah === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                        {{ selectedItem.mesin_pemisah_gabah === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                     </span>
                                 </div>
                                 <div>
@@ -919,8 +1038,8 @@ const exportData = () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Mesin Penyosoh</p>
                                     <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                        selectedItem.mesin_penyosoh === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                        {{ selectedItem.mesin_penyosoh === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                        selectedItem.mesin_penyosoh === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                        {{ selectedItem.mesin_penyosoh === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                     </span>
                                 </div>
                                 <div>
@@ -941,8 +1060,8 @@ const exportData = () => {
                                 <div>
                                     <p class="text-sm text-gray-500">Alat Pemisah Beras</p>
                                     <span :class="['inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', 
-                                        selectedItem.alat_pemisah_beras === 'ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                        {{ selectedItem.alat_pemisah_beras === 'ada' ? 'Ada' : 'Tidak Ada' }}
+                                        selectedItem.alat_pemisah_beras === 'Ada' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                        {{ selectedItem.alat_pemisah_beras === 'Ada' ? 'Ada' : 'Tidak Ada' }}
                                     </span>
                                 </div>
                                 <div>
@@ -958,6 +1077,79 @@ const exportData = () => {
                                     </select>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Kesimpulan Kriteria - Hanya tampil jika belum ada hasil validasi -->
+                    <div v-if="!hasilSeleksi && !loadingHasilSeleksi && selectedItem.status_seleksi === 'pending'" class="border-t border-gray-200 pt-5 mt-5">
+                        <h3 class="text-lg font-semibold mb-4 text-blue-700">📊 Kesimpulan Setiap Kriteria</h3>
+                        <p class="text-sm text-gray-600 mb-4">Tentukan kesimpulan untuk setiap kategori berdasarkan validasi yang sudah dilakukan:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <!-- Kesimpulan Dokumen -->
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Kesimpulan Dokumen Perizinan
+                                </label>
+                                <select 
+                                    v-model="kesimpulanDokumen"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                >
+                                    <option value="Lolos">✓ Lolos</option>
+                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanDokumen }}</p>
+                            </div>
+                            
+                            <!-- Kesimpulan Sarana Pengeringan -->
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Kesimpulan Sarana Pengeringan
+                                </label>
+                                <select 
+                                    v-model="kesimpulanSaranaPengeringan"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                    @change="console.log('Pengeringan changed to:', kesimpulanSaranaPengeringan)"
+                                >
+                                    <option value="Lolos">✓ Lolos</option>
+                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanSaranaPengeringan }}</p>
+                            </div>
+                            
+                            <!-- Kesimpulan Sarana Penggilingan -->
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Kesimpulan Sarana Penggilingan
+                                </label>
+                                <select 
+                                    v-model="kesimpulanSaranaPenggilingan"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                >
+                                    <option value="Lolos">✓ Lolos</option>
+                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanSaranaPenggilingan }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Kesimpulan Akhir -->
+                        <div class="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-5 mb-4">
+                            <label class="block text-base font-bold text-purple-900 mb-3">
+                                🏆 Kesimpulan Akhir Validasi
+                            </label>
+                            <select 
+                                v-model="kesimpulanAkhir"
+                                class="w-full px-4 py-3 text-lg font-semibold border-2 border-purple-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
+                                :class="kesimpulanAkhir === 'Lolos' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'"
+                            >
+                                <option value="Lolos">✓ LOLOS</option>
+                                <option value="Tidak Lolos">✗ TIDAK LOLOS</option>
+                            </select>
+                            <p class="text-xs font-semibold text-purple-700 mt-2">Terpilih: {{ kesimpulanAkhir }}</p>
+                            <p class="text-xs text-gray-600 mt-1">
+                                <strong>Catatan:</strong> Kesimpulan akhir ditentukan oleh admin dan tidak otomatis mengikuti kesimpulan kriteria.
+                            </p>
                         </div>
                     </div>
                     </template>
@@ -1030,11 +1222,11 @@ const exportData = () => {
                         <!-- Detail Dokumen -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Dokumen Ada & Valid (Lolos) -->
-                            <div v-if="hasilSeleksi.dokumen_ada_valid && hasilSeleksi.dokumen_ada_valid.length > 0" 
+                            <div v-if="hasilSeleksi.dokumen_Ada_valid && hasilSeleksi.dokumen_Ada_valid.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
                                 <p class="text-sm font-semibold text-green-800 mb-2">✓ Dokumen Lolos</p>
                                 <ul class="space-y-1">
-                                    <li v-for="(dok, index) in hasilSeleksi.dokumen_ada_valid" :key="index" 
+                                    <li v-for="(dok, index) in hasilSeleksi.dokumen_Ada_valid" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -1044,10 +1236,25 @@ const exportData = () => {
                                 </ul>
                             </div>
                             
-                            <!-- Dokumen Tidak Lolos -->
+                            <!-- Dokumen Ada Tidak Valid (Ada tapi Tidak Lolos) -->
+                            <div v-if="hasilSeleksi.dokumen_ada_tidak_valid && hasilSeleksi.dokumen_ada_tidak_valid.length > 0" 
+                                 class="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                                <p class="text-sm font-semibold text-orange-800 mb-2">⚠ Dokumen Ada Tidak Valid</p>
+                                <ul class="space-y-1">
+                                    <li v-for="(dok, index) in hasilSeleksi.dokumen_ada_tidak_valid" :key="'ada-tidak-valid-' + index" 
+                                        class="text-xs text-orange-700 flex items-center">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ dok }}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Dokumen Tidak Ada -->
                             <div v-if="hasilSeleksi.dokumen_tidak_ada && hasilSeleksi.dokumen_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Dokumen Tidak Lolos</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Dokumen Tidak Ada</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1060,11 +1267,11 @@ const exportData = () => {
                             </div>
                             
                             <!-- Sarana Pengeringan Lolos -->
-                            <div v-if="hasilSeleksi.sarana_pengeringan_ada && hasilSeleksi.sarana_pengeringan_ada.length > 0" 
+                            <div v-if="hasilSeleksi.sarana_pengeringan_Ada && hasilSeleksi.sarana_pengeringan_Ada.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
                                 <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Pengeringan Lolos</p>
                                 <ul class="space-y-1">
-                                    <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_ada" :key="index" 
+                                    <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_Ada" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -1090,11 +1297,11 @@ const exportData = () => {
                             </div>
                             
                             <!-- Sarana Penggilingan Lolos -->
-                            <div v-if="hasilSeleksi.sarana_penggilingan_ada && hasilSeleksi.sarana_penggilingan_ada.length > 0" 
+                            <div v-if="hasilSeleksi.sarana_penggilingan_Ada && hasilSeleksi.sarana_penggilingan_Ada.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
                                 <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Penggilingan Lolos</p>
                                 <ul class="space-y-1">
-                                    <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_ada" :key="index" 
+                                    <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_Ada" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -1181,40 +1388,38 @@ const exportData = () => {
                     </div>
                     
                     <!-- Action Buttons -->
-                    <div class="flex justify-end space-x-4 mt-4">
+                    <div class="flex justify-end space-x-4 mt-6">
+                        <!-- Tombol Simpan Validasi - hanya tampil jika belum ada hasil validasi -->
                         <button 
-                            @click="rejectSeleksi" 
-                            :disabled="isLoading || hasilSeleksi !== null || selectedItem.status_seleksi === 'tidak lolos' || selectedItem.status_seleksi === 'lolos'"
+                            v-if="!hasilSeleksi && selectedItem.status_seleksi === 'pending'"
+                            @click="saveValidation" 
+                            :disabled="isLoading"
                             :class="[
-                                'px-4 py-2 rounded-md font-medium text-sm transition-colors',
-                                isLoading || hasilSeleksi !== null || selectedItem.status_seleksi === 'tidak lolos' || selectedItem.status_seleksi === 'lolos'
+                                'px-6 py-2 rounded-md font-semibold text-sm transition-colors shadow-md',
+                                isLoading
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                                    : 'bg-red-600 text-white hover:bg-red-700'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700'
                             ]"
                         >
-                            <span v-if="hasilSeleksi !== null">Sudah Divalidasi</span>
-                            <span v-else-if="selectedItem.status_seleksi === 'tidak lolos'">Sudah Tidak Lolos</span>
-                            <span v-else-if="isLoading">Processing...</span>
-                            <span v-else>Tidak Lolos</span>
+                            <span v-if="isLoading" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Menyimpan...
+                            </span>
+                            <span v-else>💾 Simpan Hasil Validasi</span>
                         </button>
                         
-                        <button 
-                            @click="approveSeleksi"
-                            :disabled="isLoading || hasilSeleksi !== null || selectedItem.status_seleksi === 'lolos' || selectedItem.status_seleksi === 'tidak lolos'"
-                            :class="[
-                                'px-4 py-2 rounded-md font-medium text-sm transition-colors',
-                                isLoading || hasilSeleksi !== null || selectedItem.status_seleksi === 'lolos' || selectedItem.status_seleksi === 'tidak lolos'
-                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                                    : 'bg-green-600 text-white hover:bg-green-700'
-                            ]"
-                        >
-                            <span v-if="hasilSeleksi !== null">Sudah Divalidasi</span>
-                            <span v-else-if="selectedItem.status_seleksi === 'lolos'">Sudah Lolos</span>
-                            <span v-else-if="isLoading">Processing...</span>
-                            <span v-else>Lolos</span>
-                        </button>
+                        <!-- Info jika sudah divalidasi -->
+                        <div v-if="hasilSeleksi" class="flex items-center bg-green-50 px-4 py-2 rounded-md border border-green-200">
+                            <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-sm font-medium text-green-700">Sudah Divalidasi</span>
+                        </div>
                         
-                        <button @click="closeModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium text-sm">
+                        <button @click="closeModal" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-semibold text-sm shadow-md">
                             Tutup
                         </button>
                     </div>
@@ -1223,8 +1428,8 @@ const exportData = () => {
         </div>
 
         <!-- Modal Import Excel -->
-        <div v-if="showImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
+        <div v-if="showImportModal" @click="closeImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
                 <button @click="closeImportModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -1247,9 +1452,9 @@ const exportData = () => {
                                     <li>Ukuran file maksimal 5MB</li>
                                     <li>Kolom <strong>Nama Perusahaan</strong> akan digunakan untuk mencari ID mitra</li>
                                     <li>Pastikan nama perusahaan sudah terdaftar di database</li>
-                                    <li>Nilai dokumen/sarana: "ada" atau "tidak ada"</li>
-                                    <li>Format tanggal: YYYY-MM-DD atau gunakan format tanggal Excel</li>
-                                    <li>Untuk MB KTP bisa diisi "seumur hidup"</li>
+                                    <li>Nilai dokumen/sarana: "Ada" atau "Tidak Ada"</li>
+                                    <li>Format tanggal: DD/MM/YYYY atau gunakan format tanggal Excel</li>
+                                    <li>Untuk MB KTP bisa diisi "Seumur Hidup"</li>
                                 </ul>
                             </div>
                         </div>
@@ -1316,8 +1521,8 @@ const exportData = () => {
         </div>
 
         <!-- Add PDF Modal -->
-        <div v-if="showPdfModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
+        <div v-if="showPdfModal" @click="showPdfModal = false" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
                 <button @click="showPdfModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

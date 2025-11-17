@@ -32,9 +32,15 @@
         }
         .data-table td:first-child {
             width: 200px;
+            vertical-align: top;
         }
         .data-table td:nth-child(2) {
             width: 20px;
+            vertical-align: top;
+        }
+        .data-table td:nth-child(3) {
+            vertical-align: top;
+            text-align: justify;
         }
         .signature-section {
             margin-top: 40px;
@@ -105,7 +111,7 @@
     </div>
 
     <div class="content" style="font-size: 12pt;">
-        <p>Ditetapkan sebagai Mitra Kerja ADA Gabah/Beras DN Perum BULOG Kantor Cabang {{ $kantor_cabang }} dengan klasifikasi {{ $hasil_klasifikasi }}.</p>
+        <p>Ditetapkan sebagai Mitra Kerja ADA Gabah/Beras DN Perum BULOG Kantor Cabang {{ $kantor_cabang }} dengan <strong>Klasifikasi {{ $hasil_klasifikasi }}</strong>.</p>
     </div>
 
     <div class="signature-section">
@@ -119,7 +125,7 @@
             <p>Perum BULOG Kantor Cabang {{ $kantor_cabang }}</p>
             <div class="signature-space"></div>
             <p style="margin: 0; font-weight: bold;"><u>{{ $nama_pejabat }}</u></p>
-            <p style="margin: 0;">Ketua</p>
+            <p style="margin: 0;">{{ $jabatan_pejabat }}</p>
         </div>
     </div>
 </body>

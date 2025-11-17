@@ -61,6 +61,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/daftar-mitra/import', [App\Http\Controllers\DataMitraController::class, 'import'])->name('daftar-mitra.import');
     Route::get('/daftar-mitra/template', [App\Http\Controllers\DataMitraController::class, 'downloadTemplate'])->name('daftar-mitra.template');
     Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
+    Route::put('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'updateByAdmin'])->name('admin.daftar-mitra.update');
 
     // 4. Daftar Seleksi Mitra
     Route::get('/seleksi-mitra', function () {

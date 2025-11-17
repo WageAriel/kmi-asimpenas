@@ -322,8 +322,8 @@ class DataMitraController extends Controller
             'no_rekening' => 'nullable|string|max:30',
             'status_perusahaan' => 'nullable|string|max:255',
             'npwp' => 'nullable|string|max:30',
-            'pkp' => 'nullable|in:pkp,non pkp',
-            'surat_kuasa' => 'nullable|in:ada,tidak ada',
+            'pkp' => 'nullable|in:Pkp,Non Pkp',
+            'surat_kuasa' => 'nullable|in:Ada,Tidak Ada',
             'tanggal_seleksi' => 'nullable|date',
             'tanggal_klasifikasi' => 'nullable|date',
             'tanggal_penilaian' => 'nullable|date',
@@ -372,8 +372,8 @@ class DataMitraController extends Controller
             'no_rekening' => 'nullable|string|max:30',
             'status_perusahaan' => 'nullable|string|max:255',
             'npwp' => 'nullable|string|max:30',
-            'pkp' => 'nullable|in:pkp,non pkp',
-            'surat_kuasa' => 'nullable|in:ada,tidak ada',
+            'pkp' => 'nullable|in:Pkp,Non Pkp',
+            'surat_kuasa' => 'nullable|in:Ada,Tidak Ada',
             'tanggal_seleksi' => 'nullable|date',
             'tanggal_klasifikasi' => 'nullable|date',
             'tanggal_penilaian' => 'nullable|date',
@@ -475,4 +475,47 @@ class DataMitraController extends Controller
         
         return response()->json($mitras);
     }
+
+    /**
+     * Update mitra data by admin (only specific fields)
+     */
+    public function updateByAdmin(Request $request, $id)
+    {
+        try {
+            $mitra = DataMitra::findOrFail($id);
+
+            $validated = $request->validate([
+                'tanggal_seleksi' => 'nullable|date',
+                'tanggal_klasifikasi' => 'nullable|date',
+                'tanggal_penilaian' => 'nullable|date',
+                'tanggal_penetapan' => 'nullable|date',
+                'tanggal_pakta_integritas' => 'nullable|date',
+                'tanggal_surat_permohonan' => 'nullable|date',
+                'keterangan_pkp' => 'nullable|string',
+                'keterangan_surat_kuasa' => 'nullable|string',
+            ]);
+
+            $mitra->update($validated);
+
+            return response()->json([
+                'message' => 'Data mitra berhasil diperbarui',
+                'data' => $mitra
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Data mitra tidak ditemukan'
+            ], 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

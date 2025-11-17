@@ -1,3 +1,20 @@
+@php
+    // Helper function untuk mengkonversi simbol Unicode ke ASCII untuk perbandingan dan display
+    function normalizeValue($value) {
+        if (!$value) return $value;
+        $value = str_replace('≤', '<=', $value);
+        $value = str_replace('≥', '>=', $value);
+        return $value;
+    }
+    
+    // Helper function untuk display - konversi simbol untuk ditampilkan di PDF
+    function displayValue($value) {
+        if (!$value) return $value;
+        $value = str_replace('≤', '<=', $value);
+        $value = str_replace('≥', '>=', $value);
+        return $value;
+    }
+@endphp
 <!DOCTYPE html>
 <html>
 <head>
@@ -110,22 +127,22 @@
             <tr>
                 <td>NOMOR URUT SELEKSI</td>
                 <td>:</td>
-                <td>{{ $nomor_urut_klasifikasi }}</td>
+                <td><strong>{{ $nomor_urut_klasifikasi }}</strong></td>
             </tr>
             <tr>
                 <td>TANGGAL KLASIFIKASI</td>
                 <td>:</td>
-                <td>{{ date('d/m/Y', strtotime($klasifikasi->created_at)) }}</td>
+                <td><strong>{{ date('d/m/Y', strtotime($klasifikasi->created_at)) }}</strong></td>
             </tr>
             <tr>
                 <td>NOMOR ENTITAS BULOG</td>
                 <td>:</td>
-                <td>{{ $nomor_entitas }}</td>
+                <td><strong>{{ $nomor_entitas }}</strong></td>
             </tr>
             <tr>
                 <td>UNIT PELAKSANA SELEKSI</td>
                 <td>:</td>
-                <td>{{ $unit_pelaksana }}</td>
+                <td><strong>{{ $unit_pelaksana }}</strong></td>
             </tr>
         </table>
 
@@ -135,22 +152,22 @@
                 <tr>
                     <td>1. Nama Perusahaan</td>
                     <td>:</td>
-                    <td>{{ $klasifikasi->mitra->nama_perusahaan }}</td>
+                    <td><strong>{{ $klasifikasi->mitra->nama_perusahaan }}</strong></td>
                 </tr>
                 <tr>
                     <td>2. Badan Hukum/Usaha</td>
                     <td>:</td>
-                    <td>{{ $klasifikasi->mitra->badan_hukum_usaha }}</td>
+                    <td><strong>{{ $klasifikasi->mitra->badan_hukum_usaha }}</strong></td>
                 </tr>
                 <tr>
                     <td>3. Alamat Perusahaan</td>
                     <td>:</td>
-                    <td>{{ $klasifikasi->mitra->alamat_perusahaan }}</td>
+                    <td><strong>{{ $klasifikasi->mitra->alamat_perusahaan }}</strong></td>
                 </tr>
                 <tr>
                     <td>4. Status</td>
                     <td>:</td>
-                    <td>{{ $klasifikasi->mitra->status ?? 'Penggilingan' }}</td>
+                    <td><strong>{{ $klasifikasi->mitra->status ?? 'Penggilingan' }}</strong></td>
                 </tr>
             </table>
         </div>
@@ -182,21 +199,21 @@
             </tr>
             @php $no = 1; @endphp
             @foreach([
-                ['name' => 'Mesin Pembersih Gabah', 'field' => 'mesin_pembersih_gabah', 'unit' => 'ton/hari'],
-                ['name' => 'Lantai Jemur', 'field' => 'lantai_jemur', 'unit' => 'ton/hari'],
-                ['name' => 'Mesin Pengering', 'field' => 'mesin_pengering', 'unit' => 'ton/hari'],
-                ['name' => 'Alat Pengering Lainnya', 'field' => 'alat_pengering_lainnya', 'unit' => 'ton/hari']
+                ['name' => 'Mesin Pembersih Gabah', 'field' => 'mesin_pembersih_gabah', 'unit' => 'ton/hari', 'options' => ['1. Tidak Ada', '2. Ada | <= 20', '3. Ada | > 20']],
+                ['name' => 'Lantai Jemur', 'field' => 'lantai_jemur', 'unit' => 'ton/hari', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 10', '3. Ada | > 10']],
+                ['name' => 'Mesin Pengering', 'field' => 'mesin_pengering', 'unit' => 'ton/hari', 'options' => ['1. Tidak ada', '2. Ada | <= 20', '3. Ada | > 20']],
+                ['name' => 'Alat Pengering Lainnya', 'field' => 'alat_pengering_lainnya', 'unit' => 'ton/hari', 'options' => ['1. Ada | <= 1', '2. Tidak Disyaratkan', '3. Tidak Disyaratkan']]
             ] as $item)
             <tr>
                 <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['1', '2', '3'] as $value)
+                @foreach($item['options'] as $option)
                 <td style="text-align: center; font-size: 8pt;">
-                    @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
+                    @if(normalizeValue($klasifikasi->{$item['field']}) === normalizeValue($option))
+                        <strong style="font-size: 10pt;">{{ $option }}</strong>
                     @else
-                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        {{ $option }}
                     @endif
                 </td>
                 @endforeach
@@ -214,31 +231,31 @@
             </tr>
             @php $no = 1; @endphp
             @foreach([
-                ['name' => 'Mesin Pembersih Awal', 'field' => 'mesin_pembersih_awal', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Pemecah Kulit', 'field' => 'mesin_pemecah_kulit', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Pembersih Sekam', 'field' => 'mesin_pembersih_sekam', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Pemisah Gabah Pecah Kulit', 'field' => 'mesin_pemisah_gabah_pecah_kulit', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Pemisah Batu', 'field' => 'mesin_pemisah_batu', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Penyosoh', 'field' => 'mesin_penyosoh', 'unit' => 'ton/jam; pass'],
-                ['name' => 'Mesin Pengkabut', 'field' => 'mesin_pengkabut', 'unit' => 'ton/jam; pass'],
-                ['name' => 'Mesin Pemisah Menir', 'field' => 'mesin_pemesah_menir', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Pemisah Katul', 'field' => 'mesin_pemisah_katul', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Pemisah Berdasarkan Ukuran', 'field' => 'mesin_pemisah_berdasarkan_ukuran', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Pemisah Berdasarkan Warna', 'field' => 'mesin_pemisah_berdasarkan_warna', 'unit' => 'ton/jam'],
-                ['name' => 'Tangki Penyimpanan', 'field' => 'tangki_penyimpanan', 'unit' => 'ton/unit'],
-                ['name' => 'Mesin Pengemas', 'field' => 'mesin_pengemas', 'unit' => 'ton/jam'],
-                ['name' => 'Mesin Jahit', 'field' => 'mesin_jahit', 'unit' => 'unit']
+                ['name' => 'Mesin Pembersih Awal', 'field' => 'mesin_pembersih_awal', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Pemecah Kulit', 'field' => 'mesin_pemecah_kulit', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Pembersih Sekam', 'field' => 'mesin_pembersih_sekam', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Pemisah Gabah Pecah Kulit', 'field' => 'mesin_pemisah_gabah_pecah_kulit', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Pemisah Batu', 'field' => 'mesin_pemisah_batu', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Penyosoh', 'field' => 'mesin_penyosoh', 'unit' => 'ton/jam; pass', 'options' => ['1. Ada | <= 1 | 1', '2. Ada | 1 s/d 3 | 1', '3. Ada | > 3 | 2']],
+                ['name' => 'Mesin Pengkabut', 'field' => 'mesin_pengkabut', 'unit' => 'ton/jam; pass', 'options' => ['1. Ada | <= 1 | 1', '2. Ada | 1 s/d 3 | 1', '3. Ada | > 3 | 2']],
+                ['name' => 'Mesin Pemisah Menir', 'field' => 'mesin_pemesah_menir', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Pemisah Katul', 'field' => 'mesin_pemisah_katul', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Pemisah Berdasarkan Ukuran', 'field' => 'mesin_pemisah_berdasarkan_ukuran', 'unit' => 'ton/jam', 'options' => ['1. Ada | <= 1', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Pemisah Berdasarkan Warna', 'field' => 'mesin_pemisah_berdasarkan_warna', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Tangki Penyimpanan', 'field' => 'tangki_penyimpanan', 'unit' => 'ton/unit', 'options' => ['1. Tidak ada', '2. Ada | <= 10', '3. Ada | > 10']],
+                ['name' => 'Mesin Pengemas', 'field' => 'mesin_pengemas', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | Semi Otomatis', '3. Ada | Full Otomatis']],
+                ['name' => 'Mesin Jahit', 'field' => 'mesin_jahit', 'unit' => 'unit', 'options' => ['1. Tidak ada', '2. Ada | Semi Otomatis', '3. Ada | Full Otomatis']]
             ] as $item)
             <tr>
                 <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['1', '2', '3'] as $value)
+                @foreach($item['options'] as $option)
                 <td style="text-align: center; font-size: 8pt;">
-                    @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
+                    @if(normalizeValue($klasifikasi->{$item['field']}) === normalizeValue($option))
+                        <strong style="font-size: 10pt;">{{ $option }}</strong>
                     @else
-                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        {{ $option }}
                     @endif
                 </td>
                 @endforeach
@@ -256,20 +273,20 @@
             </tr>
             @php $no = 1; @endphp
             @foreach([
-                ['name' => 'Gudang Konvensional', 'field' => 'gudang_konvensional', 'unit' => 'ton'],
-                ['name' => 'Silo GKG / Hopper', 'field' => 'silo_gkg_hopper', 'unit' => 'ton']
+                ['name' => 'Gudang Konvensional', 'field' => 'gudang_konvensional', 'unit' => 'ton', 'options' => ['1. Tidak ada', '2. Ada | < 3000', '3. Ada | > 3000']],
+                ['name' => 'Silo GKG / Hopper', 'field' => 'silo_gkg_hopper', 'unit' => 'ton', 'options' => ['1. Tidak ada', '2. Tidak Ada', '3. Ada | > 2000']]
 
             ] as $item)
             <tr>
                 <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['1', '2', '3'] as $value)
+                @foreach($item['options'] as $option)
                 <td style="text-align: center; font-size: 8pt;">
-                    @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
+                    @if(normalizeValue($klasifikasi->{$item['field']}) === $option)
+                        <strong style="font-size: 10pt;">{{ $option }}</strong>
                     @else
-                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        {{ $option }}
                     @endif
                 </td>
                 @endforeach
@@ -287,18 +304,18 @@
             </tr>
             @php $no = 1; @endphp
             @foreach([
-                ['name' => 'Truk', 'field' => 'truk', 'unit' => 'unit']
+                ['name' => 'Truk', 'field' => 'truk', 'unit' => 'unit', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 5', '3. Ada | > 5']]
             ] as $item)
             <tr>
                 <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['1', '2', '3'] as $value)
+                @foreach($item['options'] as $option)
                 <td style="text-align: center; font-size: 8pt;">
-                    @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
+                    @if(normalizeValue($klasifikasi->{$item['field']}) === $option)
+                        <strong style="font-size: 10pt;">{{ $option }}</strong>
                     @else
-                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        {{ $option }}
                     @endif
                 </td>
                 @endforeach
@@ -315,21 +332,21 @@
                 <td class="section-header"></td>
             </tr>
             @php $no = 1; @endphp
-            @foreach([
-                ['name' => 'Mini Lab', 'field' => 'mini_lab', 'unit' => 'unit'],
-                ['name' => 'Moisture Tester', 'field' => 'moisture_tester', 'unit' => 'unit'],
-                ['name' => 'Pembanding Derajat Sosoh', 'field' => 'pembanding_derajat_sosoh', 'unit' => 'unit']
+                        @foreach([
+                ['name' => 'Mini Lab', 'field' => 'mini_lab', 'unit' => 'unit', 'options' => ['1. Tidak ada', '2. Ada | Tidak Khusus', '3. Ada | Ruang Khusus']],
+                ['name' => 'Moisture Tester', 'field' => 'moisture_tester', 'unit' => 'unit', 'options' => ['1. Tidak ada', '2. Ada | Berfungsi', '3. Ada | Lengkap | Berfungsi']],
+                ['name' => 'Pembanding Derajat Sosoh', 'field' => 'pembanding_derajat_sosoh', 'unit' => 'unit', 'options' => ['1. Tidak ada', '2. Ada | Tidak Sesuai', '3. Ada | Sesuai Standar']]
             ] as $item)
             <tr>
                 <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['1', '2', '3'] as $value)
+                @foreach($item['options'] as $option)
                 <td style="text-align: center; font-size: 8pt;">
-                    @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
+                    @if(normalizeValue($klasifikasi->{$item['field']}) === $option)
+                        <strong style="font-size: 10pt;">{{ $option }}</strong>
                     @else
-                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        {{ $option }}
                     @endif
                 </td>
                 @endforeach
@@ -347,18 +364,18 @@
             </tr>
             @php $no = 1; @endphp
             @foreach([
-                ['name' => 'Bagian Quality Control', 'field' => 'bagian_quality_control', 'unit' => 'orang']
+                ['name' => 'Bagian Quality Control', 'field' => 'bagian_quality_control', 'unit' => 'orang', 'options' => ['1. Tidak ada', '2. Ada | Merangkap', '3. Ada | Tidak Merangkap']]
             ] as $item)
             <tr>
                 <td style="text-align: center;">{{ $no++ }}</td>
                 <td>{{ $item['name'] }}</td>
                 <td style="text-align: center;">{{ $item['unit'] }}</td>
-                @foreach(['1', '2', '3'] as $value)
+                @foreach($item['options'] as $option)
                 <td style="text-align: center; font-size: 8pt;">
-                    @if($klasifikasi->{$item['field']} === $value)
-                        <strong>{{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}</strong>
+                    @if(normalizeValue($klasifikasi->{$item['field']}) === $option)
+                        <strong style="font-size: 10pt;">{{ $option }}</strong>
                     @else
-                        {{ $value }}. {{ $getKlasifikasiHasil($item['field'], $value) }}
+                        {{ $option }}
                     @endif
                 </td>
                 @endforeach

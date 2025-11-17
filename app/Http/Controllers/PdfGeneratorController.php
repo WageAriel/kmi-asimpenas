@@ -43,11 +43,14 @@ class PdfGeneratorController extends Controller
             $nomorEntitasBulog = '11030';
             $unitPelaksana = 'KANTOR CABANG SURAKARTA';
             
-            // Format nomor lengkap: No urut seleksi/No Entitas Bulog/A/SELEKSI/seleksi ke berapa/tahun
-            $nomorLengkap = sprintf("%s/%s/A/SELEKSI/%d/%s", 
+            // Get current month in Roman numeral
+            $bulanRomawi = $this->getRomanMonth(date('n'));
+            
+            // Format nomor lengkap: No urut seleksi/No Entitas Bulog/A/SELEKSI/bulan romawi/tahun
+            $nomorLengkap = sprintf("%s/%s/A/SELEKSI/%s/%s", 
                 $nomorUrutSeleksi,
                 $nomorEntitasBulog,
-                $seleksiKe,
+                $bulanRomawi,
                 $tahun
             );
             
@@ -106,12 +109,14 @@ class PdfGeneratorController extends Controller
             $nomorUrutKlasifikasi = sprintf("%02d", $urutanDataKlasifikasi);
             $nomorEntitasBulog = '11030';
             $unitPelaksana = 'KANTOR CABANG SURAKARTA';
+
+            $bulanRomawi = $this->getRomanMonth(date('n'));
             
             // Format nomor lengkap: No urut klasifikasi/No Entitas Bulog/B/KLASIFIKASI/klasifikasi ke berapa romawi/tahun
             $nomorLengkap = sprintf("%s/%s/B/KLASIFIKASI/%s/%s", 
                 $nomorUrutKlasifikasi,
                 $nomorEntitasBulog,
-                $klasifikasiKeRomawi,
+                $bulanRomawi,
                 $tahun
             );
             
@@ -218,6 +223,8 @@ class PdfGeneratorController extends Controller
             
             // Ambil tahun dari seleksi
             $tahunSeleksi = $seleksi->created_at->year;
+
+            $bulanRomawi = $this->getRomanMonth(date('n'));
             
             $data = [
                 'seleksi' => $seleksi,
@@ -234,13 +241,13 @@ class PdfGeneratorController extends Controller
                 'nomor_surat' => sprintf(
                     "%02d/11030/SP/MITRAPANGAN/%s/%s",
                     $urutanDataSeleksi,
-                    $seleksiKeRomawi,
+                    $bulanRomawi,
                     $tahunSeleksi
                 ),
                 'nomor_BA' => sprintf(
                     "%02d/11030/BA/SELEKSI/%s/%s",
                     $urutanDataSeleksi,
-                    $seleksiKeRomawi,
+                    $bulanRomawi,
                     $tahunSeleksi
                 ),
                 'nomor_urut_seleksi' => sprintf("%02d", $urutanDataSeleksi),
@@ -321,22 +328,29 @@ class PdfGeneratorController extends Controller
             
             // Konversi urutan hasil seleksi mitra ke angka romawi
             $urutanHasilSeleksiRomawi = $this->toRoman($urutanHasilSeleksi);
+
+            $bulanRomawi = $this->getRomanMonth(date('n'));
             
             // Format nomor surat: {urutan_data}/11030/BA/SELEKSI/{urutan_hasil_seleksi_romawi}/{tahun}
             $nomorSurat = sprintf(
                 "%02d/11030/BA/SELEKSI/%s/%s",
                 $urutanDataHasilSeleksi,
-                $urutanHasilSeleksiRomawi,
+                $bulanRomawi,
                 $tahunPengajuan
             );
             
             // Siapkan detail dokumen (sudah auto-cast ke array oleh model)
             $dokumenAda = $hasilSeleksi->dokumen_ada_valid ?: [];
             $dokumenTidakAda = $hasilSeleksi->dokumen_tidak_ada ?: [];
+            $dokumenAdaTidakValid = $hasilSeleksi->dokumen_ada_tidak_valid ?: [];
             
             $keteranganDokumen = '';
             if (!empty($dokumenAda)) {
                 $keteranganDokumen .= "Dokumen Ada dan Valid : " . implode(', ', $dokumenAda);
+            }
+            if (!empty($dokumenAdaTidakValid)) {
+                if ($keteranganDokumen) $keteranganDokumen .= "\n\n";
+                $keteranganDokumen .= "Dokumen Ada Tetapi Tidak Valid : " . implode(', ', $dokumenAdaTidakValid);
             }
             if (!empty($dokumenTidakAda)) {
                 if ($keteranganDokumen) $keteranganDokumen .= "\n\n";
@@ -440,12 +454,14 @@ class PdfGeneratorController extends Controller
             
             // Konversi id_klasifikasi ke angka romawi
             $idKlasifikasiRomawi = $this->toRoman($klasifikasi->id_klasifikasi_mitra);
+
+            $bulanRomawi = $this->getRomanMonth(date('n'));
             
             // Format nomor surat: {urutan_data}/11030/BA/KLASIFIKASI/{id_klasifikasi_romawi}/{tahun}
             $nomorSurat = sprintf(
                 "%02d/11030/BA/KLASIFIKASI/%s/%s",
                 $urutanDataKlasifikasi,
-                $idKlasifikasiRomawi,
+                $bulanRomawi,
                 $tahunPengajuan
             );
             
@@ -522,38 +538,61 @@ class PdfGeneratorController extends Controller
 
     private function getKlasifikasiHasil($field, $value)
     {
-        $mapping = [
-            'mesin_pembersih_gabah' => [3 => 'Ada | > 20', 2 => 'Ada | < 20 ', 1 => 'Tidak Ada'],
-            'lantai_jemur' => [3 => 'Ada | > 10', 2 => 'Ada | 1 s/d 10', 1 => 'Tidak ada'],
-            'mesin_pengering' => [3 => 'Ada | > 20', 2 => 'Ada | ≤ 20', 1 => 'Tidak ada'],
-            'alat_pengering_lainnya' => [3 => 'Tidak Disyaratkan', 2 => 'Tidak Disyaratkan', 1 => 'Ada | < 1'],
-            'mesin_pembersih_awal' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'mesin_pemecah_kulit' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'mesin_pembersih_sekam' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'mesin_pemisah_gabah_pecah_kulit' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'mesin_pemisah_batu' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'mesin_penyosoh' => [3 => 'Ada | > 3 | 2', 2 => 'Ada | 1 s/d 3 | 1', 1 => 'Tidak ada'],
-            'mesin_pengkabut' => [3 => 'Ada | > 3 | 2', 2 => 'Ada | 1 s/d 3 | 1', 1 => 'Tidak ada'],
-            'mesin_pemesah_menir' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'mesin_pemisah_katul' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'mesin_pemisah_berdasarkan_ukuran' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'mesin_pemisah_berdasarkan_warna' => [3 => 'Ada | > 3', 2 => 'Ada | 1 s/d 3', 1 => 'Tidak ada'],
-            'tangki_penyimpanan' => [3 => 'Ada | > 10', 2 => 'Ada | < 10', 1 => 'Tidak ada'],
-            'mesin_pengemas' => [3 => 'Ada | Full Otomatis', 2 => 'Ada | Semi Otomatis', 1 => 'Tidak ada'],
-            'mesin_jahit' => [3 => 'Ada | Full Otomatis', 2 => 'Ada | Semi Otomatis', 1 => 'Tidak ada'],
-            'gudang_konvensional' => [3 => 'Ada | > 3000', 2 => 'Ada | < 3000', 1 => 'Tidak ada'],
-            'silo_gkg_hopper' => [3 => 'Ada | > 2000', 2 => 'Ada | < 2000', 1 => 'Tidak ada'],
-            'truk' => [3 => 'Ada | > 5', 2 => 'Ada | 1 s/d 5', 1 => 'Tidak ada'],
-            'mini_lab' => [3 => 'Ada | Ruang Khusus', 2 => 'Ada | Tidak Khusus', 1 => 'Tidak ada'],
-            'moisture_tester' => [3 => 'Ada | Berfungsi', 2 => 'Ada | Tidak Berfungsi', 1 => 'Tidak ada'],
-            'pembanding_derajat_sosoh' => [3 => 'Ada | Sesuai Standar', 2 => 'Ada | Tidak Sesuai Standar', 1 => 'Tidak ada'],
-            'bagian_quality_control' => [3 => 'Ada | Tidak Merangkap', 2 => 'Ada | Merangkap', 1 => 'Tidak ada'],
+        // Jika value null atau kosong, return '-'
+        if (!$value) {
+            return '-';
+        }
+        
+        // Jika value sudah dalam format deskriptif baru (mengandung titik), konversi simbol untuk PDF
+        // Format baru: '1. Tidak Ada', '2. Ada | ≤ 20', '3. Ada | > 20'
+        if (is_string($value) && strpos($value, '.') !== false) {
+            // Ganti simbol matematika yang tidak didukung PDF dengan karakter ASCII
+            $value = str_replace('≤', '<=', $value);
+            $value = str_replace('≥', '>=', $value);
+            return $value;
+        }
+        
+        // Fallback: Mapping untuk backward compatibility dengan data lama (angka 1, 2, 3)
+        $legacyMapping = [
+            'mesin_pembersih_gabah' => [3 => '3. Ada | > 20', 2 => '2. Ada | <= 20', 1 => '1. Tidak Ada'],
+            'lantai_jemur' => [3 => '3. Ada | > 10', 2 => '2. Ada | 1 s/d 10', 1 => '1. Tidak ada'],
+            'mesin_pengering' => [3 => '3. Ada | > 20', 2 => '2. Ada | <= 20', 1 => '1. Tidak ada'],
+            'alat_pengering_lainnya' => [3 => '3. Tidak Disyaratkan', 2 => '2. Tidak Disyaratkan', 1 => '1. Ada | <= 1'],
+            'mesin_pembersih_awal' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'mesin_pemecah_kulit' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'mesin_pembersih_sekam' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'mesin_pemisah_gabah_pecah_kulit' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'mesin_pemisah_batu' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'mesin_penyosoh' => [3 => '3. Ada | > 3 | 2', 2 => '2. Ada | 1 s/d 3 | 1', 1 => '1. Tidak ada'],
+            'mesin_pengkabut' => [3 => '3. Ada | > 3 | 2', 2 => '2. Ada | 1 s/d 3 | 1', 1 => '1. Tidak ada'],
+            'mesin_pemesah_menir' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'mesin_pemisah_katul' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'mesin_pemisah_berdasarkan_ukuran' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'mesin_pemisah_berdasarkan_warna' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
+            'tangki_penyimpanan' => [3 => '3. Ada | > 10', 2 => '2. Ada | <= 10', 1 => '1. Tidak ada'],
+            'mesin_pengemas' => [3 => '3. Ada | Full Otomatis', 2 => '2. Ada | Semi Otomatis', 1 => '1. Tidak ada'],
+            'mesin_jahit' => [3 => '3. Ada | Full Otomatis', 2 => '2. Ada | Semi Otomatis', 1 => '1. Tidak ada'],
+            'gudang_konvensional' => [3 => '3. Ada | > 3000', 2 => '2. Ada | < 3000', 1 => '1. Tidak ada'],
+            'silo_gkg_hopper' => [3 => '3. Ada | > 2000', 2 => '2. Ada | < 2000', 1 => '1. Tidak ada'],
+            'truk' => [3 => '3. Ada | > 5', 2 => '2. Ada | 1 s/d 5', 1 => '1. Tidak ada'],
+            'mini_lab' => [3 => '3. Ada | Ruang Khusus', 2 => '2. Ada | Tidak Khusus', 1 => '1. Tidak ada'],
+            'moisture_tester' => [3 => '3. Ada | Berfungsi', 2 => '2. Ada | Tidak Berfunggi', 1 => '1. Tidak ada'],
+            'pembanding_derajat_sosoh' => [3 => '3. Ada | Sesuai Standar', 2 => '2. Ada | Tidak Sesuai Standar', 1 => '1. Tidak ada'],
+            'bagian_quality_control' => [3 => '3. Ada | Tidak Merangkap', 2 => '2. Ada | Merangkap', 1 => '1. Tidak ada'],
         ];
 
-        if (isset($mapping[$field][$value])) {
-            return $mapping[$field][$value];
+        // Cek apakah value adalah angka dan ada di mapping legacy
+        if (isset($legacyMapping[$field][$value])) {
+            return $legacyMapping[$field][$value];
         }
 
+        // Jika tidak ada mapping, return value dengan konversi simbol atau '-'
+        if (is_string($value)) {
+            $value = str_replace('≤', '<=', $value);
+            $value = str_replace('≥', '>=', $value);
+            return $value;
+        }
+        
         return '-';
     }
 
@@ -572,12 +611,14 @@ class PdfGeneratorController extends Controller
             
             // Convert urutan to Roman numeral
             $urutanRoman = $this->toRoman($urutanDataKlasifikasi);
+
+            $bulanRomawi = $this->getRomanMonth(date('n'));
             
             $data = [
                 'nomor_surat' => sprintf(
                     "%d/11030/SP/KLASIFIKASI/%s/%s",
                     $urutanDataKlasifikasi,
-                    $urutanRoman,
+                    $bulanRomawi,
                     $today->year
                 ),
                 'tahun' => $today->year,
@@ -592,7 +633,7 @@ class PdfGeneratorController extends Controller
                 'nomor_BA' => sprintf(
                     "%d/11030/BA/KLASIFIKASI/%s/%s",
                     $urutanDataKlasifikasi,
-                    $urutanRoman,
+                    $bulanRomawi,
                     $today->year
                 ),
                 'nama_perusahaan' => $klasifikasi->mitra->nama_perusahaan,
@@ -603,7 +644,8 @@ class PdfGeneratorController extends Controller
                 'hasil_klasifikasi' => $klasifikasi->hasil_klasifikasi,
                 'kantor_cabang' => 'Surakarta',
                 'nama_mitra' => $klasifikasi->mitra->nama_cp,
-                'nama_pejabat' => $karyawan->nama_karyawan
+                'nama_pejabat' => $karyawan->nama_karyawan,
+                'jabatan_pejabat' => $karyawan->jabatan
             ];
 
             $pdf = PDF::loadView('pdf.surat-penetapan-klasifikasi', $data);

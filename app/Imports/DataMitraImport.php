@@ -163,8 +163,8 @@ class DataMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsE
             'kode_mitra' => 'nullable|string|unique:data_mitra,kode_mitra|max:50',
             'nik' => 'nullable|string|max:30',
             'npwp' => 'nullable|string|max:30',
-            'pkp' => 'nullable|in:pkp,non pkp',
-            'surat_kuasa' => 'nullable|in:ada,tidak ada',
+            'pkp' => 'nullable|in:Pkp,Non Pkp',
+            'surat_kuasa' => 'nullable|in:Ada,Tidak Ada',
         ];
     }
 

@@ -14,7 +14,7 @@ onMounted(async () => {
         const resKlas = await axios.get('/klasifikasi-mitra/my');
         const items = Array.isArray(resKlas.data) ? resKlas.data : [];
 
-        classifications.value = items.map(item => {
+        const mappedItems = items.map(item => {
             const createdYear = item.created_at ? new Date(item.created_at).getFullYear() : null;
 
             return {
@@ -29,6 +29,11 @@ onMounted(async () => {
                 result: item.hasil_klasifikasi ?? null,
             };
         });
+
+        // Urutkan dari terbaru ke terlama berdasarkan created_at
+        classifications.value = mappedItems.sort((a, b) => 
+            new Date(b.created_at) - new Date(a.created_at)
+        );
     } catch (e) {
         // Silent fail agar halaman tetap tampil
     }
@@ -80,139 +85,53 @@ const formatDate = (dateString) => {
     });
 };
 
-const descriptionMap = {
-    mesin_pembersih_gabah: {
-        3: 'Ada | > 20',
-        2: 'Ada | ≤ 20 unit',
-        1: 'Tidak Ada',
-    },
-    lantai_jemur: {
-        3: 'Ada | > 10',
-        2: 'Ada | 1 s/d 10',
-        1: 'Tidak ada',
-    },
-    mesin_pengering: {
-        3: 'Ada | > 20',
-        2: 'Ada | ≤ 20',
-        1: 'Tidak ada',
-    },
-    alat_pengering_lainnya: {
-        3: 'Tidak Disyaratkan',
-        2: 'Tidak Disyaratkan',
-        1: 'Ada | ≤ 1',
-    },
-    mesin_pembersih_awal: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemecah_kulit: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pembersih_sekam: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_gabah_pecah_kulit: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_batu: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_penyosoh: {
-        3: 'Ada | > 3 | 2',
-        2: 'Ada | 1 s/d 3 | 1',
-        1: 'Tidak ada',
-    },
-    mesin_pengkabut: {
-        3: 'Ada | > 3 | 2',
-        2: 'Ada | 1 s/d 3 | 1',
-        1: 'Tidak ada',
-    },
-    mesin_pemesah_menir: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_katul: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_berdasarkan_ukuran: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_berdasarkan_warna: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    tangki_penyimpanan: {
-        3: 'Ada | > 10',
-        2: 'Ada | ≤ 10',
-        1: 'Tidak ada',
-    },
-    mesin_pengemas: {
-        3: 'Ada | Full Otomatis',
-        2: 'Ada | Semi Otomatis',
-        1: 'Tidak ada',
-    },
-    mesin_jahit: {
-        3: 'Ada | Full Otomatis',
-        2: 'Ada | Semi Otomatis',
-        1: 'Tidak ada',
-    },
-    gudang_konvensional: {
-        3: 'Ada | > 3000',
-        2: 'Ada | < 3000',
-        1: 'Tidak ada',
-    },
-    silo_gkg_hopper: {
-        3: 'Ada | > 2000',
-        2: 'Ada | < 2000',
-        1: 'Tidak ada',
-    },
-    truk: {
-        3: 'Ada | > 5',
-        2: 'Ada | 1 s/d 5',
-        1: 'Tidak ada',
-    },
-    mini_lab: {
-        3: 'Ada | Ruang Khusus',
-        2: 'Ada | Tidak Khusus',
-        1: 'Tidak ada',
-    },
-    moisture_tester: {
-        3: 'Ada | Berfungsi',
-        2: 'Ada | Tidak Berfunggi',
-        1: 'Tidak ada',
-    },
-    pembanding_derajat_sosoh: {
-        3: 'Ada | Sesuai Standar',
-        2: 'Ada | Tidak Sesuai Standar',
-        1: 'Tidak ada',
-    },
-    bagian_quality_control: {
-        3: 'Ada | Tidak Merangkap',
-        2: 'Ada | Merangkap',
-        1: 'Tidak ada',
-    },
-};
-
+// Fungsi untuk menampilkan nilai klasifikasi
+// Karena database sudah menyimpan nilai deskriptif langsung (e.g., '1. Tidak Ada', '2. Ada | ≤ 20'),
+// kita tidak perlu lagi mapping, cukup tampilkan nilai aslinya
 const interpretClassification = (field, value) => {
-    if (descriptionMap[field] && value in descriptionMap[field]) {
-        return descriptionMap[field][value];
+    // Jika value null atau undefined, return '-'
+    if (!value) return '-';
+    
+    // Jika value adalah string deskriptif (format baru dari migration), tampilkan langsung
+    if (typeof value === 'string' && value.includes('.')) {
+        return value;
     }
-    return '-'; // default jika field atau value tidak ada
+    
+    // Fallback untuk data lama yang masih berupa angka (backward compatibility)
+    // Mapping untuk konversi data lama ke format baru
+    const legacyMap = {
+        mesin_pembersih_gabah: { 3: '3. Ada | > 20', 2: '2. Ada | ≤ 20', 1: '1. Tidak Ada' },
+        lantai_jemur: { 3: '3. Ada | > 10', 2: '2. Ada | 1 s/d 10', 1: '1. Tidak ada' },
+        mesin_pengering: { 3: '3. Ada | > 20', 2: '2. Ada | ≤ 20', 1: '1. Tidak ada' },
+        alat_pengering_lainnya: { 3: '3. Tidak Disyaratkan', 2: '2. Tidak Disyaratkan', 1: '1. Ada | ≤ 1' },
+        mesin_pembersih_awal: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        mesin_pemecah_kulit: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        mesin_pembersih_sekam: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        mesin_pemisah_gabah_pecah_kulit: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        mesin_pemisah_batu: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        mesin_penyosoh: { 3: '3. Ada | > 3 | 2', 2: '2. Ada | 1 s/d 3 | 1', 1: '1. Tidak ada' },
+        mesin_pengkabut: { 3: '3. Ada | > 3 | 2', 2: '2. Ada | 1 s/d 3 | 1', 1: '1. Tidak ada' },
+        mesin_pemesah_menir: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        mesin_pemisah_katul: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        mesin_pemisah_berdasarkan_ukuran: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        mesin_pemisah_berdasarkan_warna: { 3: '3. Ada | > 3', 2: '2. Ada | 1 s/d 3', 1: '1. Tidak ada' },
+        tangki_penyimpanan: { 3: '3. Ada | > 10', 2: '2. Ada | ≤ 10', 1: '1. Tidak ada' },
+        mesin_pengemas: { 3: '3. Ada | Full Otomatis', 2: '2. Ada | Semi Otomatis', 1: '1. Tidak ada' },
+        mesin_jahit: { 3: '3. Ada | Full Otomatis', 2: '2. Ada | Semi Otomatis', 1: '1. Tidak ada' },
+        gudang_konvensional: { 3: '3. Ada | > 3000', 2: '2. Ada | < 3000', 1: '1. Tidak ada' },
+        silo_gkg_hopper: { 3: '3. Ada | > 2000', 2: '2. Ada | < 2000', 1: '1. Tidak ada' },
+        truk: { 3: '3. Ada | > 5', 2: '2. Ada | 1 s/d 5', 1: '1. Tidak ada' },
+        mini_lab: { 3: '3. Ada | Ruang Khusus', 2: '2. Ada | Tidak Khusus', 1: '1. Tidak ada' },
+        moisture_tester: { 3: '3. Ada | Berfungsi', 2: '2. Ada | Tidak Berfunggi', 1: '1. Tidak ada' },
+        pembanding_derajat_sosoh: { 3: '3. Ada | Sesuai Standar', 2: '2. Ada | Tidak Sesuai Standar', 1: '1. Tidak ada' },
+        bagian_quality_control: { 3: '3. Ada | Tidak Merangkap', 2: '2. Ada | Merangkap', 1: '1. Tidak ada' },
+    };
+    
+    if (legacyMap[field] && value in legacyMap[field]) {
+        return legacyMap[field][value];
+    }
+    
+    return '-';
 };
 
 const downloadPdf = (classificationId) => {
@@ -453,8 +372,8 @@ const editClassification = (classification) => {
         </div>
 
         <!-- Modal Detail Klasifikasi Mitra -->
-        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div class="bg-white rounded-xl shadow-lg max-w-xl w-full h-auto p-6 relative max-h-[80vh] flex flex-col">
+        <div v-if="showModal" @click="closeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-xl w-full h-auto p-6 relative max-h-[80vh] flex flex-col">
                 <button @click="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

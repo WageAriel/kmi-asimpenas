@@ -24,11 +24,11 @@ const form = ref({
   npwp:"",
   pkp:"",
   surat_kuasa:"",
-  tanggal_surat_permohonan:"", // opsional
-  tanggal_pakta_integritas:"", // opsional
   email: "",
   no_vms:"",
   kode_mitra: "",
+  tanggal_surat_permohonan:"",
+  tanggal_pakta_integritas:"",
 });
 
 const user = ref(null)
@@ -654,7 +654,7 @@ const submitForm = async () => {
                   <input
                     type="radio"
                     v-model="form.pkp"
-                    value="pkp"
+                    value="Pkp"
                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                   />
                   <span class="ml-2 text-sm text-gray-700">PKP</span>
@@ -663,7 +663,7 @@ const submitForm = async () => {
                   <input
                     type="radio"
                     v-model="form.pkp"
-                    value="non pkp"
+                    value="Non Pkp"
                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                   />
                   <span class="ml-2 text-sm text-gray-700">Non-PKP</span>
@@ -671,6 +671,9 @@ const submitForm = async () => {
               </div>
               <div v-if="form.pkp === ''" class="text-xs text-red-500">Pilih salah satu opsi</div>
             </div>
+
+            <!-- Keterangan PKP -->
+            
 
             <!-- Surat Kuasa -->
             <div class="space-y-2">
@@ -682,7 +685,7 @@ const submitForm = async () => {
                   <input
                     type="radio"
                     v-model="form.surat_kuasa"
-                    value="ada"
+                    value="Ada"
                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                   />
                   <span class="ml-2 text-sm text-gray-700">Ada</span>
@@ -691,7 +694,7 @@ const submitForm = async () => {
                   <input
                     type="radio"
                     v-model="form.surat_kuasa"
-                    value="tidak ada"
+                    value="Tidak Ada"
                     class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                   />
                   <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
@@ -699,6 +702,9 @@ const submitForm = async () => {
               </div>
               <div v-if="form.surat_kuasa === ''" class="text-xs text-red-500">Pilih salah satu opsi</div>
             </div>
+
+            <!-- Keterangan Surat Kuasa -->
+            
           </div>
         </div>
 

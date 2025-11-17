@@ -28,76 +28,219 @@ class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation,
             throw new \Exception("Mitra dengan nama '{$row['nama_perusahaan']}' tidak ditemukan");
         }
 
-        // Helper function untuk convert nilai ke enum (1,2,3)
-        $parseEnumValue = function($value) {
+        // Helper function untuk convert nilai ke format enum descriptive
+        // Mendukung input angka (1,2,3) atau format descriptive langsung
+        $parseEnumValue = function($value, $field) {
             if (empty($value)) {
                 return null;
             }
             
             $value = trim($value);
-            return in_array($value, ['1', '2', '3']) ? $value : null;
+            
+            // Jika sudah format descriptive (mengandung titik), langsung return
+            if (strpos($value, '.') !== false) {
+                return $value;
+            }
+            
+            // Mapping dari angka ke format descriptive sesuai migration
+            $enumMappings = [
+                'mesin_pembersih_gabah' => [
+                    '1' => '1. Tidak Ada',
+                    '2' => '2. Ada | ≤ 20',
+                    '3' => '3. Ada | > 20'
+                ],
+                'lantai_jemur' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 10',
+                    '3' => '3. Ada | > 10'
+                ],
+                'mesin_pengering' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | ≤ 20',
+                    '3' => '3. Ada | > 20'
+                ],
+                'alat_pengering_lainnya' => [
+                    '1' => '1. Ada | ≤ 1',
+                    '2' => '2. Tidak Disyaratkan',
+                    '3' => '3. Tidak Disyaratkan'
+                ],
+                'mesin_pembersih_awal' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'mesin_pemecah_kulit' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'mesin_pembersih_sekam' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'mesin_pemisah_gabah_pecah_kulit' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'mesin_pemisah_batu' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'mesin_penyosoh' => [
+                    '1' => '1. Ada | ≤ 1 | 1',
+                    '2' => '2. Ada | 1 s/d 3 | 1',
+                    '3' => '3. Ada | > 3 | 2'
+                ],
+                'mesin_pengkabut' => [
+                    '1' => '1. Ada | ≤ 1 | 1',
+                    '2' => '2. Ada | 1 s/d 3 | 1',
+                    '3' => '3. Ada | > 3 | 2'
+                ],
+                'mesin_pemesah_menir' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'mesin_pemisah_katul' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'mesin_pemisah_berdasarkan_ukuran' => [
+                    '1' => '1. Ada | ≤ 1',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'mesin_pemisah_berdasarkan_warna' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 3',
+                    '3' => '3. Ada | > 3'
+                ],
+                'tangki_penyimpanan' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | ≤ 10',
+                    '3' => '3. Ada | > 10'
+                ],
+                'mesin_pengemas' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | Semi Otomatis',
+                    '3' => '3. Ada | Full Otomatis'
+                ],
+                'mesin_jahit' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | Semi Otomatis',
+                    '3' => '3. Ada | Full Otomatis'
+                ],
+                'gudang_konvensional' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | < 3000',
+                    '3' => '3. Ada | > 3000'
+                ],
+                'silo_gkg_hopper' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Tidak Ada',
+                    '3' => '3. Ada | > 2000'
+                ],
+                'truk' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | 1 s/d 5',
+                    '3' => '3. Ada | > 5'
+                ],
+                'mini_lab' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | Tidak Khusus',
+                    '3' => '3. Ada | Ruang Khusus'
+                ],
+                'moisture_tester' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | Berfungsi',
+                    '3' => '3. Ada | Lengkap | Berfungsi'
+                ],
+                'pembanding_derajat_sosoh' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | Tidak Sesuai',
+                    '3' => '3. Ada | Sesuai Standar'
+                ],
+                'bagian_quality_control' => [
+                    '1' => '1. Tidak ada',
+                    '2' => '2. Ada | Merangkap',
+                    '3' => '3. Ada | Tidak Merangkap'
+                ]
+            ];
+            
+            // Jika value adalah angka (1,2,3), konversi ke format descriptive
+            if (isset($enumMappings[$field][$value])) {
+                return $enumMappings[$field][$value];
+            }
+            
+            return null;
         };
 
         return new KlasifikasiMitra([
             'id_mitra' => $mitra->id_mitra,
-            'mesin_pembersih_gabah' => $parseEnumValue($row['mesin_pembersih_gabah'] ?? null),
-            'lantai_jemur' => $parseEnumValue($row['lantai_jemur'] ?? null),
-            'mesin_pengering' => $parseEnumValue($row['mesin_pengering'] ?? null),
-            'alat_pengering_lainnya' => $parseEnumValue($row['alat_pengering_lainnya'] ?? null),
-            'mesin_pembersih_awal' => $parseEnumValue($row['mesin_pembersih_awal'] ?? null),
-            'mesin_pemecah_kulit' => $parseEnumValue($row['mesin_pemecah_kulit'] ?? null),
-            'mesin_pembersih_sekam' => $parseEnumValue($row['mesin_pembersih_sekam'] ?? null),
-            'mesin_pemisah_gabah_pecah_kulit' => $parseEnumValue($row['mesin_pemisah_gabah_pecah_kulit'] ?? null),
-            'mesin_pemisah_batu' => $parseEnumValue($row['mesin_pemisah_batu'] ?? null),
-            'mesin_penyosoh' => $parseEnumValue($row['mesin_penyosoh'] ?? null),
-            'mesin_pengkabut' => $parseEnumValue($row['mesin_pengkabut'] ?? null),
-            'mesin_pemesah_menir' => $parseEnumValue($row['mesin_pemesah_menir'] ?? null),
-            'mesin_pemisah_katul' => $parseEnumValue($row['mesin_pemisah_katul'] ?? null),
-            'mesin_pemisah_berdasarkan_ukuran' => $parseEnumValue($row['mesin_pemisah_berdasarkan_ukuran'] ?? null),
-            'mesin_pemisah_berdasarkan_warna' => $parseEnumValue($row['mesin_pemisah_berdasarkan_warna'] ?? null),
-            'tangki_penyimpanan' => $parseEnumValue($row['tangki_penyimpanan'] ?? null),
-            'mesin_pengemas' => $parseEnumValue($row['mesin_pengemas'] ?? null),
-            'mesin_jahit' => $parseEnumValue($row['mesin_jahit'] ?? null),
-            'gudang_konvensional' => $parseEnumValue($row['gudang_konvensional'] ?? null),
-            'silo_gkg_hopper' => $parseEnumValue($row['silo_gkg_hopper'] ?? null),
-            'truk' => $parseEnumValue($row['truk'] ?? null),
-            'mini_lab' => $parseEnumValue($row['mini_lab'] ?? null),
-            'moisture_tester' => $parseEnumValue($row['moisture_tester'] ?? null),
-            'pembanding_derajat_sosoh' => $parseEnumValue($row['pembanding_derajat_sosoh'] ?? null),
-            'bagian_quality_control' => $parseEnumValue($row['bagian_quality_control'] ?? null),
+            'mesin_pembersih_gabah' => $parseEnumValue($row['mesin_pembersih_gabah'] ?? null, 'mesin_pembersih_gabah'),
+            'lantai_jemur' => $parseEnumValue($row['lantai_jemur'] ?? null, 'lantai_jemur'),
+            'mesin_pengering' => $parseEnumValue($row['mesin_pengering'] ?? null, 'mesin_pengering'),
+            'alat_pengering_lainnya' => $parseEnumValue($row['alat_pengering_lainnya'] ?? null, 'alat_pengering_lainnya'),
+            'mesin_pembersih_awal' => $parseEnumValue($row['mesin_pembersih_awal'] ?? null, 'mesin_pembersih_awal'),
+            'mesin_pemecah_kulit' => $parseEnumValue($row['mesin_pemecah_kulit'] ?? null, 'mesin_pemecah_kulit'),
+            'mesin_pembersih_sekam' => $parseEnumValue($row['mesin_pembersih_sekam'] ?? null, 'mesin_pembersih_sekam'),
+            'mesin_pemisah_gabah_pecah_kulit' => $parseEnumValue($row['mesin_pemisah_gabah_pecah_kulit'] ?? null, 'mesin_pemisah_gabah_pecah_kulit'),
+            'mesin_pemisah_batu' => $parseEnumValue($row['mesin_pemisah_batu'] ?? null, 'mesin_pemisah_batu'),
+            'mesin_penyosoh' => $parseEnumValue($row['mesin_penyosoh'] ?? null, 'mesin_penyosoh'),
+            'mesin_pengkabut' => $parseEnumValue($row['mesin_pengkabut'] ?? null, 'mesin_pengkabut'),
+            'mesin_pemesah_menir' => $parseEnumValue($row['mesin_pemesah_menir'] ?? null, 'mesin_pemesah_menir'),
+            'mesin_pemisah_katul' => $parseEnumValue($row['mesin_pemisah_katul'] ?? null, 'mesin_pemisah_katul'),
+            'mesin_pemisah_berdasarkan_ukuran' => $parseEnumValue($row['mesin_pemisah_berdasarkan_ukuran'] ?? null, 'mesin_pemisah_berdasarkan_ukuran'),
+            'mesin_pemisah_berdasarkan_warna' => $parseEnumValue($row['mesin_pemisah_berdasarkan_warna'] ?? null, 'mesin_pemisah_berdasarkan_warna'),
+            'tangki_penyimpanan' => $parseEnumValue($row['tangki_penyimpanan'] ?? null, 'tangki_penyimpanan'),
+            'mesin_pengemas' => $parseEnumValue($row['mesin_pengemas'] ?? null, 'mesin_pengemas'),
+            'mesin_jahit' => $parseEnumValue($row['mesin_jahit'] ?? null, 'mesin_jahit'),
+            'gudang_konvensional' => $parseEnumValue($row['gudang_konvensional'] ?? null, 'gudang_konvensional'),
+            'silo_gkg_hopper' => $parseEnumValue($row['silo_gkg_hopper'] ?? null, 'silo_gkg_hopper'),
+            'truk' => $parseEnumValue($row['truk'] ?? null, 'truk'),
+            'mini_lab' => $parseEnumValue($row['mini_lab'] ?? null, 'mini_lab'),
+            'moisture_tester' => $parseEnumValue($row['moisture_tester'] ?? null, 'moisture_tester'),
+            'pembanding_derajat_sosoh' => $parseEnumValue($row['pembanding_derajat_sosoh'] ?? null, 'pembanding_derajat_sosoh'),
+            'bagian_quality_control' => $parseEnumValue($row['bagian_quality_control'] ?? null, 'bagian_quality_control'),
             'hasil_klasifikasi' => null, // Admin yang akan set melalui interface
         ]);
     }
 
     public function rules(): array
     {
+        // Validasi akan dilakukan di parseEnumValue function
+        // Terima angka (1,2,3) atau format descriptive
         return [
             'nama_perusahaan' => 'required|string',
-            'mesin_pembersih_gabah' => 'nullable|in:1,2,3',
-            'lantai_jemur' => 'nullable|in:1,2,3',
-            'mesin_pengering' => 'nullable|in:1,2,3',
-            'alat_pengering_lainnya' => 'nullable|in:1,2,3',
-            'mesin_pembersih_awal' => 'nullable|in:1,2,3',
-            'mesin_pemecah_kulit' => 'nullable|in:1,2,3',
-            'mesin_pembersih_sekam' => 'nullable|in:1,2,3',
-            'mesin_pemisah_gabah_pecah_kulit' => 'nullable|in:1,2,3',
-            'mesin_pemisah_batu' => 'nullable|in:1,2,3',
-            'mesin_penyosoh' => 'nullable|in:1,2,3',
-            'mesin_pengkabut' => 'nullable|in:1,2,3',
-            'mesin_pemesah_menir' => 'nullable|in:1,2,3',
-            'mesin_pemisah_katul' => 'nullable|in:1,2,3',
-            'mesin_pemisah_berdasarkan_ukuran' => 'nullable|in:1,2,3',
-            'mesin_pemisah_berdasarkan_warna' => 'nullable|in:1,2,3',
-            'tangki_penyimpanan' => 'nullable|in:1,2,3',
-            'mesin_pengemas' => 'nullable|in:1,2,3',
-            'mesin_jahit' => 'nullable|in:1,2,3',
-            'gudang_konvensional' => 'nullable|in:1,2,3',
-            'silo_gkg_hopper' => 'nullable|in:1,2,3',
-            'truk' => 'nullable|in:1,2,3',
-            'mini_lab' => 'nullable|in:1,2,3',
-            'moisture_tester' => 'nullable|in:1,2,3',
-            'pembanding_derajat_sosoh' => 'nullable|in:1,2,3',
-            'bagian_quality_control' => 'nullable|in:1,2,3',
+            'mesin_pembersih_gabah' => 'nullable',
+            'lantai_jemur' => 'nullable',
+            'mesin_pengering' => 'nullable',
+            'alat_pengering_lainnya' => 'nullable',
+            'mesin_pembersih_awal' => 'nullable',
+            'mesin_pemecah_kulit' => 'nullable',
+            'mesin_pembersih_sekam' => 'nullable',
+            'mesin_pemisah_gabah_pecah_kulit' => 'nullable',
+            'mesin_pemisah_batu' => 'nullable',
+            'mesin_penyosoh' => 'nullable',
+            'mesin_pengkabut' => 'nullable',
+            'mesin_pemesah_menir' => 'nullable',
+            'mesin_pemisah_katul' => 'nullable',
+            'mesin_pemisah_berdasarkan_ukuran' => 'nullable',
+            'mesin_pemisah_berdasarkan_warna' => 'nullable',
+            'tangki_penyimpanan' => 'nullable',
+            'mesin_pengemas' => 'nullable',
+            'mesin_jahit' => 'nullable',
+            'gudang_konvensional' => 'nullable',
+            'silo_gkg_hopper' => 'nullable',
+            'truk' => 'nullable',
+            'mini_lab' => 'nullable',
+            'moisture_tester' => 'nullable',
+            'pembanding_derajat_sosoh' => 'nullable',
+            'bagian_quality_control' => 'nullable',
         ];
     }
 
@@ -105,7 +248,6 @@ class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation,
     {
         return [
             'nama_perusahaan.required' => 'Nama perusahaan tidak boleh kosong',
-            '*.in' => 'Nilai harus 1, 2, atau 3',
         ];
     }
 }

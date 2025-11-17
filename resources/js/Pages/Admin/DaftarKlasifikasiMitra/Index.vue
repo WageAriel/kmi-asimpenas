@@ -39,139 +39,150 @@ const filteredKlasifikasiMitras = computed(() => {
 const showModal = ref(false);
 const selectedKlasifikasi = ref(null);
 
-// Classification interpretation table
-const klasifikasiDescriptions = {
-    mesin_pembersih_gabah: {
-        3: 'Ada | > 20',
-        2: 'Ada | ≤ 20 unit',
-        1: 'Tidak Ada',
-    },
-    lantai_jemur: {
-        3: 'Ada | > 10',
-        2: 'Ada | 1 s/d 10',
-        1: 'Tidak ada',
-    },
-    mesin_pengering: {
-        3: 'Ada | > 20',
-        2: 'Ada | ≤ 20',
-        1: 'Tidak ada',
-    },
-    alat_pengering_lainnya: {
-        3: 'Tidak Disyaratkan',
-        2: 'Tidak Disyaratkan',
-        1: 'Ada | ≤ 1',
-    },
-    mesin_pembersih_awal: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemecah_kulit: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pembersih_sekam: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_gabah_pecah_kulit: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_batu: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_penyosoh: {
-        3: 'Ada | > 3 | 2',
-        2: 'Ada | 1 s/d 3 | 1',
-        1: 'Tidak ada',
-    },
-    mesin_pengkabut: {
-        3: 'Ada | > 3 | 2',
-        2: 'Ada | 1 s/d 3 | 1',
-        1: 'Tidak ada',
-    },
-    mesin_pemesah_menir: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_katul: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_berdasarkan_ukuran: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    mesin_pemisah_berdasarkan_warna: {
-        3: 'Ada | > 3',
-        2: 'Ada | 1 s/d 3',
-        1: 'Tidak ada',
-    },
-    tangki_penyimpanan: {
-        3: 'Ada | > 10',
-        2: 'Ada | ≤ 10',
-        1: 'Tidak ada',
-    },
-    mesin_pengemas: {
-        3: 'Ada | Full Otomatis',
-        2: 'Ada | Semi Otomatis',
-        1: 'Tidak ada',
-    },
-    mesin_jahit: {
-        3: 'Ada | Full Otomatis',
-        2: 'Ada | Semi Otomatis',
-        1: 'Tidak ada',
-    },
-    gudang_konvensional: {
-        3: 'Ada | > 3000',
-        2: 'Ada | < 3000',
-        1: 'Tidak ada',
-    },
-    silo_gkg_hopper: {
-        3: 'Ada | > 2000',
-        2: 'Ada | < 2000',
-        1: 'Tidak ada',
-    },
-    truk: {
-        3: 'Ada | > 5',
-        2: 'Ada | 1 s/d 5',
-        1: 'Tidak ada',
-    },
-    mini_lab: {
-        3: 'Ada | Ruang Khusus',
-        2: 'Ada | Tidak Khusus',
-        1: 'Tidak ada',
-    },
-    moisture_tester: {
-        3: 'Ada | Berfungsi',
-        2: 'Ada | Tidak Berfungsi',
-        1: 'Tidak ada',
-    },
-    pembanding_derajat_sosoh: {
-        3: 'Ada | Sesuai Standar',
-        2: 'Ada | Tidak Sesuai Standar',
-        1: 'Tidak ada',
-    },
-    bagian_quality_control: {
-        3: 'Ada | Tidak Merangkap',
-        2: 'Ada | Merangkap',
-        1: 'Tidak ada',
-    },
-};
-
 const interpretClassification = (field, value) => {
-    if (klasifikasiDescriptions[field] && value in klasifikasiDescriptions[field]) {
-        return klasifikasiDescriptions[field][value];
+    // Jika value null atau undefined, return '-'
+    if (!value) return '-';
+    
+    // Jika value sudah dalam format deskriptif baru (mengandung titik), langsung return
+    // Format baru: '1. Tidak Ada', '2. Ada | ≤ 20', '3. Ada | > 20'
+    if (typeof value === 'string' && value.includes('.')) {
+        return value;
     }
+    
+    // Fallback: Legacy mapping untuk backward compatibility dengan data lama (angka 1, 2, 3)
+    const legacyMap = {
+        mesin_pembersih_gabah: {
+            3: '3. Ada | > 20',
+            2: '2. Ada | ≤ 20',
+            1: '1. Tidak Ada',
+        },
+        lantai_jemur: {
+            3: '3. Ada | > 10',
+            2: '2. Ada | 1 s/d 10',
+            1: '1. Tidak ada',
+        },
+        mesin_pengering: {
+            3: '3. Ada | > 20',
+            2: '2. Ada | ≤ 20',
+            1: '1. Tidak ada',
+        },
+        alat_pengering_lainnya: {
+            3: '3. Tidak Disyaratkan',
+            2: '2. Tidak Disyaratkan',
+            1: '1. Ada | ≤ 1',
+        },
+        mesin_pembersih_awal: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Tidak ada',
+        },
+        mesin_pemecah_kulit: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Tidak ada',
+        },
+        mesin_pembersih_sekam: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Tidak ada',
+        },
+        mesin_pemisah_gabah_pecah_kulit: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Tidak ada',
+        },
+        mesin_pemisah_batu: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Tidak ada',
+        },
+        mesin_penyosoh: {
+            3: '3. Ada | > 3 | 2',
+            2: '2. Ada | 1 s/d 3 | 1',
+            1: '1. Ada | ≤ 1 | 1',
+        },
+        mesin_pengkabut: {
+            3: '3. Ada | > 3 | 2',
+            2: '2. Ada | 1 s/d 3 | 1',
+            1: '1. Ada | ≤ 1 | 1',
+        },
+        mesin_pemesah_menir: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Tidak ada',
+        },
+        mesin_pemisah_katul: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Tidak ada',
+        },
+        mesin_pemisah_berdasarkan_ukuran: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Ada | ≤ 1',
+        },
+        mesin_pemisah_berdasarkan_warna: {
+            3: '3. Ada | > 3',
+            2: '2. Ada | 1 s/d 3',
+            1: '1. Tidak ada',
+        },
+        tangki_penyimpanan: {
+            3: '3. Ada | > 10',
+            2: '2. Ada | ≤ 10',
+            1: '1. Tidak ada',
+        },
+        mesin_pengemas: {
+            3: '3. Ada | Full Otomatis',
+            2: '2. Ada | Semi Otomatis',
+            1: '1. Tidak ada',
+        },
+        mesin_jahit: {
+            3: '3. Ada | Full Otomatis',
+            2: '2. Ada | Semi Otomatis',
+            1: '1. Tidak ada',
+        },
+        gudang_konvensional: {
+            3: '3. Ada | > 3000',
+            2: '2. Ada | < 3000',
+            1: '1. Tidak ada',
+        },
+        silo_gkg_hopper: {
+            3: '3. Ada | > 2000',
+            2: '2. Tidak Ada',
+            1: '1. Tidak ada',
+        },
+        truk: {
+            3: '3. Ada | > 5',
+            2: '2. Ada | 1 s/d 5',
+            1: '1. Tidak ada',
+        },
+        mini_lab: {
+            3: '3. Ada | Ruang Khusus',
+            2: '2. Ada | Tidak Khusus',
+            1: '1. Tidak ada',
+        },
+        moisture_tester: {
+            3: '3. Ada | Lengkap | Berfungsi',
+            2: '2. Ada | Berfungsi',
+            1: '1. Tidak ada',
+        },
+        pembanding_derajat_sosoh: {
+            3: '3. Ada | Sesuai Standar',
+            2: '2. Ada | Tidak Sesuai',
+            1: '1. Tidak ada',
+        },
+        bagian_quality_control: {
+            3: '3. Ada | Tidak Merangkap',
+            2: '2. Ada | Merangkap',
+            1: '1. Tidak ada',
+        },
+    };
+    
+    // Cek apakah ada mapping untuk field dan value ini
+    if (legacyMap[field] && value in legacyMap[field]) {
+        return legacyMap[field][value];
+    }
+    
     return '-';
 };
 

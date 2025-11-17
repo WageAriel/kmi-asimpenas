@@ -30,8 +30,10 @@ return new class extends Migration
             $table->string('no_rekening', 30)->nullable();
             $table->string('status_perusahaan')->nullable();
             $table->string('npwp', 30)->nullable();
-            $table->enum('pkp', ['pkp', 'non pkp'])->nullable();
-            $table->enum('surat_kuasa', ['ada', 'tidak ada'])->nullable();
+            $table->enum('pkp', ['Pkp', 'Non Pkp'])->nullable();
+            $table->text('keterangan_pkp')->nullable();
+            $table->enum('surat_kuasa', ['Ada', 'Tidak Ada'])->nullable();
+            $table->text('keterangan_surat_kuasa')->nullable();
             $table->date('tanggal_seleksi')->nullable();
             $table->date('tanggal_klasifikasi')->nullable();
             $table->date('tanggal_penilaian')->nullable();
