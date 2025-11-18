@@ -160,6 +160,10 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
     Route::get('/data-mitra/{id}/surat-pernyataan-non-pkp', [PdfGeneratorController::class, 'generateSuratPernyataanNonPkp'])
         ->name('data-mitra.surat-pernyataan-non-pkp');
 
+    // Generate PDF Pakta Integritas
+    Route::get('/data-mitra/{id}/pakta-integritas', [PdfGeneratorController::class, 'generatePaktaIntegritas'])
+        ->name('data-mitra.pakta-integritas');
+
     //untuk mengakses form pengajuan seleksi
     Route::get('/pengajuan-seleksi/form', function () {
         return Inertia::render('Mitra/PengajuanSeleksi/Form');
@@ -283,6 +287,81 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
     Route::get('/purchase-orders/{purchaseOrder}/form-penawaran', [PurchaseOrderController::class, 'generateFormPenawaran'])->name('purchase-orders.form-penawaran');
     Route::get('/purchase-orders/{purchaseOrder}/combined-pdf', [PurchaseOrderController::class, 'generateCombinedPdf'])->name('purchase-orders.combined-pdf');
     Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])->name('purchase-orders.kualitas-options');
+});
+
+//Route Dashboard Super Admin
+Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'role:super admin'])->group(function () {
+    // 1. Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'superAdminDashboard'])->name('dashboard');
+
+    // 2. Daftar User
+    Route::get('/daftar-user', function () {
+        $users = App\Models\User::orderBy('created_at', 'desc')->get();
+        
+        return Inertia::render('SuperAdmin/Users/Index', [
+            'users' => $users
+        ]);
+    })->name('daftar-user.index');
+
+    // 3. Daftar Mitra
+    Route::get('/daftar-mitra', function () {
+        $mitras = App\Models\DataMitra::with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return Inertia::render('SuperAdmin/Mitra/Index', [
+            'mitras' => $mitras
+        ]);
+    })->name('daftar-mitra.index');
+
+    // 4. Daftar Seleksi Mitra
+    Route::get('/seleksi-mitra', function () {
+        $seleksiMitras = App\Models\DataSeleksiMitra::with('mitra')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return Inertia::render('SuperAdmin/Seleksi/Index', [
+            'seleksiMitras' => $seleksiMitras
+        ]);
+    })->name('seleksi-mitra.index');
+
+    // Generate PDF Surat Penetapan Seleksi (Super Admin)
+    Route::get('/seleksi-mitra/{id}/surat-penetapan', [PdfGeneratorController::class, 'generateSuratPenetapan'])
+        ->name('seleksi-mitra.surat-penetapan');
+
+    // 5. Daftar Klasifikasi Mitra
+    Route::get('/klasifikasi-mitra', function () {
+        $klasifikasiMitras = App\Models\KlasifikasiMitra::with('mitra')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return Inertia::render('SuperAdmin/Klasifikasi/Index', [
+            'klasifikasiMitras' => $klasifikasiMitras
+        ]);
+    })->name('klasifikasi-mitra.index');
+
+    // Generate PDF Surat Penetapan Klasifikasi (Super Admin)
+    Route::get('/klasifikasi-mitra/{id}/surat-penetapan', [PdfGeneratorController::class, 'generateSuratPenetapanKlasifikasi'])
+        ->name('klasifikasi-mitra.surat-penetapan');
+
+    // Generate PDF Berita Acara Klasifikasi (Super Admin)
+    Route::get('/klasifikasi-mitra/{id}/berita-acara', [PdfGeneratorController::class, 'generateBeritaAcaraKlasifikasi'])
+        ->name('klasifikasi-mitra.berita-acara');
+
+    // 6. Daftar Hasil Seleksi Mitra
+    Route::get('/hasil-seleksi-mitra', function () {
+        $hasilSeleksiMitras = App\Models\HasilSeleksiMitra::with(['mitra', 'seleksiMitra'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return Inertia::render('SuperAdmin/HasilSeleksi/Index', [
+            'hasilSeleksiMitras' => $hasilSeleksiMitras
+        ]);
+    })->name('hasil-seleksi-mitra.index');
+
+    // Generate PDF Berita Acara Hasil Seleksi Mitra (Super Admin)
+    Route::get('/hasil-seleksi-mitra/{id}/berita-acara', [PdfGeneratorController::class, 'generateBeritaAcara'])
+        ->name('hasil-seleksi-mitra.berita-acara');
 });
 
 Route::middleware('auth')->group(function () {

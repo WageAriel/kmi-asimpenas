@@ -1,7 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 
@@ -90,7 +90,7 @@ const generatePdf = async () => {
     isGeneratingPdf.value = true;
     try {
         const response = await axios.get(
-            `/admin/hasil-seleksi-mitra/${selectedItemForPdf.value.id_hasil_seleksi_mitra}/berita-acara`,
+            `/super-admin/hasil-seleksi-mitra/${selectedItemForPdf.value.id_hasil_seleksi_mitra}/berita-acara`,
             {
                 params: { 
                     id_pelaksana: selectedPelaksana.value,
@@ -138,15 +138,15 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head title="Daftar Hasil Seleksi Mitra - ASIMPENAS" />
+    <Head title="Hasil Seleksi - Super Admin" />
 
-    <AdminLayout>
+    <SuperAdminLayout>
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
 
             <!-- Header -->
             <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">Daftar Hasil Seleksi Mitra</h2>
-                <p class="text-gray-600">Kelola klasifikasi mitra yang terdaftar di sistem.</p>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Hasil Seleksi</h2>
+                <p class="text-gray-600">Kelola hasil seleksi mitra yang terdaftar di sistem.</p>
             </div>
 
             <!-- Quick Actions-->
@@ -241,7 +241,7 @@ onMounted(() => {
                                     @click="viewDetail(item)"
                                     class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
                                 >
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                     Download
@@ -330,5 +330,5 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-    </AdminLayout>
+    </SuperAdminLayout>
 </template>

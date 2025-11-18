@@ -1,6 +1,6 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
 import { ref, computed } from 'vue';
 import axios from 'axios';
 
@@ -253,7 +253,7 @@ const generatePdf = async () => {
     isGeneratingPdf.value = true;
     try {
         const response = await axios.get(
-            `/admin/seleksi-mitra/${selectedItemForPdf.value.id_seleksi_mitra}/surat-penetapan`, // Tambahkan prefix /admin/
+            `/super-admin/seleksi-mitra/${selectedItemForPdf.value.id_seleksi_mitra}/surat-penetapan`,
             {
                 params: { id_karyawan: selectedKaryawan.value },
                 responseType: 'blob'
@@ -473,12 +473,48 @@ const exportData = () => {
     window.location.href = '/data-seleksi-mitra/export/data';
 };
 
+// Delete functionality
+const showDeleteModal = ref(false);
+const selectedItemToDelete = ref(null);
+const isDeleting = ref(false);
+const deleteError = ref(null);
+
+const openDeleteModal = (item) => {
+    selectedItemToDelete.value = item;
+    showDeleteModal.value = true;
+    deleteError.value = null;
+};
+
+const closeDeleteModal = () => {
+    showDeleteModal.value = false;
+    selectedItemToDelete.value = null;
+    deleteError.value = null;
+};
+
+const confirmDelete = async () => {
+    if (!selectedItemToDelete.value || isDeleting.value) return;
+    
+    isDeleting.value = true;
+    deleteError.value = null;
+    
+    try {
+        await axios.delete(`/data-seleksi-mitra/${selectedItemToDelete.value.id_seleksi_mitra}`);
+        
+        // Reload page after successful delete
+        window.location.reload();
+    } catch (error) {
+        console.error('Delete error:', error);
+        deleteError.value = error.response?.data?.message || 'Gagal menghapus data. Silakan coba lagi.';
+    } finally {
+        isDeleting.value = false;
+    }
+};
 </script>
 
 <template>
-    <Head title="Daftar Seleksi Mitra - ASIMPENAS" />
+    <Head title="Daftar Seleksi Mitra - Super Admin" />
 
-    <AdminLayout>
+    <SuperAdminLayout>
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8">
@@ -497,15 +533,6 @@ const exportData = () => {
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
                         <button
-                            @click="openImportModal"
-                            class="inline-flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors duration-200 font-medium shadow-sm"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                            Import Excel
-                        </button>
-                        <button
                             @click="exportData"
                             class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium shadow-sm"
                         >
@@ -516,7 +543,9 @@ const exportData = () => {
                         </button>
                     </div>
                 </div>
+                
             </div>
+            
 
             <!-- Search Bar -->
             <div class="mb-4">
@@ -571,8 +600,8 @@ const exportData = () => {
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Mesin Penyosoh</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Alat Pemisah Beras</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Status Seleksi</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Aksi</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Surat Penetapan</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -671,31 +700,32 @@ const exportData = () => {
                                 </span>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center gap-2">
+                                <div class="flex gap-2">
                                     <button
-                                        @click="lihatSeleksi(item)"
+                                        @click="showPdfDownloadModal(item)"
                                         class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
-                                        title="Lihat detail seleksi"
+                                        title="Download surat penetapan"
                                     >
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
-                                        Lihat
+                                        Download
                                     </button>
                                 </div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <button
-                                    @click="showPdfDownloadModal(item)"
-                                    class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
-                                    title="Download surat penetapan"
-                                >
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    Download
-                                </button>
+                                <div class="flex gap-2">
+                                    <button
+                                        @click="openDeleteModal(item)"
+                                        class="inline-flex items-center px-2 py-1 text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded transition-colors duration-200 text-xs"
+                                        title="Hapus data seleksi"
+                                    >
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        Hapus
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <tr v-if="filteredSeleksiMitras.length === 0">
@@ -741,12 +771,12 @@ const exportData = () => {
                         </div>
                     </div>
                     
-                    <!-- Form Seleksi - Hanya tampil jika belum Ada hasil validasi -->
-                    <template v-if="!hasilSeleksi && !loadingHasilSeleksi">
-                    <!-- Dokumen Perizinan -->
-                    <div class="border-b border-gray-200 pb-5">
-                        <h3 class="text-lg font-semibold mb-3">Dokumen Perizinan</h3>
-                        <div class="grid grid-cols-1 gap-4">
+                    <!-- Kesimpulan Kriteria - Hanya tampil jika belum ada hasil validasi -->
+                    <div v-if="!hasilSeleksi && !loadingHasilSeleksi && selectedItem.status_seleksi === 'pending'" class="border-t border-gray-200 pt-5 mt-5">
+                        <h3 class="text-lg font-semibold mb-4 text-blue-700">📊 Kesimpulan Setiap Kriteria</h3>
+                        <p class="text-sm text-gray-600 mb-4">Tentukan kesimpulan untuk setiap kategori berdasarkan validasi yang sudah dilakukan:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <!-- Surat Permohonan -->
                             <div class="grid grid-cols-1 md:grid-cols-3 items-center p-2 rounded-lg hover:bg-gray-50">
                                 <div>
@@ -1091,7 +1121,7 @@ const exportData = () => {
                     
                     <!-- Kesimpulan Kriteria - Hanya tampil jika belum ada hasil validasi -->
                     <div v-if="!hasilSeleksi && !loadingHasilSeleksi && selectedItem.status_seleksi === 'pending'" class="border-t border-gray-200 pt-5 mt-5">
-                        <h3 class="text-lg font-semibold mb-4 text-blue-700">📊 Kesimpulan Setiap Kriteria</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-blue-700">ðŸ“Š Kesimpulan Setiap Kriteria</h3>
                         <p class="text-sm text-gray-600 mb-4">Tentukan kesimpulan untuk setiap kategori berdasarkan validasi yang sudah dilakukan:</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -1104,8 +1134,8 @@ const exportData = () => {
                                     v-model="kesimpulanDokumen"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                 >
-                                    <option value="Lolos">✓ Lolos</option>
-                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
+                                    <option value="Lolos">âœ“ Lolos</option>
+                                    <option value="Tidak Lolos">âœ— Tidak Lolos</option>
                                 </select>
                                 <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanDokumen }}</p>
                             </div>
@@ -1120,8 +1150,8 @@ const exportData = () => {
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                     @change="console.log('Pengeringan changed to:', kesimpulanSaranaPengeringan)"
                                 >
-                                    <option value="Lolos">✓ Lolos</option>
-                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
+                                    <option value="Lolos">âœ“ Lolos</option>
+                                    <option value="Tidak Lolos">âœ— Tidak Lolos</option>
                                 </select>
                                 <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanSaranaPengeringan }}</p>
                             </div>
@@ -1135,8 +1165,8 @@ const exportData = () => {
                                     v-model="kesimpulanSaranaPenggilingan"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                 >
-                                    <option value="Lolos">✓ Lolos</option>
-                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
+                                    <option value="Lolos">âœ“ Lolos</option>
+                                    <option value="Tidak Lolos">âœ— Tidak Lolos</option>
                                 </select>
                                 <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanSaranaPenggilingan }}</p>
                             </div>
@@ -1145,15 +1175,15 @@ const exportData = () => {
                         <!-- Kesimpulan Akhir -->
                         <div class="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-5 mb-4">
                             <label class="block text-base font-bold text-purple-900 mb-3">
-                                🏆 Kesimpulan Akhir Validasi
+                                ðŸ† Kesimpulan Akhir Validasi
                             </label>
                             <select 
                                 v-model="kesimpulanAkhir"
                                 class="w-full px-4 py-3 text-lg font-semibold border-2 border-purple-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
                                 :class="kesimpulanAkhir === 'Lolos' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'"
                             >
-                                <option value="Lolos">✓ LOLOS</option>
-                                <option value="Tidak Lolos">✗ TIDAK LOLOS</option>
+                                <option value="Lolos">âœ“ LOLOS</option>
+                                <option value="Tidak Lolos">âœ— TIDAK LOLOS</option>
                             </select>
                             <p class="text-xs font-semibold text-purple-700 mt-2">Terpilih: {{ kesimpulanAkhir }}</p>
                             <p class="text-xs text-gray-600 mt-1">
@@ -1161,7 +1191,7 @@ const exportData = () => {
                             </p>
                         </div>
                     </div>
-                    </template>
+                   
                     <!-- End Form Seleksi -->
                     
                     <!-- Status messages -->
@@ -1185,7 +1215,7 @@ const exportData = () => {
                     </div>
                     
                     <div v-if="!loadingHasilSeleksi && hasilSeleksi" class="border-t border-gray-200 pt-5">
-                        <h3 class="text-lg font-semibold mb-4 text-green-700">📋 Hasil Validasi Seleksi</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-green-700">ðŸ“‹ Hasil Validasi Seleksi</h3>
                         
                         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg mb-4">
                             <div class="flex items-center justify-between">
@@ -1193,7 +1223,7 @@ const exportData = () => {
                                     <p class="text-sm text-gray-600">Kesimpulan Akhir</p>
                                     <span :class="['inline-flex items-center px-3 py-1 rounded-full text-sm font-bold mt-1', 
                                         hasilSeleksi.kesimpulan_akhir === 'Lolos' ? 'bg-green-500 text-white' : 'bg-red-500 text-white']">
-                                        {{ hasilSeleksi.kesimpulan_akhir === 'Lolos' ? '✓ LOLOS' : '✗ TIDAK LOLOS' }}
+                                        {{ hasilSeleksi.kesimpulan_akhir === 'Lolos' ? 'âœ“ LOLOS' : 'âœ— TIDAK LOLOS' }}
                                     </span>
                                 </div>
                                 <div class="text-right">
@@ -1233,7 +1263,7 @@ const exportData = () => {
                             <!-- Dokumen Ada & Valid (Lolos) -->
                             <div v-if="hasilSeleksi.dokumen_Ada_valid && hasilSeleksi.dokumen_Ada_valid.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Dokumen Lolos</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">âœ“ Dokumen Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_Ada_valid" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1248,7 +1278,7 @@ const exportData = () => {
                             <!-- Dokumen Ada Tidak Valid (Ada tapi Tidak Lolos) -->
                             <div v-if="hasilSeleksi.dokumen_ada_tidak_valid && hasilSeleksi.dokumen_ada_tidak_valid.length > 0" 
                                  class="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-orange-800 mb-2">⚠ Dokumen Ada Tidak Valid</p>
+                                <p class="text-sm font-semibold text-orange-800 mb-2">âš  Dokumen Ada Tidak Valid</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_ada_tidak_valid" :key="'ada-tidak-valid-' + index" 
                                         class="text-xs text-orange-700 flex items-center">
@@ -1263,7 +1293,7 @@ const exportData = () => {
                             <!-- Dokumen Tidak Ada -->
                             <div v-if="hasilSeleksi.dokumen_tidak_ada && hasilSeleksi.dokumen_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Dokumen Tidak Ada</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">âœ— Dokumen Tidak Ada</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1278,7 +1308,7 @@ const exportData = () => {
                             <!-- Sarana Pengeringan Lolos -->
                             <div v-if="hasilSeleksi.sarana_pengeringan_Ada && hasilSeleksi.sarana_pengeringan_Ada.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Pengeringan Lolos</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">âœ“ Sarana Pengeringan Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_Ada" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1293,7 +1323,7 @@ const exportData = () => {
                             <!-- Sarana Pengeringan Tidak Lolos -->
                             <div v-if="hasilSeleksi.sarana_pengeringan_tidak_ada && hasilSeleksi.sarana_pengeringan_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Pengeringan Tidak Lolos</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">âœ— Sarana Pengeringan Tidak Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1308,7 +1338,7 @@ const exportData = () => {
                             <!-- Sarana Penggilingan Lolos -->
                             <div v-if="hasilSeleksi.sarana_penggilingan_Ada && hasilSeleksi.sarana_penggilingan_Ada.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Penggilingan Lolos</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">âœ“ Sarana Penggilingan Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_Ada" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1323,7 +1353,7 @@ const exportData = () => {
                             <!-- Sarana Penggilingan Tidak Lolos -->
                             <div v-if="hasilSeleksi.sarana_penggilingan_tidak_ada && hasilSeleksi.sarana_penggilingan_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Penggilingan Tidak Lolos</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">âœ— Sarana Penggilingan Tidak Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1417,7 +1447,7 @@ const exportData = () => {
                                 </svg>
                                 Menyimpan...
                             </span>
-                            <span v-else>💾 Simpan Hasil Validasi</span>
+                            <span v-else>ðŸ’¾ Simpan Hasil Validasi</span>
                         </button>
                         
                         <!-- Info jika sudah divalidasi -->
@@ -1436,98 +1466,7 @@ const exportData = () => {
             </div>
         </div>
 
-        <!-- Modal Import Excel -->
-        <div v-if="showImportModal" @click="closeImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
-                <button @click="closeImportModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-                
-                <h2 class="text-xl font-bold mb-6 text-blue-700">Import Data Seleksi Mitra dari Excel</h2>
-                
-                <div class="space-y-4">
-                    <!-- Info Box -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="flex items-start">
-                            <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                            </svg>
-                            <div class="text-sm text-blue-800">
-                                <p class="font-semibold mb-1">Panduan Import:</p>
-                                <ul class="list-disc list-inside space-y-1 ml-2">
-                                    <li>File harus berformat Excel (.xlsx, .xls) atau CSV</li>
-                                    <li>Ukuran file maksimal 5MB</li>
-                                    <li>Kolom <strong>Nama Perusahaan</strong> akan digunakan untuk mencari ID mitra</li>
-                                    <li>Pastikan nama perusahaan sudah terdaftar di database</li>
-                                    <li>Nilai dokumen/sarana: "1. Ada" atau "2. Tidak Ada"</li>
-                                    <li>Format tanggal: DD/MM/YYYY atau gunakan format tanggal Excel</li>
-                                    <li>Untuk MB KTP bisa diisi "Seumur Hidup"</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Download Template Button -->
-                    <div class="flex justify-center">
-                        <button
-                            @click="downloadTemplate"
-                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium text-sm shadow-sm"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Download Template Excel
-                        </button>
-                    </div>
-
-                    <!-- File Upload -->
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                        <input
-                            type="file"
-                            @change="handleFileChange"
-                            accept=".xlsx,.xls,.csv"
-                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                        />
-                        <p v-if="selectedFile" class="mt-2 text-sm text-green-600">
-                            File dipilih: {{ selectedFile.name }}
-                        </p>
-                    </div>
-
-                    <!-- Error Message -->
-                    <div v-if="uploadError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm whitespace-pre-line">
-                        {{ uploadError }}
-                    </div>
-
-                    <!-- Success Message -->
-                    <div v-if="uploadSuccess" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-                        {{ uploadSuccess }}
-                    </div>
-                </div>
-                
-                <div class="flex justify-end gap-3 mt-6">
-                    <button
-                        @click="closeImportModal"
-                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium text-sm"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        @click="uploadFile"
-                        :disabled="!selectedFile || isUploading"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
-                    >
-                        <svg v-if="isUploading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span v-if="isUploading">Mengupload...</span>
-                        <span v-else>Upload & Import</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+        
 
         <!-- Add PDF Modal -->
         <div v-if="showPdfModal" @click="showPdfModal = false" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -1578,5 +1517,59 @@ const exportData = () => {
                 </div>
             </div>
         </div>
-    </AdminLayout>
+
+        <!-- Delete Confirmation Modal -->
+        <div v-if="showDeleteModal" @click="closeDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+                <button @click="closeDeleteModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+
+                <h2 class="text-xl font-bold mb-2 text-center text-gray-900">Konfirmasi Hapus Data</h2>
+                <p class="text-sm text-gray-600 text-center mb-6">
+                    Apakah Anda yakin ingin menghapus data seleksi mitra untuk 
+                    <strong class="text-gray-900">{{ selectedItemToDelete?.mitra?.nama_perusahaan }}</strong>?
+                    <br><br>
+                    <span class="text-red-600 font-semibold">Tindakan ini tidak dapat dibatalkan!</span>
+                </p>
+
+                <!-- Error Message -->
+                <div v-if="deleteError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
+                    {{ deleteError }}
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button
+                        @click="closeDeleteModal"
+                        :disabled="isDeleting"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="confirmDelete"
+                        :disabled="isDeleting"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
+                    >
+                        <svg v-if="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        {{ isDeleting ? 'Menghapus...' : 'Ya, Hapus Data' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </SuperAdminLayout>
 </template>

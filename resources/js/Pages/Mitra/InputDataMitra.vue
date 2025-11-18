@@ -281,6 +281,47 @@ const generateSuratPernyataanNonPkpPdf = async () => {
         isSubmitting.value = false;
     }
 };
+
+const downloadTemplateSuratKuasa = () => {
+    const link = document.createElement('a');
+    link.href = '/storage/templates/SURAT KUASA.docx';
+    link.setAttribute('download', 'Template-Surat-Kuasa.docx');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    
+    showNotification('success', 'Berhasil!', 'Template Surat Kuasa berhasil diunduh');
+};
+
+const generatePaktaIntegritasPdf = async () => {
+    if (!mitraId.value) {
+        errorMessage.value = "Silakan simpan data mitra terlebih dahulu sebelum generate PDF";
+        return;
+    }
+
+    isSubmitting.value = true;
+    try {
+        const response = await axios.get(`/mitra/data-mitra/${mitraId.value}/pakta-integritas`, {
+            responseType: 'blob'
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Pakta-Integritas-${form.value.nama_perusahaan}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        showNotification('success', 'Berhasil!', 'PDF Pakta Integritas berhasil diunduh');
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showNotification('error', 'Gagal!', 'Terjadi kesalahan saat generate PDF');
+    } finally {
+        isSubmitting.value = false;
+    }
+};
 </script>
 
 <template>
@@ -835,38 +876,69 @@ const generateSuratPernyataanNonPkpPdf = async () => {
         </div>
         
         <!-- Submit Button -->
-        <div class="flex justify-between pt-6 border-t border-gray-200">
-          <button 
-              type="button" 
-              @click="generateSuratPermohonanPdf"
-              :disabled="!mitraId || isSubmitting"
-              :class="[
-                'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
-                mitraId && !isSubmitting
-                  ? 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              ]"
-          >
-              <span v-if="isSubmitting">Generating...</span>
-              <span v-else-if="!mitraId">Simpan Data Dulu</span>
-              <span v-else>Surat Permohonan</span>
-          </button>
+        <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+          <div class="flex gap-3">
+            <button 
+                type="button" 
+                @click="generateSuratPermohonanPdf"
+                :disabled="!mitraId || isSubmitting"
+                :class="[
+                  'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                  mitraId && !isSubmitting
+                    ? 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'
+                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                ]"
+            >
+                <span v-if="isSubmitting">Generating...</span>
+                <span v-else-if="!mitraId">Simpan Data Dulu</span>
+                <span v-else>Surat Permohonan</span>
+            </button>
 
-          <button 
-              type="button" 
-              @click="generateSuratPernyataanNonPkpPdf"
-              :disabled="!mitraId || isSubmitting"
-              :class="[
-                'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
-                mitraId && !isSubmitting
-                  ? 'bg-purple-600 text-white hover:bg-purple-700 cursor-pointer'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              ]"
-          >
-              <span v-if="isSubmitting">Generating...</span>
-              <span v-else-if="!mitraId">Simpan Data Dulu</span>
-              <span v-else>Surat Non PKP</span>
-          </button>
+            <button 
+                type="button" 
+                @click="generateSuratPernyataanNonPkpPdf"
+                :disabled="!mitraId || isSubmitting"
+                :class="[
+                  'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                  mitraId && !isSubmitting
+                    ? 'bg-purple-600 text-white hover:bg-purple-700 cursor-pointer'
+                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                ]"
+            >
+                <span v-if="isSubmitting">Generating...</span>
+                <span v-else-if="!mitraId">Simpan Data Dulu</span>
+                <span v-else>Surat Non PKP</span>
+            </button>
+
+            <button 
+                type="button" 
+                @click="generatePaktaIntegritasPdf"
+                :disabled="!mitraId || isSubmitting"
+                :class="[
+                  'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                  mitraId && !isSubmitting
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer'
+                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                ]"
+            >
+                <span v-if="isSubmitting">Generating...</span>
+                <span v-else-if="!mitraId">Simpan Data Dulu</span>
+                <span v-else>Pakta Integritas</span>
+            </button>
+
+            <button 
+                type="button" 
+                @click="downloadTemplateSuratKuasa"
+                class="px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors bg-orange-600 text-white hover:bg-orange-700 cursor-pointer"
+            >
+                <span class="flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  Template Surat Kuasa
+                </span>
+            </button>
+          </div>
 
           <button 
             type="submit" 

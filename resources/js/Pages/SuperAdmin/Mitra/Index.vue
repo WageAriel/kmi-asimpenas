@@ -1,7 +1,7 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
 
 // Accept data from the controller as props
 const props = defineProps({
@@ -323,9 +323,9 @@ const formatDate = (dateString) => {
 </script>
 
 <template>
-    <Head title="Daftar Mitra - ASIMPENAS" />
+    <Head title="Daftar Mitra - Super Admin" />
 
-    <AdminLayout>
+    <SuperAdminLayout>
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8">
@@ -342,26 +342,7 @@ const formatDate = (dateString) => {
                             Berikut adalah daftar mitra yang terdaftar di sistem ASIMPENAS.
                         </p>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <button
-                            @click="exportData"
-                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-white transition-colors"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            Export Excel
-                        </button>
-                        <button
-                            @click="openImportModal"
-                            class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white transition-colors"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            Import Excel
-                        </button>
-                    </div>
+                    
                 </div>
             </div>
 
@@ -407,7 +388,7 @@ const formatDate = (dateString) => {
                                 >
                                     Nama Perusahaan
                                     <span v-if="sortBy === 'nama_perusahaan'" class="ml-1">
-                                        {{ sortOrder === 'desc' ? '▼' : '▲' }}
+                                        {{ sortOrder === 'desc' ? 'â–¼' : 'â–²' }}
                                     </span>
                                 </th>
                                 <th 
@@ -416,7 +397,7 @@ const formatDate = (dateString) => {
                                 >
                                     Badan Hukum
                                     <span v-if="sortBy === 'badan_hukum'" class="ml-1">
-                                        {{ sortOrder === 'desc' ? '▼' : '▲' }}
+                                        {{ sortOrder === 'desc' ? 'â–¼' : 'â–²' }}
                                     </span>
                                 </th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Alamat</th>
@@ -429,7 +410,7 @@ const formatDate = (dateString) => {
                                 >
                                     Status
                                     <span v-if="sortBy === 'status'" class="ml-1">
-                                        {{ sortOrder === 'desc' ? '▼' : '▲' }}
+                                        {{ sortOrder === 'desc' ? 'â–¼' : 'â–²' }}
                                     </span>
                                 </th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
@@ -460,15 +441,7 @@ const formatDate = (dateString) => {
                                             </svg>
                                             Lihat
                                         </button>
-                                        <button
-                                            @click="openEditModal(mitra)"
-                                            class="inline-flex items-center px-2 py-1 text-green-600 hover:text-white hover:bg-green-600 border border-green-600 rounded transition-colors duration-200 text-xs"
-                                        >
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                            Edit
-                                        </button>
+                                    
                                     </div>
                                 </td>
                             </tr>
@@ -696,10 +669,10 @@ const formatDate = (dateString) => {
                             <div class="flex-1">
                                 <h4 class="font-semibold text-blue-900 mb-1">Panduan Import</h4>
                                 <ul class="text-sm text-blue-800 space-y-1">
-                                    <li>• File harus berformat Excel (.xlsx, .xls) atau CSV</li>
-                                    <li>• Ukuran file maksimal 5MB</li>
-                                    <li>• Download template untuk melihat format yang benar</li>
-                                    <li>• Pastikan kolom sesuai dengan template</li>
+                                    <li>â€¢ File harus berformat Excel (.xlsx, .xls) atau CSV</li>
+                                    <li>â€¢ Ukuran file maksimal 5MB</li>
+                                    <li>â€¢ Download template untuk melihat format yang benar</li>
+                                    <li>â€¢ Pastikan kolom sesuai dengan template</li>
                                 </ul>
                             </div>
                         </div>
@@ -956,5 +929,5 @@ const formatDate = (dateString) => {
                 </form>
             </div>
         </div>
-    </AdminLayout>
+    </SuperAdminLayout>
 </template>

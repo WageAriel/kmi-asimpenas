@@ -6,6 +6,7 @@ use App\Http\Controllers\KlasifikasiMitraController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -74,5 +75,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/klasifikasi-mitra/export/template', [KlasifikasiMitraController::class, 'downloadTemplate'])->name('klasifikasi-mitra.template');
 
     Route::get('/karyawan', [KaryawanController::class, 'index'])->name('karyawan.index');
+    
+    // User Management (Super Admin only)
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 

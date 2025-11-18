@@ -88,7 +88,8 @@
         .signature {
             text-align: center;
             margin-top: 40px;
-            width: 100%;
+            margin-left: auto;
+            width: 40%;
         }
 
         .signature-space {

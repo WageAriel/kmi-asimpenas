@@ -709,4 +709,30 @@ class PdfGeneratorController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function generatePaktaIntegritas($id)
+    {
+        try {
+            $mitra = DataMitra::where('id_mitra', $id)
+                            ->where('user_id', auth()->id())
+                            ->firstOrFail();
+            
+            $data = [
+                'tanggal' => Carbon::now()->locale('id')->isoFormat('D MMMM Y'),
+                'tahun' => Carbon::now()->year,
+                'nama_cp' => $mitra->nama_cp,
+                'nama_perusahaan' => $mitra->nama_perusahaan,
+                'alamat_perusahaan' => $mitra->alamat_perusahaan
+            ];
+
+            $pdf = PDF::loadView('pdf.pakta-integritas', $data);
+            $pdf->setPaper('A4', 'portrait');
+            
+            return $pdf->download('Pakta-Integritas-' . str_replace(' ', '-', $mitra->nama_perusahaan) . '.pdf');
+            
+        } catch (\Exception $e) {
+            Log::error('Pakta Integritas PDF Generation Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

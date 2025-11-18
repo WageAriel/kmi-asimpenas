@@ -6,6 +6,7 @@ use App\Models\DataMitra;
 use App\Models\DataSeleksiMitra;
 use App\Models\KlasifikasiMitra;
 use App\Models\HasilSeleksiMitra;
+use App\Models\User;
 use App\Services\ActivityAggregatorService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -45,6 +46,46 @@ class DashboardController extends Controller
             });
 
         return Inertia::render('Admin/Dashboard', [
+            'stats' => $stats,
+            'recentActivities' => $recentActivities,
+            'latestSubmissions' => $latestSubmissions,
+        ]);
+    }
+
+    /**
+     * Display super admin dashboard with comprehensive statistics
+     */
+    public function superAdminDashboard()
+    {
+        // Get comprehensive statistics
+        $stats = [
+            'total_users' => User::count(),
+            'total_admin' => User::where('role', 'admin')->count(),
+            'total_mitra' => DataMitra::count(),
+            'total_seleksi' => DataSeleksiMitra::count(),
+            'total_klasifikasi' => KlasifikasiMitra::count(),
+            'pending_seleksi' => DataSeleksiMitra::where('status_seleksi', 'pending')->count(),
+        ];
+
+        // Get recent activities (last 10)
+        $recentActivities = ActivityAggregatorService::getRecentActivities(10);
+
+        // Get latest submissions (last 10)
+        $latestSubmissions = DataSeleksiMitra::with('mitra')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($seleksi) {
+                return [
+                    'id' => $seleksi->id_seleksi_mitra,
+                    'mitra_name' => $seleksi->mitra->nama_perusahaan ?? 'N/A',
+                    'type' => 'Pengajuan Seleksi',
+                    'status' => $seleksi->status_seleksi ?? 'pending',
+                    'created_at' => $seleksi->created_at->diffForHumans(),
+                ];
+            });
+
+        return Inertia::render('SuperAdmin/Dashboard', [
             'stats' => $stats,
             'recentActivities' => $recentActivities,
             'latestSubmissions' => $latestSubmissions,

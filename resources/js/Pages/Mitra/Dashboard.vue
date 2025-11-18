@@ -269,7 +269,7 @@ const getActivityIcon = (activityType) => {
     return icons[activityType] || 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
 };
 
-// Data dummy untuk testing
+// Data dummy untuk testing (tidak digunakan lagi karena menggunakan data real)
 const statistik = ref({
     pengajuan_total: 3,
     pengajuan_approved: 1,
@@ -503,7 +503,7 @@ const goToAction = (action) => {
 
                 <!-- Quick Stats -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Total Pengajuan -->
+                    <!-- Total Pengajuan Seleksi -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -513,15 +513,15 @@ const goToAction = (action) => {
                                     </svg>
                                 </div>
                             </div>
-                            <div class="ml-5">
-                                <h3 class="text-sm font-medium text-gray-900 mb-1">Total Pengajuan Seleksi</h3>
+                            <div class="ml-5 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900 mb-1 whitespace-nowrap">Total Pengajuan Seleksi</h3>
                                 <p class="text-2xl font-semibold text-blue-600">{{ selections.length }}</p>
                                 <p class="text-xs text-gray-500 mt-1">Seluruh periode</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Pengajuan Disetujui -->
+                    <!-- Status Seleksi Terbaru -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -531,9 +531,9 @@ const goToAction = (action) => {
                                     </svg>
                                 </div>
                             </div>
-                            <div class="ml-5">
-                                <h3 class="text-sm font-medium text-gray-900 mb-1">Status Seleksi Terbaru</h3>
-                                <p class="text-m font-semibold text-green-600">{{ latestSelectionStatusText }}</p>
+                            <div class="ml-5 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900 mb-1 whitespace-nowrap">Status Seleksi Terbaru</h3>
+                                <p class="text-2xl font-semibold text-green-600">{{ latestSelectionStatusText }}</p>
                                 <p class="text-xs text-gray-500 mt-1">
                                     <template v-if="selections.length > 0">
                                         {{ pendingCount }} pending
@@ -556,28 +556,29 @@ const goToAction = (action) => {
                                     </svg>
                                 </div>
                             </div>
-                            <div class="ml-5">
-                                <h3 class="text-sm font-medium text-gray-900 mb-1">Hasil Klasifikasi</h3>
+                            <div class="ml-5 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900 mb-1 whitespace-nowrap">Hasil Klasifikasi</h3>
                                 <p class="text-2xl font-semibold text-orange-600">{{ latestKlasifikasiResult }}</p>
                                 <p class="text-xs text-gray-500 mt-1">{{ klasifikasiSubtitle }}</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- PO Aktif -->
+                    <!-- Total Pengajuan Klasifikasi -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
                                 <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
                                     <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
+                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
                                     </svg>
                                 </div>
                             </div>
-                            <div class="ml-5">
-                                <h3 class="text-sm font-medium text-gray-900 mb-1">PO Aktif</h3>
-                                <p class="text-2xl font-semibold text-purple-600">{{ statistik.po_aktif }}</p>
-                                <p class="text-xs text-gray-500 mt-1">Purchase Order</p>
+                            <div class="ml-5 flex-1">
+                                <h3 class="text-sm font-medium text-gray-900 mb-1 whitespace-nowrap">Total Pengajuan Klasifikasi</h3>
+                                <p class="text-2xl font-semibold text-purple-600">{{ klasifikasis.length }}</p>
+                                <p class="text-xs text-gray-500 mt-1">Seluruh periode</p>
                             </div>
                         </div>
                     </div>

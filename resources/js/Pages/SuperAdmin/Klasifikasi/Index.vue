@@ -1,6 +1,6 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
@@ -44,7 +44,7 @@ const interpretClassification = (field, value) => {
     if (!value) return '-';
     
     // Jika value sudah dalam format deskriptif baru (mengandung titik), langsung return
-    // Format baru: '1. Tidak Ada', '2. Ada | ≤ 20', '3. Ada | > 20'
+    // Format baru: '1. Tidak Ada', '2. Ada | â‰¤ 20', '3. Ada | > 20'
     if (typeof value === 'string' && value.includes('.')) {
         return value;
     }
@@ -53,7 +53,7 @@ const interpretClassification = (field, value) => {
     const legacyMap = {
         mesin_pembersih_gabah: {
             3: '3. Ada | > 20',
-            2: '2. Ada | ≤ 20',
+            2: '2. Ada | â‰¤ 20',
             1: '1. Tidak Ada',
         },
         lantai_jemur: {
@@ -63,13 +63,13 @@ const interpretClassification = (field, value) => {
         },
         mesin_pengering: {
             3: '3. Ada | > 20',
-            2: '2. Ada | ≤ 20',
+            2: '2. Ada | â‰¤ 20',
             1: '1. Tidak ada',
         },
         alat_pengering_lainnya: {
             3: '3. Tidak Disyaratkan',
             2: '2. Tidak Disyaratkan',
-            1: '1. Ada | ≤ 1',
+            1: '1. Ada | â‰¤ 1',
         },
         mesin_pembersih_awal: {
             3: '3. Ada | > 3',
@@ -99,12 +99,12 @@ const interpretClassification = (field, value) => {
         mesin_penyosoh: {
             3: '3. Ada | > 3 | 2',
             2: '2. Ada | 1 s/d 3 | 1',
-            1: '1. Ada | ≤ 1 | 1',
+            1: '1. Ada | â‰¤ 1 | 1',
         },
         mesin_pengkabut: {
             3: '3. Ada | > 3 | 2',
             2: '2. Ada | 1 s/d 3 | 1',
-            1: '1. Ada | ≤ 1 | 1',
+            1: '1. Ada | â‰¤ 1 | 1',
         },
         mesin_pemesah_menir: {
             3: '3. Ada | > 3',
@@ -119,7 +119,7 @@ const interpretClassification = (field, value) => {
         mesin_pemisah_berdasarkan_ukuran: {
             3: '3. Ada | > 3',
             2: '2. Ada | 1 s/d 3',
-            1: '1. Ada | ≤ 1',
+            1: '1. Ada | â‰¤ 1',
         },
         mesin_pemisah_berdasarkan_warna: {
             3: '3. Ada | > 3',
@@ -128,7 +128,7 @@ const interpretClassification = (field, value) => {
         },
         tangki_penyimpanan: {
             3: '3. Ada | > 10',
-            2: '2. Ada | ≤ 10',
+            2: '2. Ada | â‰¤ 10',
             1: '1. Tidak ada',
         },
         mesin_pengemas: {
@@ -484,7 +484,7 @@ const generatePdf = async () => {
     isGeneratingPdf.value = true;
     try {
         const response = await axios.get(
-            `/admin/klasifikasi-mitra/${selectedItemForPdf.value.id_klasifikasi_mitra}/surat-penetapan`,
+            `/super-admin/klasifikasi-mitra/${selectedItemForPdf.value.id_klasifikasi_mitra}/surat-penetapan`,
             {
                 params: { id_karyawan: selectedKaryawan.value },
                 responseType: 'blob'
@@ -532,7 +532,7 @@ const generateBaPdf = async () => {
     isGeneratingBaPdf.value = true;
     try {
         const response = await axios.get(
-            `/admin/klasifikasi-mitra/${selectedItemForBaPdf.value.id_klasifikasi_mitra}/berita-acara`,
+            `/super-admin/klasifikasi-mitra/${selectedItemForBaPdf.value.id_klasifikasi_mitra}/berita-acara`,
             {
                 params: { 
                     id_pelaksana: selectedPelaksana.value,
@@ -565,9 +565,9 @@ const generateBaPdf = async () => {
 </script>
 
 <template>
-    <Head title="Daftar Klasifikasi Mitra - ASIMPENAS" />
+    <Head title="Daftar Klasifikasi Mitra - Super Admin" />
 
-    <AdminLayout>
+    <SuperAdminLayout>
         <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8">
@@ -585,15 +585,6 @@ const generateBaPdf = async () => {
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
-                        <button
-                            @click="openImportModal"
-                            class="inline-flex items-center px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition-colors duration-200 font-medium shadow-sm"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                            Import Excel
-                        </button>
                         <button
                             @click="exportData"
                             class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium shadow-sm"
@@ -672,26 +663,18 @@ const generateBaPdf = async () => {
                                             </svg>
                                             Lihat
                                         </button>
-                                        <button
-                                            @click="openDeleteModal(item)"
-                                            class="inline-flex items-center px-2 py-1 text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded transition-colors duration-200 text-xs"
-                                        >
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
-                                            Hapus
-                                        </button>
+                                        
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <button
                                         @click="showBaPdfDownloadModal(item)"
                                         class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
-                                >
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    Download
+                                    >
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Download
                                     </button>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
@@ -884,67 +867,7 @@ const generateBaPdf = async () => {
                     <!-- Action Buttons -->
                     <div class="flex justify-between items-center">
                         <!-- Dropdown Button untuk Verifikasi Klasifikasi -->
-                        <div class="relative" id="classification-dropdown">
-                            <button 
-                                @click="toggleDropdown"
-                                :disabled="isUpdating || selectedKlasifikasi.hasil_klasifikasi"
-                                :class="[
-                                    'inline-flex items-center px-4 py-2 rounded-lg font-medium text-sm transition-colors',
-                                    isUpdating || selectedKlasifikasi.hasil_klasifikasi
-                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                        : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500'
-                                ]"
-                            >
-                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                </svg>
-                                <span v-if="isUpdating">Memproses...</span>
-                                <span v-else-if="selectedKlasifikasi.hasil_klasifikasi">
-                                    Sudah Diverifikasi (Kelas {{ selectedKlasifikasi.hasil_klasifikasi }})
-                                </span>
-                                <span v-else>Verifikasi Klasifikasi</span>
-                                <svg class="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                                </svg>
-                            </button>
-                            
-                            <!-- Dropdown Menu -->
-                            <div 
-                                v-if="showDropdown && !selectedKlasifikasi.hasil_klasifikasi"
-                                class="absolute left-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10"
-                            >
-                                <button
-                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'A')"
-                                    class="w-full text-left px-4 py-2 text-sm hover:bg-green-50 flex items-center transition-colors"
-                                    :disabled="isUpdating"
-                                >
-                                    <span class="w-6 h-6 rounded-full bg-green-100 text-green-800 flex items-center justify-center mr-3 font-bold text-xs">
-                                        A
-                                    </span>
-                                    <span class="text-gray-700">Kelas A (Terbaik)</span>
-                                </button>
-                                <button
-                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'B')"
-                                    class="w-full text-left px-4 py-2 text-sm hover:bg-blue-50 flex items-center transition-colors"
-                                    :disabled="isUpdating"
-                                >
-                                    <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center mr-3 font-bold text-xs">
-                                        B
-                                    </span>
-                                    <span class="text-gray-700">Kelas B (Menengah)</span>
-                                </button>
-                                <button
-                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'C')"
-                                    class="w-full text-left px-4 py-2 text-sm hover:bg-yellow-50 flex items-center transition-colors"
-                                    :disabled="isUpdating"
-                                >
-                                    <span class="w-6 h-6 rounded-full bg-yellow-100 text-yellow-800 flex items-center justify-center mr-3 font-bold text-xs">
-                                        C
-                                    </span>
-                                    <span class="text-gray-700">Kelas C (Standar)</span>
-                                </button>
-                            </div>
-                        </div>
+                        
                         
                         <!-- Tombol Tutup -->
                         <button 
@@ -958,98 +881,7 @@ const generateBaPdf = async () => {
             </div>
         </div>
 
-        <!-- Modal Import Excel -->
-        <div v-if="showImportModal" @click="closeImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-3xl w-full p-6 relative">
-                <button @click="closeImportModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-                
-                <h2 class="text-xl font-bold mb-6 text-green-700">Import Data Klasifikasi Mitra dari Excel</h2>
-                
-                <div class="space-y-4">
-                    <!-- Info Box -->
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div class="flex items-start">
-                            <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                            </svg>
-                            <div class="text-sm text-green-800">
-                                <p class="font-semibold mb-1">Panduan Import:</p>
-                                <ul class="list-disc list-inside space-y-1 ml-2">
-                                    <li>File harus berformat Excel (.xlsx, .xls) atau CSV</li>
-                                    <li>Ukuran file maksimal 5MB</li>
-                                    <li>Kolom <strong>Nama Perusahaan</strong> akan digunakan untuk mencari ID mitra</li>
-                                    <li>Pastikan nama perusahaan sudah terdaftar di database</li>
-                                    <li>Hasil klasifikasi (A, B, C) akan diset oleh admin melalui interface</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
 
-                
-
-                    <!-- Download Template Button -->
-                    <div class="flex justify-center">
-                        <button
-                            @click="downloadTemplate"
-                            class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium text-sm shadow-sm"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Download Template Excel
-                        </button>
-                    </div>
-
-                    <!-- File Upload -->
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                        <input
-                            type="file"
-                            @change="handleFileChange"
-                            accept=".xlsx,.xls,.csv"
-                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                        />
-                        <p v-if="selectedFile" class="mt-2 text-sm text-green-600">
-                            File dipilih: {{ selectedFile.name }}
-                        </p>
-                    </div>
-
-                    <!-- Error Message -->
-                    <div v-if="uploadError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm whitespace-pre-line">
-                        {{ uploadError }}
-                    </div>
-
-                    <!-- Success Message -->
-                    <div v-if="uploadSuccess" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-                        {{ uploadSuccess }}
-                    </div>
-                </div>
-                
-                <div class="flex justify-end gap-3 mt-6">
-                    <button
-                        @click="closeImportModal"
-                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium text-sm"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        @click="uploadFile"
-                        :disabled="!selectedFile || isUploading"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
-                    >
-                        <svg v-if="isUploading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span v-if="isUploading">Mengupload...</span>
-                        <span v-else>Upload & Import</span>
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <!-- Add PDF Modal -->
         <div v-if="showPdfModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -1171,57 +1003,6 @@ const generateBaPdf = async () => {
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div v-if="showDeleteModal" @click="closeDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
-                <button @click="closeDeleteModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-
-                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                </div>
-
-                <h2 class="text-xl font-bold mb-2 text-center text-gray-900">Konfirmasi Hapus Data</h2>
-                <p class="text-sm text-gray-600 text-center mb-6">
-                    Apakah Anda yakin ingin menghapus data klasifikasi mitra untuk 
-                    <strong class="text-gray-900">{{ selectedItemToDelete?.mitra?.nama_perusahaan }}</strong>?
-                    <br><br>
-                    <span class="text-red-600 font-semibold">Tindakan ini tidak dapat dibatalkan!</span>
-                </p>
-
-                <!-- Error Message -->
-                <div v-if="deleteError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
-                    {{ deleteError }}
-                </div>
-
-                <div class="flex justify-end gap-3">
-                    <button
-                        @click="closeDeleteModal"
-                        :disabled="isDeleting"
-                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        @click="confirmDelete"
-                        :disabled="isDeleting"
-                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
-                    >
-                        <svg v-if="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                        {{ isDeleting ? 'Menghapus...' : 'Ya, Hapus Data' }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </AdminLayout>
+        
+    </SuperAdminLayout>
 </template>

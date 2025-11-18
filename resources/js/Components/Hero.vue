@@ -18,6 +18,9 @@ const dashboardRoute = computed(() => {
     if (user.value.role === 'mitra') {
         return '/mitra/dashboard';
     }
+    if (user.value.role === 'super admin') {
+        return '/super-admin/dashboard';
+    }
     
     return '/dashboard';
 });

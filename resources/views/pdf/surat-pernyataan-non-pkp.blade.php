@@ -70,6 +70,9 @@
         .signature-name {
             font-weight: bold;
             text-decoration: underline;
+            display: inline-block;
+            text-align: center;
+            min-width: 200px;
         }
     </style>
 </head>
