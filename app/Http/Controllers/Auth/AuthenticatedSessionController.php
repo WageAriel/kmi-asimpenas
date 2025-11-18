@@ -44,6 +44,9 @@
     if ($user->role === 'admin') {
         return redirect()->intended(route('admin.dashboard', absolute: false));
     }
+    if ($user->role === 'super admin') {
+        return redirect()->intended(route('super-admin.dashboard', absolute: false));
+    }
 
     // Default ke landing page
     return redirect()->intended('/');

@@ -1,2 +1,15 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Disallow admin pages
+Disallow: /admin/
+Disallow: /super-admin/
+Disallow: /mitra/
+
+# Allow public pages
+Allow: /
+Allow: /login
+Allow: /register
+
+# Sitemap
+Sitemap: https://asimpenas.com/sitemap.xml

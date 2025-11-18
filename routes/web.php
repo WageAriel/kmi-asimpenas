@@ -6,10 +6,14 @@ use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\PDF;
+
+// SEO Routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
 Route::get('/', function () {
     return Inertia::render('Landing', [

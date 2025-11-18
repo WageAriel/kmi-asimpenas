@@ -113,7 +113,7 @@ const handleLogout = () => {
                     Selamat Datang di <span class="text-blue-600">ASIMPENAS</span>
                 </h1>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                    Platform digital untuk proses seleksi mitra bisnis yang ingin melakukan Purchase Order (PO) dengan standar dan ketentuan yang ketat
+                    Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG untuk seleksi calon mitra, klasifikasi mitra, dan penawaran komoditas
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -123,7 +123,7 @@ const handleLogout = () => {
                             href="/register"
                             class="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg"
                         >
-                            Daftar untuk Seleksi PO
+                            Daftar Sebagai Mitra Pangan
                         </Link>
                         <Link 
                             href="/login"
@@ -163,36 +163,35 @@ const handleLogout = () => {
                     <div class="grid md:grid-cols-2 gap-8 items-center">
                         <div>
                             <p class="text-lg text-gray-600 mb-4 leading-relaxed">
-                                <strong>ASIMPENAS</strong> (Aplikasi Seleksi Mitra dan Penawaran Komoditas) adalah platform digital 
-                                yang digunakan untuk menyeleksi mitra bisnis yang ingin melakukan Purchase Order (PO) sesuai dengan ketentuan dan standar yang berlaku.
+                                <strong>ASIMPENAS</strong> (Aplikasi Seleksi Mitra dan Penawaran Komoditas) adalah platform digital yang dikelola oleh Perum BULOG untuk mengelola proses seleksi calon mitra pangan, klasifikasi mitra berdasarkan kapasitas dan kualitas, serta penawaran komoditas pangan seperti gabah dan beras sesuai dengan standar dan ketentuan yang berlaku.
                             </p>
                             <ul class="space-y-3 text-gray-600">
                                 <li class="flex items-center">
                                     <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                     </svg>
-                                    Seleksi mitra untuk keperluan Purchase Order
+                                    Seleksi calon mitra pangan yang berkualitas
                                 </li>
                                 <li class="flex items-center">
                                     <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                     </svg>
-                                    Evaluasi berdasarkan ketentuan yang berlaku
+                                    Klasifikasi mitra berdasarkan kapasitas dan mutu
                                 </li>
                                 <li class="flex items-center">
                                     <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                     </svg>
-                                    Pengelolaan penawaran komoditas
+                                    Pengelolaan penawaran komoditas gabah dan beras
                                 </li>
                             </ul>
                         </div>
                         <div class="bg-blue-50 p-6 rounded-xl">
                             <h4 class="font-semibold text-gray-800 mb-3">Tujuan Utama:</h4>
                             <div class="space-y-2 text-sm">
-                                <div class="bg-white p-3 rounded-lg">🎯 Menyeleksi Mitra PO yang Qualified</div>
-                                <div class="bg-white p-3 rounded-lg">📋 Memastikan Kepatuhan Ketentuan</div>
-                                <div class="bg-white p-3 rounded-lg">💼 Evaluasi Kapasitas Bisnis</div>
+                                <div class="bg-white p-3 rounded-lg">🎯 Seleksi Calon Mitra Pangan</div>
+                                <div class="bg-white p-3 rounded-lg">� Klasifikasi Berdasarkan Kapasitas</div>
+                                <div class="bg-white p-3 rounded-lg">🌾 Penawaran Komoditas seperti Gabah & Beras</div>
                                 <div class="bg-white p-3 rounded-lg">✅ Verifikasi Dokumen & Legalitas</div>
                             </div>
                         </div>
@@ -205,27 +204,27 @@ const handleLogout = () => {
                         <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
                             <span class="text-2xl">💡</span>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-900">Kenapa Perlu Mengikuti Seleksi?</h2>
+                        <h2 class="text-3xl font-bold text-gray-900">Kenapa Perlu Mendaftar?</h2>
                     </div>
                     
                     <div class="grid md:grid-cols-3 gap-6">
                         <div class="text-center p-6 border border-gray-100 rounded-xl">
                             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <span class="text-2xl">💰</span>
+                                <span class="text-2xl">🤝</span>
                             </div>
-                            <h4 class="font-semibold text-gray-800 mb-2">Akses Purchase Order</h4>
+                            <h4 class="font-semibold text-gray-800 mb-2">Menjadi Mitra Resmi BULOG</h4>
                             <p class="text-gray-600 text-sm">
-                                Hanya mitra yang lolos seleksi yang berhak mendapatkan dan melaksanakan Purchase Order
+                                Menjadi bagian dari jaringan mitra pangan Perum BULOG dengan status resmi dan terverifikasi
                             </p>
                         </div>
                         
                         <div class="text-center p-6 border border-gray-100 rounded-xl">
                             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <span class="text-2xl">🔒</span>
+                                <span class="text-2xl">🌾</span>
                             </div>
-                            <h4 class="font-semibold text-gray-800 mb-2">Standar Kualitas Terjamin</h4>
+                            <h4 class="font-semibold text-gray-800 mb-2">Akses Penawaran Komoditas</h4>
                             <p class="text-gray-600 text-sm">
-                                Proses seleksi memastikan hanya mitra berkualitas yang dapat berpartisipasi dalam PO
+                                Mendapatkan akses penawaran komoditas gabah dan beras dari BULOG secara berkala
                             </p>
                         </div>
                         
@@ -233,9 +232,9 @@ const handleLogout = () => {
                             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <span class="text-2xl">📈</span>
                             </div>
-                            <h4 class="font-semibold text-gray-800 mb-2">Kemitraan Jangka Panjang</h4>
+                            <h4 class="font-semibold text-gray-800 mb-2">Kemitraan Berkelanjutan</h4>
                             <p class="text-gray-600 text-sm">
-                                Mitra yang lolos seleksi berpotensi mendapat PO berkelanjutan sesuai performa
+                                Peluang kemitraan jangka panjang dengan Perum BULOG untuk stabilitas usaha
                             </p>
                         </div>
                     </div>
@@ -247,7 +246,7 @@ const handleLogout = () => {
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
                             <span class="text-2xl">📋</span>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-900">Tahapan Proses Seleksi Mitra PO</h2>
+                        <h2 class="text-3xl font-bold text-gray-900">Tahapan Proses Menjadi Mitra</h2>
                     </div>
                     
                     <div class="relative">
@@ -259,9 +258,9 @@ const handleLogout = () => {
                             <div class="relative flex items-center">
                                 <div class="flex-1 md:text-right md:pr-8">
                                     <div class="bg-blue-50 p-6 rounded-xl">
-                                        <h4 class="font-semibold text-gray-800 mb-2">1. Registrasi & Pengajuan</h4>
+                                        <h4 class="font-semibold text-gray-800 mb-2">1. Registrasi & Input Data Mitra</h4>
                                         <p class="text-gray-600 text-sm">
-                                            Daftar akun, lengkapi profil perusahaan, dan submit dokumen persyaratan untuk mengikuti seleksi PO
+                                            Daftar akun, lengkapi data profil perusahaan, dan submit dokumen persyaratan sebagai calon mitra pangan
                                         </p>
                                     </div>
                                 </div>
@@ -275,9 +274,9 @@ const handleLogout = () => {
                                 <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mx-4 text-white font-bold text-sm z-10">2</div>
                                 <div class="flex-1 md:pl-8">
                                     <div class="bg-green-50 p-6 rounded-xl">
-                                        <h4 class="font-semibold text-gray-800 mb-2">2. Verifikasi Kelengkapan</h4>
+                                        <h4 class="font-semibold text-gray-800 mb-2">2. Pengajuan Seleksi Mitra</h4>
                                         <p class="text-gray-600 text-sm">
-                                            Tim verifikasi akan memeriksa kelengkapan dokumen, legalitas, dan keabsahan data perusahaan
+                                            Ajukan permohonan seleksi mitra dengan melengkapi dokumen seperti Surat Permohonan, NIB, NPWP, dan lainnya
                                         </p>
                                     </div>
                                 </div>
@@ -287,9 +286,9 @@ const handleLogout = () => {
                             <div class="relative flex items-center">
                                 <div class="flex-1 md:text-right md:pr-8">
                                     <div class="bg-yellow-50 p-6 rounded-xl">
-                                        <h4 class="font-semibold text-gray-800 mb-2">3. Evaluasi Kriteria Seleksi</h4>
+                                        <h4 class="font-semibold text-gray-800 mb-2">3. Verifikasi & Evaluasi Admin</h4>
                                         <p class="text-gray-600 text-sm">
-                                            Penilaian berdasarkan ketentuan yang berlaku: kapasitas produksi, kualitas, pengalaman, dan kemampuan finansial
+                                            Tim admin memverifikasi kelengkapan dokumen dan mengevaluasi kelayakan berdasarkan kriteria yang berlaku
                                         </p>
                                     </div>
                                 </div>
@@ -303,9 +302,9 @@ const handleLogout = () => {
                                 <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mx-4 text-white font-bold text-sm z-10">4</div>
                                 <div class="flex-1 md:pl-8">
                                     <div class="bg-purple-50 p-6 rounded-xl">
-                                        <h4 class="font-semibold text-gray-800 mb-2">4. Pengumuman Hasil Seleksi</h4>
+                                        <h4 class="font-semibold text-gray-800 mb-2">4. Klasifikasi Mitra Pangan</h4>
                                         <p class="text-gray-600 text-sm">
-                                            Notifikasi hasil seleksi dan informasi selanjutnya untuk mitra yang lolos seleksi
+                                            Mitra yang lolos seleksi akan diklasifikasikan berdasarkan kapasitas dan mutu untuk penawaran komoditas yang sesuai
                                         </p>
                                     </div>
                                 </div>
@@ -315,9 +314,9 @@ const handleLogout = () => {
                             <div class="relative flex items-center">
                                 <div class="flex-1 md:text-right md:pr-8">
                                     <div class="bg-emerald-50 p-6 rounded-xl">
-                                        <h4 class="font-semibold text-gray-800 mb-2">5. Penerbitan & Pelaksanaan PO</h4>
+                                        <h4 class="font-semibold text-gray-800 mb-2">5. Penawaran Komoditas & Kerjasama</h4>
                                         <p class="text-gray-600 text-sm">
-                                            Mitra yang lolos seleksi akan menerima Purchase Order dan melaksanakan sesuai ketentuan kontrak
+                                            Mitra resmi akan mendapatkan penawaran komoditas gabah dan beras secara berkala sesuai klasifikasi dan kebutuhan
                                         </p>
                                     </div>
                                 </div>
@@ -331,15 +330,15 @@ const handleLogout = () => {
                 <!-- Call to Action -->
                 <div class="text-center bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-12 text-white">
                     <template v-if="!isAuthenticated">
-                        <h2 class="text-3xl font-bold mb-4">Siap Mengikuti Seleksi Mitra PO?</h2>
+                        <h2 class="text-3xl font-bold mb-4">Siap Menjadi Mitra Pangan BULOG?</h2>
                         <p class="text-xl mb-8 text-blue-100">
-                            Daftarkan perusahaan Anda untuk mengikuti proses seleksi dan berpeluang mendapatkan Purchase Order dari kami
+                            Daftarkan perusahaan Anda sekarang dan bergabung dengan jaringan mitra pangan Perum BULOG untuk penawaran komoditas gabah dan beras
                         </p>
                         <Link 
                             href="/register"
                             class="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"
                         >
-                            Daftar Seleksi Sekarang
+                            Daftar Sebagai Mitra Sekarang
                             <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L8 12.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                             </svg>
