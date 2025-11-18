@@ -407,6 +407,47 @@ const exportData = () => {
     window.location.href = '/klasifikasi-mitra/export/data';
 };
 
+// Delete functionality
+const showDeleteModal = ref(false);
+const selectedItemToDelete = ref(null);
+const isDeleting = ref(false);
+const deleteError = ref(null);
+
+const openDeleteModal = (item) => {
+    selectedItemToDelete.value = item;
+    showDeleteModal.value = true;
+    deleteError.value = null;
+};
+
+const closeDeleteModal = () => {
+    showDeleteModal.value = false;
+    selectedItemToDelete.value = null;
+    deleteError.value = null;
+    isDeleting.value = false;
+};
+
+const confirmDelete = async () => {
+    if (!selectedItemToDelete.value) return;
+
+    isDeleting.value = true;
+    deleteError.value = null;
+
+    try {
+        await axios.delete(`/klasifikasi-mitra/${selectedItemToDelete.value.id_klasifikasi_mitra}`);
+        
+        // Reload page after successful deletion
+        window.location.reload();
+    } catch (error) {
+        console.error('Error deleting klasifikasi:', error);
+        if (error.response && error.response.data && error.response.data.message) {
+            deleteError.value = error.response.data.message;
+        } else {
+            deleteError.value = 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.';
+        }
+        isDeleting.value = false;
+    }
+};
+
 // Add new refs
 const showPdfModal = ref(false);
 const selectedItemForPdf = ref(null);
@@ -620,12 +661,27 @@ const generateBaPdf = async () => {
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
-                                    <button
-                                        @click="viewDetails(item)"
-                                        class="inline-flex items-center text-green-600 hover:text-green-900 text-xs mr-3"
-                                    >
-                                        Lihat
-                                    </button>
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            @click="viewDetails(item)"
+                                            class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
+                                        >
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                            Lihat
+                                        </button>
+                                        <button
+                                            @click="openDeleteModal(item)"
+                                            class="inline-flex items-center px-2 py-1 text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded transition-colors duration-200 text-xs"
+                                        >
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                            Hapus
+                                        </button>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <button
@@ -662,8 +718,8 @@ const generateBaPdf = async () => {
         </div>
 
         <!-- Modal Detail Klasifikasi Mitra -->
-        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full h-auto p-6 relative max-h-[80vh] overflow-y-auto">
+        <div v-if="showModal" @click="closeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-4xl w-full h-auto p-6 relative max-h-[80vh] overflow-y-auto">
                 <button @click="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -903,8 +959,8 @@ const generateBaPdf = async () => {
         </div>
 
         <!-- Modal Import Excel -->
-        <div v-if="showImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div class="bg-white rounded-xl shadow-lg max-w-3xl w-full p-6 relative">
+        <div v-if="showImportModal" @click="closeImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-3xl w-full p-6 relative">
                 <button @click="closeImportModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -927,26 +983,13 @@ const generateBaPdf = async () => {
                                     <li>Ukuran file maksimal 5MB</li>
                                     <li>Kolom <strong>Nama Perusahaan</strong> akan digunakan untuk mencari ID mitra</li>
                                     <li>Pastikan nama perusahaan sudah terdaftar di database</li>
-                                    <li>Nilai untuk setiap kriteria: <strong>1</strong>, <strong>2</strong>, atau <strong>3</strong></li>
-                                    <li><strong>1</strong> = Kriteria terbaik/tertinggi</li>
-                                    <li><strong>2</strong> = Kriteria menengah</li>
-                                    <li><strong>3</strong> = Kriteria terendah/tidak ada</li>
                                     <li>Hasil klasifikasi (A, B, C) akan diset oleh admin melalui interface</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Kriteria Explanation -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <p class="text-sm font-semibold text-blue-800 mb-2">Contoh Penilaian Kriteria:</p>
-                        <div class="text-xs text-blue-700 space-y-1">
-                            <p>• <strong>Mesin Pembersih Gabah:</strong> 1 = Ada & >3 unit, 2 = Ada & 1-3 unit, 3 = Tidak Ada</p>
-                            <p>• <strong>Lantai Jemur:</strong> 1 = Ada & >1000m², 2 = Ada & 500-1000m², 3 = Tidak Ada / </p>
-                            <p>• <strong>Tangki Penyimpanan:</strong> 1 = Ada & >10 unit, 2 = Ada & ≤10 unit, 3 = Tidak Ada</p>
-                            <p class="mt-2 italic">* Lihat template Excel untuk detail lengkap semua kriteria</p>
-                        </div>
-                    </div>
+                
 
                     <!-- Download Template Button -->
                     <div class="flex justify-center">
@@ -1122,6 +1165,65 @@ const generateBaPdf = async () => {
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         {{ isGeneratingBaPdf ? 'Generating...' : 'Generate PDF' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div v-if="showDeleteModal" @click="closeDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+                <button @click="closeDeleteModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h2 class="ml-4 text-xl font-bold text-gray-900">Konfirmasi Hapus</h2>
+                </div>
+                
+                <div class="mb-6">
+                    <p class="text-gray-700 mb-2">
+                        Apakah Anda yakin ingin menghapus data klasifikasi mitra untuk:
+                    </p>
+                    <p class="font-semibold text-gray-900 text-lg">
+                        {{ selectedItemToDelete?.mitra?.nama_perusahaan }}
+                    </p>
+                    <p class="text-sm text-red-600 mt-3">
+                        ⚠️ Tindakan ini tidak dapat dibatalkan!
+                    </p>
+                </div>
+
+                <!-- Error Message -->
+                <div v-if="deleteError" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {{ deleteError }}
+                </div>
+                
+                <div class="flex justify-end gap-3">
+                    <button
+                        @click="closeDeleteModal"
+                        :disabled="isDeleting"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="confirmDelete"
+                        :disabled="isDeleting"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
+                    >
+                        <svg v-if="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span v-if="isDeleting">Menghapus...</span>
+                        <span v-else>Ya, Hapus</span>
                     </button>
                 </div>
             </div>

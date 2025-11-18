@@ -9,10 +9,33 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
+class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure, WithStartRow, SkipsEmptyRows
 {
     use SkipsFailures;
+
+    /**
+     * Mulai import dari baris ke-3 (melewati 2 baris header)
+     *
+     * @return int
+     */
+    public function startRow(): int
+    {
+        return 3;
+    }
+
+    /**
+     * Tentukan baris mana yang dijadikan heading
+     * Baris 2 akan dijadikan sebagai heading/key untuk array
+     *
+     * @return int
+     */
+    public function headingRow(): int
+    {
+        return 2;
+    }
 
     /**
      * @param array $row
@@ -21,11 +44,64 @@ class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation,
      */
     public function model(array $row)
     {
+        // Debug: Log struktur row untuk memahami mapping
+        \Log::info('===== IMPORT ROW DEBUG =====');
+        \Log::info('Row keys: ' . implode(', ', array_keys($row)));
+        \Log::info('Full row data:', $row);
+        
+        // Laravel Excel akan convert header ke snake_case
+        // "No" -> "no"
+        // "Nama MKP" -> "nama_mkp"
+        
+        // Periksa apakah ada kolom 'no' yang berisi angka
+        if (isset($row['no']) && is_numeric($row['no'])) {
+            \Log::info('Detected "no" column with value: ' . $row['no']);
+        }
+        
+        // Ambil nama mitra dari kolom yang tepat
+        $namaMitra = null;
+        
+        // Coba ambil dari 'nama_mkp' dulu
+        if (isset($row['nama_mkp']) && !empty($row['nama_mkp'])) {
+            $namaMitra = trim($row['nama_mkp']);
+            \Log::info('Found nama_mkp: ' . $namaMitra);
+            
+            // Validasi: jika nama_mkp adalah angka saja, berarti mapping salah
+            if (is_numeric($namaMitra)) {
+                \Log::warning('nama_mkp contains only numbers, likely wrong mapping');
+                $namaMitra = null;
+            }
+        }
+        
+        // Jika masih null, cari di kolom lain
+        if (!$namaMitra) {
+            \Log::info('nama_mkp not found or invalid, searching other columns...');
+            foreach ($row as $key => $value) {
+                if ($key === 'no' || empty($value)) continue;
+                
+                $value = trim($value);
+                // Cari kolom yang berisi string (bukan angka murni)
+                if (is_string($value) && !is_numeric($value) && strlen($value) > 3) {
+                    $namaMitra = $value;
+                    \Log::info("Found potential nama_mitra in column '$key': $namaMitra");
+                    break;
+                }
+            }
+        }
+        
+        // Jika masih tidak ada nama mitra, skip row
+        if (!$namaMitra) {
+            \Log::warning('Nama MKP tidak ditemukan di row, skipping...');
+            return null;
+        }
+        
+        \Log::info("Processing mitra: $namaMitra");
+        
         // Cari ID mitra berdasarkan nama perusahaan
-        $mitra = DataMitra::where('nama_perusahaan', $row['nama_perusahaan'])->first();
+        $mitra = DataMitra::where('nama_perusahaan', $namaMitra)->first();
         
         if (!$mitra) {
-            throw new \Exception("Mitra dengan nama '{$row['nama_perusahaan']}' tidak ditemukan");
+            throw new \Exception("Mitra dengan nama '{$namaMitra}' tidak ditemukan");
         }
 
         // Helper function untuk convert nilai ke format enum descriptive
@@ -179,6 +255,46 @@ class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation,
             return null;
         };
 
+        // Parse hasil_klasifikasi dari Excel
+        // Format yang diterima: "A", "B", "C" (case-insensitive)
+        $hasilKlasifikasi = null;
+        
+        // Debug: Log untuk melihat key hasil_klasifikasi
+        \Log::info('Checking hasil_klasifikasi...');
+        \Log::info('Available keys in row: ' . implode(', ', array_keys($row)));
+        
+        // Coba cari dari key 'hasil_klasifikasi' dulu
+        if (isset($row['hasil_klasifikasi']) && !empty($row['hasil_klasifikasi'])) {
+            $nilai = strtoupper(trim($row['hasil_klasifikasi']));
+            \Log::info('Found hasil_klasifikasi from named key: ' . $nilai);
+            
+            if (in_array($nilai, ['A', 'B', 'C'])) {
+                $hasilKlasifikasi = $nilai;
+            }
+        } else {
+            // Jika tidak ada key 'hasil_klasifikasi', cari di key numerik terakhir
+            // atau cari value yang berisi A, B, atau C saja
+            \Log::info('hasil_klasifikasi key not found, searching in all columns...');
+            
+            foreach ($row as $key => $value) {
+                if (!empty($value)) {
+                    $cleanValue = strtoupper(trim($value));
+                    // Cek apakah value adalah A, B, atau C (tepat 1 karakter)
+                    if (strlen($cleanValue) === 1 && in_array($cleanValue, ['A', 'B', 'C'])) {
+                        $hasilKlasifikasi = $cleanValue;
+                        \Log::info("Found hasil_klasifikasi '$cleanValue' in key '$key'");
+                        break;
+                    }
+                }
+            }
+            
+            if (!$hasilKlasifikasi) {
+                \Log::warning('hasil_klasifikasi not found in any column');
+            }
+        }
+        
+        \Log::info('Final hasil_klasifikasi: ' . ($hasilKlasifikasi ?? 'NULL'));
+        
         return new KlasifikasiMitra([
             'id_mitra' => $mitra->id_mitra,
             'mesin_pembersih_gabah' => $parseEnumValue($row['mesin_pembersih_gabah'] ?? null, 'mesin_pembersih_gabah'),
@@ -206,7 +322,7 @@ class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation,
             'moisture_tester' => $parseEnumValue($row['moisture_tester'] ?? null, 'moisture_tester'),
             'pembanding_derajat_sosoh' => $parseEnumValue($row['pembanding_derajat_sosoh'] ?? null, 'pembanding_derajat_sosoh'),
             'bagian_quality_control' => $parseEnumValue($row['bagian_quality_control'] ?? null, 'bagian_quality_control'),
-            'hasil_klasifikasi' => null, // Admin yang akan set melalui interface
+            'hasil_klasifikasi' => $hasilKlasifikasi, // Bisa diisi dari Excel atau null jika tidak ada
         ]);
     }
 
@@ -214,8 +330,10 @@ class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation,
     {
         // Validasi akan dilakukan di parseEnumValue function
         // Terima angka (1,2,3) atau format descriptive
+        // CATATAN: 'nama_mkp' bisa jadi berisi angka dari kolom "No" jika mapping salah
+        // Jadi kita hilangkan required, dan lakukan validasi manual di model()
         return [
-            'nama_perusahaan' => 'required|string',
+            // 'nama_mkp' => 'required|string', // DIHAPUS - validasi manual di model()
             'mesin_pembersih_gabah' => 'nullable',
             'lantai_jemur' => 'nullable',
             'mesin_pengering' => 'nullable',
@@ -241,13 +359,14 @@ class KlasifikasiMitraImport implements ToModel, WithHeadingRow, WithValidation,
             'moisture_tester' => 'nullable',
             'pembanding_derajat_sosoh' => 'nullable',
             'bagian_quality_control' => 'nullable',
+            'hasil_klasifikasi' => 'nullable|in:A,B,C,a,b,c',
         ];
     }
 
     public function customValidationMessages()
     {
         return [
-            'nama_perusahaan.required' => 'Nama perusahaan tidak boleh kosong',
+            // Validation messages - kosongkan karena validasi nama_mkp dilakukan manual di model()
         ];
     }
 }

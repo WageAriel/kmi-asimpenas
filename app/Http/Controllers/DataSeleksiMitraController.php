@@ -132,7 +132,20 @@ public function mySeleksi()
     public function destroy($id)
     {
         $seleksimitra = DataSeleksiMitra::findOrFail($id);
+        
+        // Hapus hasil seleksi terkait jika ada (cascade delete)
+        if ($seleksimitra->hasilSeleksi) {
+            $seleksimitra->hasilSeleksi->delete();
+        }
+        
         $seleksimitra->delete();
+        
+        // Clear cache for dashboard updates
+        if (Auth::check()) {
+            ActivityAggregatorService::clearUserCache(Auth::id());
+        }
+        ActivityAggregatorService::clearAllActivitiesCache();
+        
         return response()->json(['message' => 'Data seleksi mitra berhasil dihapus']);
     }
 
@@ -215,6 +228,16 @@ public function mySeleksi()
      */
     public function downloadTemplate()
     {
+        // Path ke file template yang sudah ada
+        $templatePath = storage_path('app/public/templates/template-data-seleksi-mitra.xlsx');
+        
+        // Cek apakah file template ada
+        if (file_exists($templatePath)) {
+            // Download file yang sudah ada
+            return response()->download($templatePath, 'template-data-seleksi-mitra.xlsx');
+        }
+        
+        // Fallback: jika file tidak ada, generate menggunakan Export
         return Excel::download(new DataSeleksiMitraExport(true), 'template-data-seleksi-mitra.xlsx');
     }
 

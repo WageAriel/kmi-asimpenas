@@ -5,7 +5,7 @@
     <title>Surat Permohonan MPP</title>
     <style>
         @page {
-            margin: 3cm 2.5cm 2.5cm 2.5cm;
+            margin: 2cm 2.5cm 2.5cm 2.5cm;
             size: A4;
         }
         
@@ -19,11 +19,10 @@
         
         .header-right {
             text-align: right;
-            margin-bottom: 40px;
+            
         }
         
         .header-right .location-date {
-            margin-bottom: 30px;
         }
         
         .header-left .subject {
