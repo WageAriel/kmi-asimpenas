@@ -21,20 +21,50 @@ const sortedSeleksiMitras = computed(() => {
 
 // Add search functionality
 const searchQuery = ref('');
+const selectedYear = ref(''); // Filter tahun
 
-// Filter seleksi mitras based on search query
-const filteredSeleksiMitras = computed(() => {
-    if (!searchQuery.value) return sortedSeleksiMitras.value;
+// Get unique years from seleksi mitras
+const availableYears = computed(() => {
+    const years = sortedSeleksiMitras.value.map(item => {
+        if (item.created_at) {
+            return new Date(item.created_at).getFullYear();
+        }
+        return null;
+    }).filter(year => year !== null);
     
-    const query = searchQuery.value.toLowerCase();
-    return sortedSeleksiMitras.value.filter(item => {
-        return (
-            item.mitra?.nama_perusahaan?.toLowerCase().includes(query) ||
-            item.mitra?.no_telp_perusahaan?.toLowerCase().includes(query) ||
-            item.mitra?.nama_cp?.toLowerCase().includes(query) ||
-            (item.status_seleksi?.toLowerCase().includes(query))
-        );
-    });
+    // Return unique years sorted descending
+    return [...new Set(years)].sort((a, b) => b - a);
+});
+
+// Filter seleksi mitras based on search query and year
+const filteredSeleksiMitras = computed(() => {
+    let filtered = sortedSeleksiMitras.value;
+    
+    // Filter by year
+    if (selectedYear.value) {
+        filtered = filtered.filter(item => {
+            if (item.created_at) {
+                const itemYear = new Date(item.created_at).getFullYear();
+                return itemYear === parseInt(selectedYear.value);
+            }
+            return false;
+        });
+    }
+    
+    // Filter by search query
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        filtered = filtered.filter(item => {
+            return (
+                item.mitra?.nama_perusahaan?.toLowerCase().includes(query) ||
+                item.mitra?.no_telp_perusahaan?.toLowerCase().includes(query) ||
+                item.mitra?.nama_cp?.toLowerCase().includes(query) ||
+                (item.status_seleksi?.toLowerCase().includes(query))
+            );
+        });
+    }
+    
+    return filtered;
 });
 
 // Modal state
@@ -518,9 +548,10 @@ const exportData = () => {
                 </div>
             </div>
 
-            <!-- Search Bar -->
-            <div class="mb-4">
-                <div class="relative w-full">
+            <!-- Search Bar and Year Filter -->
+            <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+                <!-- Search Input -->
+                <div class="relative md:col-span-3">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
@@ -542,6 +573,19 @@ const exportData = () => {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
+                </div>
+
+                <!-- Year Filter -->
+                <div class="relative">
+                    <select 
+                        v-model="selectedYear"
+                        class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">Semua Tahun</option>
+                        <option v-for="year in availableYears" :key="year" :value="year">
+                            {{ year }}
+                        </option>
+                    </select>
                 </div>
             </div>
 
