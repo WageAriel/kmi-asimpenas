@@ -63,4 +63,19 @@ class DataMitra extends Model
 {
     return $this->belongsTo(User::class, 'user_id', 'id');
 }
+
+    // Accessor: gabungkan badan hukum + nama perusahaan (contoh: PT. Nama Perusahaan)
+    public function getNamaPerusahaanLengkapAttribute()
+    {
+        $prefix = trim($this->badan_hukum_usaha ?? '');
+        $nama = trim($this->nama_perusahaan ?? '');
+        if ($prefix === '') {
+            return $nama; // Tidak ada badan hukum
+        }
+        // Pastikan ada titik di akhir prefix (PT, CV, dll.) tanpa menggandakan
+        if (substr($prefix, -1) !== '.') {
+            $prefix .= '.';
+        }
+        return trim($prefix.' '.$nama);
+    }
 }

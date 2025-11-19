@@ -144,6 +144,9 @@
     </style>
 </head>
 <body>
+    @php
+        $namaPerusahaanLengkap = isset($mitra) && $mitra ? $mitra->nama_perusahaan_lengkap : ($purchaseOrder->nama_perusahaan ?? '');
+    @endphp
     <div class="header">
         <div class="company-name">Perum BULOG</div>
         <div class="address">Kantor Cabang Surakarta</div>
@@ -159,7 +162,7 @@
             <div class="info-row">
                 <div class="info-label">Nama Pemasok</div>
                 <div class="info-separator">:</div>
-                <div class="info-value">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+                <div class="info-value">{{ $namaPerusahaanLengkap }}</div>
                 <div class="info-label" style="padding-left: 50px;">Nama Bank</div>
                 <div class="info-separator" style="padding-left: 25px;">:</div>
                 <div class="info-value" style="padding-left: 15px;">{{ $mitra->bank_korespondensi ?? '' }}</div>
@@ -213,7 +216,7 @@
     <div class="statement-section">
         <div class="info-title">PERNYATAAN PEMASOK</div>
         <ol>
-            <li>Bersedia tunduk dan patuh terhadap seluruh pernyataan, ketentuan, prosedur maupun instruksi yang berlaku dalam Pengadaan Gabah/Beras/Beras Negeri Perum BULOG maupun instruksi yang berlaku dalam Pengadaan Gabah/Beras/Beras Negeri Perum BULOG secara mutlak dan/atau tidak akan menggugat secara hukum.</li>
+            <li>Bersedia tunduk dan patuh terhadap seluruh pernyataan, ketentuan, prosedur maupun instruksi yang berlaku dalam Pengadaan {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} Dalam Negeri Perum BULOG.</li>
             <li>Menyampaikan penawaran komoditi sebagai berikut:</li>
         </ol>
     </div>

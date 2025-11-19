@@ -28,43 +28,79 @@
         }
         
         .company-name { 
-            font-size: 11pt; 
+            font-size: 13pt; 
             font-weight: bold; 
             margin-bottom: 3px;
         }
         
         .address { 
             font-size: 10pt; 
+            font-weight: bold;
             margin-bottom: 5px;
         }
         
         .document-number { 
-            font-size: 10pt; 
-            font-weight: bold;
+            font-size: 10pt;
+        }
+
+        .box-contall {
+            display: table;
+            width: 100%; 
+            margin: 4px ;
+            border-collapse: separate;
+            border-spacing: 2px 0;
         }
 
         .box-container { 
             display: table;
-            width: 100%; 
-            margin: 8px 0;
-            border-collapse: separate;
-            border-spacing: 10px 0;
+            width: 35%; 
+            margin: 4px ;
+            border-collapse: collapse;
+            border-spacing: 2px 0;
         }
         
         .box { 
             display: table-cell;
-            width: 42%; 
+            width: 20%; 
             border: 1px solid #000; 
-            padding: 6px 8px;
             vertical-align: top;
         }
         
         .box-item { 
-            margin-bottom: 6px; 
-            min-height: 22px;
+            padding: 4px;
             font-size: 9pt;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 3px;
+            border-bottom: 1px solid #000;
+            border-right: 1px solid #000;
+            min-height: 16px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .box-container-right { 
+            display: table;
+            width: 35%; 
+            margin: 4px ;
+            border-collapse: collapse;
+            border-spacing: 2px 0;
+        }
+        
+        .box-right { 
+            display: table-cell;
+            width: 20%; 
+            border: 1px solid #000; 
+            vertical-align: top;
+        }
+        
+        .box-item-right { 
+            padding: 4px;
+            font-size: 9pt;
+            border-bottom: 1px solid #000;
+            border-right: 1px solid #000;
+            min-height: 16px;
+            display: flex;
+            align-items: center;
+            position: relative;
         }
         
         .box-item:last-child {
@@ -72,9 +108,9 @@
         }
         
         .box-item strong {
-            display: inline-block;
-            width: 100%;
-            margin-bottom: 2px;
+            display: block;
+            margin-bottom: 0;
+            font-weight: bold;
         }
 
         .title { 
@@ -100,7 +136,7 @@
         }
         
         table th, table td { 
-            border: 1px solid #000; 
+            border: 0px solid #000; 
             padding: 3px 4px; 
             text-align: center;
         }
@@ -182,26 +218,55 @@
 </head>
 <body>
 
+    @php
+        $namaPerusahaanLengkap = isset($mitra) && $mitra ? $mitra->nama_perusahaan_lengkap : ($purchaseOrder->nama_perusahaan ?? '');
+    @endphp
+
     <!-- Header -->
     <div class="header">
-        <div class="company-name">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+        <div class="company-name">{{ $namaPerusahaanLengkap }}</div>
         <div class="address">{{ $mitra->alamat_perusahaan ?? '' }}</div>
         <div class="document-number">NO {{ $purchaseOrder->no_surat }}</div>
     </div>
 
-    <!-- Box Container -->
-    <div class="box-container">
-        <div class="box">
-            <div class="box-item"><strong>Agenda No.</strong>{{ $purchaseOrder->agenda_no ?? '' }}</div>
-            <div class="box-item"><strong>Tgl. Terima</strong>{{ $purchaseOrder->tanggal_terima ? $purchaseOrder->tanggal_terima->format('d/m/Y') : '' }}</div>
-            <div class="box-item"><strong>Paraf</strong>{{ $purchaseOrder->paraf ?? '' }}</div>
-        </div>
-        <div class="box">
-            <div class="box-item"><strong>KONTRAK YLL</strong>{{ $purchaseOrder->kontrak_yll ?? '' }}</div>
-            <div class="box-item"><strong>REALISASI S/D</strong></div>
-            <div class="box-item"><strong>DISETUJUI/TIDAK</strong></div>
-        </div>
-    </div>
+    <!-- Box Container (Left: Agenda/Tgl/Paraf | Right: Kontrak/Realisasi/Disetujui) -->
+    <table>
+        <tr>
+            <td style="width:45%; vertical-align:top; padding:0;">
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr>
+                        <td style="width:55%; border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">Agenda No.</td>
+                        <td style="width:45%; border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">Tgl. Terima</td>
+                        <td style="border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">Paraf</td>
+                        <td style="border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width:10%; border:1px solid #fff"></td>
+            <td style="width:45%; vertical-align:top; padding:0;">
+                <table style="width:100%; border-collapse:collapse;">
+                    <tr>
+                        <td style="width:55%; border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">KONTRAK YLL</td>
+                        <td style="width:45%; border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">REALISASI S/D</td>
+                        <td style="border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">DISETUJUI/TIDAK</td>
+                        <td style="border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 
     <!-- Title -->
     <div class="title">
@@ -217,30 +282,30 @@
     </div>
 
     <div class="content">
-        Bersama ini kami <strong>{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
+        Bersama ini kami {{ $namaPerusahaanLengkap }} bermohon untuk ikut serta dalam rangka pengadaan {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
     </div>
 
     <!-- Table -->
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 25%;">Jenis Komoditas</th>
-                <th style="width: 15%;">Harga (Rp/Kg)</th>
-                <th style="width: 15%;">Kuantum (Kg)</th>
-                <th style="width: 20%;">Nilai (Rp)</th>
-                <th style="width: 20%;">Komp. Pergud.</th>
+    <table style="border:1px solid #000; width:100%; border-collapse:collapse;">
+        <thead style="border:1px solid #000">
+            <tr style="border:1px solid #000">
+                <th style="border:1px solid #000;width: 5%;">No</th>
+                <th style="border:1px solid #000;width: 25%;">Jenis Komoditas</th>
+                <th style="border:1px solid #000;width: 15%;">Harga (Rp/Kg)</th>
+                <th style="border:1px solid #000;width: 15%;">Kuantum (Kg)</th>
+                <th style="border:1px solid #000;width: 20%;">Nilai (Rp)</th>
+                <th style="border:1px solid #000;width: 20%;">Komp. Pergud.</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody style="border:1px solid #000">
             @foreach($purchaseOrder->items as $index => $item)
             <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} - {{ $item->kualitas_lengkap }}</td>
-                <td>{{ number_format($item->harga, 0, ',', '.') }}</td>
-                <td>{{ number_format($item->kuantum, 0, ',', '.') }}</td>
-                <td>{{ number_format($item->nilai, 0, ',', '.') }}</td>
-                <td>{{ $item->komplek_pergudangan_lengkap }}</td>
+                <td style="border:1px solid #000;">{{ $index + 1 }}</td>
+                <td style="border:1px solid #000;">{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} - {{ $item->kualitas_lengkap }}</td>
+                <td style="border:1px solid #000;">{{ number_format($item->harga, 0, ',', '.') }}</td>
+                <td style="border:1px solid #000;">{{ number_format($item->kuantum, 0, ',', '.') }}</td>
+                <td style="border:1px solid #000;">{{ number_format($item->nilai, 0, ',', '.') }}</td>
+                <td style="border:1px solid #000;">{{ $item->komplek_pergudangan_lengkap }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -258,10 +323,10 @@
     <!-- Signature -->
     <div class="signature">
         <div>Surakarta, {{ $tanggal }}</div>
-        <div style="margin-top: 5px;">Pemohon</div>
+        <div style="margin-top: 3px;">Pemohon</div>
         <div class="signature-space"></div>
-        <div style="margin-top: 5px;">({{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? '') }})</div>
-        <div style="margin-top: 2px;">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+        <div style="margin-top: 5px;"><strong>{{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? '') }}</strong></div>
+        <div style="margin-top: 3px;">{{ $namaPerusahaanLengkap }}</div>
     </div>
 
     <!-- Approval Box -->
@@ -271,7 +336,7 @@
             <strong>PERSETUJUAN</strong><br>
             <strong>GUDANG</strong>
         </div>
-        <div class="approval-content" style="margin-top: 5px;">
+        <div class="approval-content" style="margin-top: 6px;">
             <strong>Disposisi:</strong><br>
             <div class="checkbox-item"><span class="checkbox-box"></span> Cek dan Koordinasikan</div>
             <div class="checkbox-item"><span class="checkbox-box"></span> Tindak Lanjut Sesuai Ketentuan</div>

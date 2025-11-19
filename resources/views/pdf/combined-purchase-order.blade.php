@@ -271,10 +271,14 @@
 </head>
 <body>
 
+@php
+    $namaPerusahaanLengkap = isset($mitra) && $mitra ? $mitra->nama_perusahaan_lengkap : ($purchaseOrder->nama_perusahaan ?? '');
+@endphp
+
 <!-- Page 1: Surat Permohonan -->
 <div class="surat-permohonan" style="font-size: 10pt; line-height: 1.3;">
     <div class="header">
-        <div class="company-name">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+        <div class="company-name">{{ $namaPerusahaanLengkap }}</div>
         <div class="address">{{ $mitra->alamat_perusahaan ?? '' }}</div>
         <div class="document-number">NO {{ $purchaseOrder->no_surat }}</div>
     </div>
@@ -304,7 +308,7 @@
     </div>
 
     <div class="content">
-        Bersama ini kami <strong>{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
+        Bersama ini kami <strong>{{ $namaPerusahaanLengkap }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
     </div>
 
     <table>
@@ -345,7 +349,7 @@
         <div style="margin-top: 5px;">Pemohon</div>
         <div class="signature-space"></div>
         <div style="margin-top: 5px;">({{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? '') }})</div>
-        <div style="margin-top: 2px;">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+        <div style="margin-top: 2px;">{{ $namaPerusahaanLengkap }}</div>
     </div>
 
     <div class="approval-box">
@@ -383,7 +387,7 @@
             <div class="fp-info-row">
                 <div class="fp-info-label">Nama Pemasok</div>
                 <div class="fp-info-separator">:</div>
-                <div class="fp-info-value">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+                <div class="fp-info-value">{{ $namaPerusahaanLengkap }}</div>
                 <div class="fp-info-label" style="padding-left: 50px;">Nama Bank</div>
                 <div class="fp-info-separator" style="padding-left: 25px;">:</div>
                 <div class="fp-info-value" style="padding-left: 15px;">{{ $mitra->bank_korespondensi ?? '' }}</div>
