@@ -19,36 +19,31 @@
             page-break-after: always;
         }
         
-        /* Surat Permohonan Styles */
-        .surat-permohonan {
-            font-size: 10pt;
-            line-height: 1.3;
-        }
-        
-        .surat-permohonan .header { 
+        /* ========== SURAT PERMOHONAN STYLES ========== */
+        .header { 
             text-align: center; 
             margin-bottom: 15px;
             padding-bottom: 8px;
             border-bottom: 3px double #000;
         }
         
-        .surat-permohonan .company-name { 
+        .company-name { 
             font-size: 11pt; 
             font-weight: bold; 
             margin-bottom: 3px;
         }
         
-        .surat-permohonan .address { 
+        .address { 
             font-size: 10pt; 
             margin-bottom: 5px;
         }
         
-        .surat-permohonan .document-number { 
+        .document-number { 
             font-size: 10pt; 
             font-weight: bold;
         }
 
-        .surat-permohonan .box-container { 
+        .box-container { 
             display: table;
             width: 100%; 
             margin: 8px 0;
@@ -56,7 +51,7 @@
             border-spacing: 10px 0;
         }
         
-        .surat-permohonan .box { 
+        .box { 
             display: table-cell;
             width: 42%; 
             border: 1px solid #000; 
@@ -64,7 +59,7 @@
             vertical-align: top;
         }
         
-        .surat-permohonan .box-item { 
+        .box-item { 
             margin-bottom: 6px; 
             min-height: 22px;
             font-size: 9pt;
@@ -72,17 +67,17 @@
             padding-bottom: 3px;
         }
         
-        .surat-permohonan .box-item:last-child {
+        .box-item:last-child {
             border-bottom: none;
         }
         
-        .surat-permohonan .box-item strong {
+        .box-item strong {
             display: inline-block;
             width: 100%;
             margin-bottom: 2px;
         }
 
-        .surat-permohonan .title { 
+        .title { 
             text-align: center; 
             font-weight: bold; 
             margin: 12px 0 10px 0;
@@ -90,7 +85,7 @@
             line-height: 1.4;
         }
         
-        .surat-permohonan .content { 
+        .content { 
             margin: 8px 0; 
             line-height: 1.4; 
             text-align: justify;
@@ -115,13 +110,13 @@
             font-weight: bold;
         }
 
-        .surat-permohonan .footer-text {
+        .footer-text {
             margin: 8px 0;
             font-size: 9pt;
             line-height: 1.3;
         }
 
-        .surat-permohonan .signature { 
+        .signature { 
             margin-top: 10px; 
             text-align: right;
             font-size: 9pt;
@@ -131,12 +126,12 @@
             text-align: center;
         }
         
-        .surat-permohonan .signature-space {
+        .signature-space {
             margin-top: 40px;
             margin-bottom: 0;
         }
 
-        .surat-permohonan .approval-box {
+        .approval-box {
             margin-top: 140px;
             border: 1px solid #000;
             padding: 8px;
@@ -146,25 +141,25 @@
             clear: both;
         }
         
-        .surat-permohonan .approval-title {
+        .approval-title {
             text-align: center; 
             font-weight: bold;
             margin-bottom: 5px;
             font-size: 9pt;
         }
         
-        .surat-permohonan .approval-content {
+        .approval-content {
             font-size: 9pt;
             line-height: 1.4;
         }
         
-        .surat-permohonan .checkbox-item {
+        .checkbox-item {
             margin: 3px 0;
             position: relative;
             padding-left: 20px;
         }
         
-        .surat-permohonan .checkbox-box {
+        .checkbox-box {
             display: inline-block;
             width: 12px;
             height: 12px;
@@ -174,93 +169,88 @@
             top: 2px;
         }
         
-        /* Form Penawaran Styles */
-        .form-penawaran {
-            font-size: 9pt;
-            line-height: 1.4;
-        }
-        
-        .form-penawaran .header {
+        /* ========== FORM PENAWARAN STYLES ========== */
+        .fp-header {
             text-align: left;
             margin-bottom: 15px;
         }
         
-        .form-penawaran .company-name {
+        .fp-company-name {
             font-size: 9pt;
             font-weight: normal;
         }
         
-        .form-penawaran .address {
+        .fp-address {
             font-size: 9pt;
         }
         
-        .form-penawaran .title {
+        .fp-title {
             text-align: center;
             font-weight: bold;
             margin: 15px 0;
             font-size: 11pt;
         }
         
-        .form-penawaran .info-section {
+        .fp-info-section {
             margin: 15px 0;
             font-size: 9pt;
         }
         
-        .form-penawaran .info-title {
+        .fp-info-title {
             font-weight: bold;
             margin-bottom: 8px;
             text-decoration: underline;
         }
         
-        .form-penawaran .info-grid {
+        .fp-info-grid {
             display: table;
             width: 100%;
         }
         
-        .form-penawaran .info-row {
+        .fp-info-row {
             display: table-row;
         }
         
-        .form-penawaran .info-label {
+        .fp-info-label {
             display: table-cell;
             width: 18%;
             padding: 1px 0;
             white-space: nowrap;
         }
         
-        .form-penawaran .info-separator {
+        .fp-info-separator {
             display: table-cell;
             width: 1%;
         }
         
-        .form-penawaran .info-value {
+        .fp-info-value {
             display: table-cell;
             width: 31%;
             padding: 1px 0;
         }
         
-        .form-penawaran .statement-section {
+        .fp-statement-section {
             margin: 2px 0;
             text-align: justify;
             line-height: 1.3;
         }
         
-        .form-penawaran .statement-section ol {
+        .fp-statement-section ol {
             margin: 2px 0;
             padding-left: 20px;
         }
         
-        .form-penawaran .statement-section li {
+        .fp-statement-section li {
             margin: 2px 0;
         }
         
-        .form-penawaran .signature-container {
+        .fp-signature-container {
             margin-top: 20px;
             display: table;
             width: 100%;
         }
         
-        .form-penawaran .signature-box {
+        .fp-signature-box {
             display: table-cell;
             width: 2%;
             border: 1px solid #000;
@@ -269,7 +259,7 @@
             font-size: 8pt;
         }
         
-        .form-penawaran .signature-box-right {
+        .fp-signature-box-right {
             display: table-cell;
             width: 2%;
             border: 1px solid #000;
@@ -282,7 +272,7 @@
 <body>
 
 <!-- Page 1: Surat Permohonan -->
-<div class="surat-permohonan">
+<div class="surat-permohonan" style="font-size: 10pt; line-height: 1.3;">
     <div class="header">
         <div class="company-name">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
         <div class="address">{{ $mitra->alamat_perusahaan ?? '' }}</div>
@@ -377,74 +367,74 @@
 <div class="page-break"></div>
 
 <!-- Page 2: Form Penawaran -->
-<div class="form-penawaran">
-    <div class="header">
-        <div class="company-name">Perum BULOG</div>
-        <div class="address">Kantor Cabang Surakarta</div>
+<div class="form-penawaran" style="font-size: 9pt; line-height: 1.4;">
+    <div class="fp-header">
+        <div class="fp-company-name">Perum BULOG</div>
+        <div class="fp-address">Kantor Cabang Surakarta</div>
     </div>
 
-    <div class="title">
+    <div class="fp-title">
         FORM PENAWARAN {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} DALAM NEGERI
     </div>
 
-    <div class="info-section">
-        <div class="info-title">DATA INFORMASI PEMASOK</div>
-        <div class="info-grid">
-            <div class="info-row">
-                <div class="info-label">Nama Pemasok</div>
-                <div class="info-separator">:</div>
-                <div class="info-value">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
-                <div class="info-label" style="padding-left: 50px;">Nama Bank</div>
-                <div class="info-separator" style="padding-left: 25px;">:</div>
-                <div class="info-value" style="padding-left: 15px;">{{ $mitra->bank_korespondensi ?? '' }}</div>
+    <div class="fp-info-section">
+        <div class="fp-info-title">DATA INFORMASI PEMASOK</div>
+        <div class="fp-info-grid">
+            <div class="fp-info-row">
+                <div class="fp-info-label">Nama Pemasok</div>
+                <div class="fp-info-separator">:</div>
+                <div class="fp-info-value">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+                <div class="fp-info-label" style="padding-left: 50px;">Nama Bank</div>
+                <div class="fp-info-separator" style="padding-left: 25px;">:</div>
+                <div class="fp-info-value" style="padding-left: 15px;">{{ $mitra->bank_korespondensi ?? '' }}</div>
             </div>
-            <div class="info-row">
-                <div class="info-label">Alamat Pemasok</div>
-                <div class="info-separator">:</div>
-                <div class="info-value">{{ $mitra->alamat_perusahaan ?? '' }}</div>
-                <div class="info-label" style="padding-left: 50px;">Nomor Rekening</div>
-                <div class="info-separator" style="padding-left: 25px;">:</div>
-                <div class="info-value" style="padding-left: 15px;">{{ $mitra->no_rekening ?? '' }}</div>
+            <div class="fp-info-row">
+                <div class="fp-info-label">Alamat Pemasok</div>
+                <div class="fp-info-separator">:</div>
+                <div class="fp-info-value">{{ $mitra->alamat_perusahaan ?? '' }}</div>
+                <div class="fp-info-label" style="padding-left: 50px;">Nomor Rekening</div>
+                <div class="fp-info-separator" style="padding-left: 25px;">:</div>
+                <div class="fp-info-value" style="padding-left: 15px;">{{ $mitra->no_rekening ?? '' }}</div>
             </div>
-            <div class="info-row">
-                <div class="info-label">Nomor KTP</div>
-                <div class="info-separator">:</div>
-                <div class="info-value">{{ $mitra->nik ?? '' }}</div>
-                <div class="info-label" style="padding-left: 50px;">Nama Pemilik</div>
-                <div class="info-separator" style="padding-left: 25px;">:</div>
-                <div class="info-value" style="padding-left: 15px;">{{ $mitra->nama_cp ?? '' }}</div>
+            <div class="fp-info-row">
+                <div class="fp-info-label">Nomor KTP</div>
+                <div class="fp-info-separator">:</div>
+                <div class="fp-info-value">{{ $mitra->nik ?? '' }}</div>
+                <div class="fp-info-label" style="padding-left: 50px;">Nama Pemilik</div>
+                <div class="fp-info-separator" style="padding-left: 25px;">:</div>
+                <div class="fp-info-value" style="padding-left: 15px;">{{ $mitra->nama_cp ?? '' }}</div>
             </div>
-            <div class="info-row">
-                <div class="info-label">Nomor Telepon/HP</div>
-                <div class="info-separator">:</div>
-                <div class="info-value">{{ $mitra->no_telp_cp ?? $mitra->no_telp_perusahaan ?? '' }}</div>
-                <div class="info-label" style="padding-left: 50px;">NPWP</div>
-                <div class="info-separator" style="padding-left: 25px;">:</div>
-                <div class="info-value" style="padding-left: 15px;">{{ $mitra->npwp ?? '' }}</div>
+            <div class="fp-info-row">
+                <div class="fp-info-label">Nomor Telepon/HP</div>
+                <div class="fp-info-separator">:</div>
+                <div class="fp-info-value">{{ $mitra->no_telp_cp ?? $mitra->no_telp_perusahaan ?? '' }}</div>
+                <div class="fp-info-label" style="padding-left: 50px;">NPWP</div>
+                <div class="fp-info-separator" style="padding-left: 25px;">:</div>
+                <div class="fp-info-value" style="padding-left: 15px;">{{ $mitra->npwp ?? '' }}</div>
             </div>
-            <div class="info-row">
-                <div class="info-label">Kota</div>
-                <div class="info-separator">:</div>
-                <div class="info-value">{{ $mitra->kota_kabupaten ?? '' }}</div>
-                <div class="info-label" style="padding-left: 50px;">NPPK</div>
-                <div class="info-separator" style="padding-left: 25px;">:</div>
-                <div class="info-value" style="padding-left: 15px;">{{ strtoupper($mitra->pkp ?? '') }}</div>
+            <div class="fp-info-row">
+                <div class="fp-info-label">Kota</div>
+                <div class="fp-info-separator">:</div>
+                <div class="fp-info-value">{{ $mitra->kota_kabupaten ?? '' }}</div>
+                <div class="fp-info-label" style="padding-left: 50px;">NPPK</div>
+                <div class="fp-info-separator" style="padding-left: 25px;">:</div>
+                <div class="fp-info-value" style="padding-left: 15px;">{{ strtoupper($mitra->pkp ?? '') }}</div>
             </div>
-            <div class="info-row">
-                <div class="info-label">Nama Pejabat</div>
-                <div class="info-separator">:</div>
-                <div class="info-value">{{ $mitra->nama_cp ?? '' }}</div>
-                <div class="info-label"></div>
-                <div class="info-separator"></div>
-                <div class="info-value"></div>
+            <div class="fp-info-row">
+                <div class="fp-info-label">Nama Pejabat</div>
+                <div class="fp-info-separator">:</div>
+                <div class="fp-info-value">{{ $mitra->nama_cp ?? '' }}</div>
+                <div class="fp-info-label"></div>
+                <div class="fp-info-separator"></div>
+                <div class="fp-info-value"></div>
             </div>
         </div>
     </div>
 
     <div style="margin-bottom: 60px;"></div>
 
-    <div class="statement-section">
-        <div class="info-title">PERNYATAAN PEMASOK</div>
+    <div class="fp-statement-section">
+        <div class="fp-info-title">PERNYATAAN PEMASOK</div>
         <ol>
             <li>Bersedia tunduk dan patuh terhadap seluruh pernyataan, ketentuan, prosedur maupun instruksi yang berlaku dalam Pengadaan Gabah/Beras/Beras Negeri Perum BULOG maupun instruksi yang berlaku dalam Pengadaan Gabah/Beras/Beras Negeri Perum BULOG secara mutlak dan/atau tidak akan menggugat secara hukum.</li>
             <li>Menyampaikan penawaran komoditi sebagai berikut:</li>
@@ -482,14 +472,14 @@
         </div>
     </div>
 
-    <div class="statement-section" style="margin-top: 10px;">
+    <div class="fp-statement-section" style="margin-top: 10px;">
         <ol start="3">
             <li>Bersedia menerima hasil pemeriksaan kualitas yang dilakukan oleh pemeriksa yang ditunjuk Perum BULOG secara mutlak dan/atau tidak akan menggugat secara hukum.</li>
         </ol>
     </div>
 
-    <div class="signature-container" style="margin-top: 100px;">
-        <div class="signature-box" style="height: 110px; position: relative;">
+    <div class="fp-signature-container" style="margin-top: 100px;">
+        <div class="fp-signature-box" style="height: 110px; position: relative;">
             <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; font-weight: normal;">Tempat :</div>
             <div style="position: absolute; top: 18px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
             <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; font-weight: normal;">Tanggal :</div>
@@ -499,7 +489,7 @@
             <div style="position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: 7pt;">Tanda tangan dan nama lengkap</div>
         </div>
         <div style="display: table-cell; width: 4%;"></div>
-        <div class="signature-box-right" style="height: 105px; position: relative;">
+        <div class="fp-signature-box-right" style="height: 105px; position: relative;">
             <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; text-align: center; font-weight: normal;">Pengadaan</div>
             <div style="position: absolute; top: 25px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
             <div style="flex-grow: 1;"></div>

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Jurosh\PDFMerge\PDFMerger;
+use Illuminate\Support\Facades\Storage;
 
 class PurchaseOrderController extends Controller
 {
@@ -314,23 +316,57 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * Generate Combined PDF (Surat Permohonan + Form Penawaran)
+     * Generate Combined PDF (Surat Permohonan + Form Penawaran) using PDF Merger
      */
     public function generateCombinedPdf(PurchaseOrder $purchaseOrder)
     {
-        // Load relasi items untuk PDF
-        $purchaseOrder->load('items');
+        // Load relasi items dan mitra untuk PDF
+        $purchaseOrder->load('items', 'mitra');
+
+        // Ambil data mitra
+        $mitra = \App\Models\DataMitra::where('nama_perusahaan', $purchaseOrder->nama_perusahaan)->first();
 
         $data = [
             'purchaseOrder' => $purchaseOrder,
+            'mitra' => $mitra,
             'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
-            'no_surat' => $purchaseOrder->no_surat ?? 'NO Test',
         ];
 
-        $pdf = Pdf::loadView('pdf.combined-purchase-order', $data);
-        $pdf->setPaper('A4', 'portrait');
+        // Generate PDF 1: Surat Permohonan
+        $pdf1 = Pdf::loadView('pdf.surat-permohonan', $data);
+        $pdf1->setPaper('A4', 'portrait');
+        $tempPath1 = storage_path('app/temp/surat-permohonan-' . $purchaseOrder->id . '.pdf');
+        
+        // Pastikan direktori temp ada
+        if (!file_exists(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0755, true);
+        }
+        
+        $pdf1->save($tempPath1);
 
-        return $pdf->stream('Purchase_Order_' . $purchaseOrder->id . '.pdf');
+        // Generate PDF 2: Form Penawaran
+        $pdf2 = Pdf::loadView('pdf.form-penawaran', $data);
+        $pdf2->setPaper('A4', 'portrait');
+        $tempPath2 = storage_path('app/temp/form-penawaran-' . $purchaseOrder->id . '.pdf');
+        $pdf2->save($tempPath2);
+
+        // Merge kedua PDF
+        $merger = new PDFMerger();
+        $merger->addPDF($tempPath1, 'all');
+        $merger->addPDF($tempPath2, 'all');
+        
+        $outputPath = storage_path('app/temp/combined-po-' . $purchaseOrder->id . '.pdf');
+        $merger->merge('file', $outputPath);
+
+        // Hapus file temporary
+        @unlink($tempPath1);
+        @unlink($tempPath2);
+
+        // Buat nama file yang aman (tanpa karakter / dan \)
+        $safeFilename = 'Purchase_Order_' . str_replace(['/', '\\'], '_', $purchaseOrder->no_surat) . '.pdf';
+
+        // Return merged PDF
+        return response()->download($outputPath, $safeFilename)->deleteFileAfterSend(true);
     }
 
     /**
