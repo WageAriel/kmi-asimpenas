@@ -28,9 +28,7 @@ Route::get('/test', function () {
     return Inertia::render('Test');
 })->name('test');
 
-Route::get('/input-data-mitra', function () {
-    return Inertia::render('Mitra/InputDataMitra');
-})->name('input-data-mitra');
+
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -66,6 +64,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/daftar-mitra/template', [App\Http\Controllers\DataMitraController::class, 'downloadTemplate'])->name('daftar-mitra.template');
     Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
     Route::put('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'updateByAdmin'])->name('admin.daftar-mitra.update');
+    
 
     // 4. Daftar Seleksi Mitra
     Route::get('/seleksi-mitra', function () {
@@ -186,6 +185,8 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
         ]);
     })->name('dashboard');
 
+    
+
     //2. untuk mengakses tabel pengajuan seleksi
     Route::get('/pengajuan-seleksi', function () {
         return Inertia::render('Mitra/PengajuanSeleksi/Index');
@@ -282,6 +283,8 @@ Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'role:su
             'mitras' => $mitras
         ]);
     })->name('daftar-mitra.index');
+    Route::delete('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'destroy'])->name('daftar-mitra.destroy');
+    Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
 
     // 4. Daftar Seleksi Mitra
     Route::get('/seleksi-mitra', function () {
@@ -337,6 +340,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/input-data-mitra', function () {
+        return Inertia::render('Mitra/InputDataMitra');
+    })->name('input-data-mitra');
 });
 
 // API Routes

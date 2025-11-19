@@ -125,7 +125,7 @@ onMounted(async () => {
                 id: 1,
                 type: 'warning',
                 title: 'Data Mitra Diperlukan',
-                message: 'Lengkapi data mitra untuk dapat mengikuti proses seleksi dan klasifikasi',
+                message: 'Lengkapi data mitra terlebih dahulu sebelum memulai pengajuan',
                 action: 'Lengkapi Data',
                 route: 'input-data-mitra',
                 urgent: true
@@ -476,12 +476,12 @@ const goToAction = (action) => {
                                 <div class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
                                         <div class="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold">
-                                            {{ birthday.nama_perusahaan ? birthday.nama_perusahaan.charAt(0).toUpperCase() : '?' }}
+                                            {{ birthday.nama_cp ? birthday.nama_cp.charAt(0).toUpperCase() : '?' }}
                                         </div>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">{{ birthday.nama_perusahaan }}</p>
-                                        <p class="text-xs text-gray-500">{{ birthday.nama_cp }}</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ birthday.nama_cp }}</p>
+                                        <p class="text-xs text-gray-500">{{ birthday.nama_perusahaan }}</p>
                                     </div>
                                 </div>
                                 <div class="text-right">

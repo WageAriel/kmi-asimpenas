@@ -669,7 +669,7 @@ class PdfGeneratorController extends Controller
                 'tahun' => date('Y'),
                 'nama_cp' => $mitra->nama_cp,
                 'alamat_perusahaan' => $mitra->alamat_perusahaan,
-                'jabatan' => 'Direktur', // You can add this field to your mitra table if needed
+                'jabatan' => $mitra->jabatan ?? 'Direktur',
                 'nama_perusahaan' => $mitra->nama_perusahaan
             ];
 
@@ -695,7 +695,7 @@ class PdfGeneratorController extends Controller
                 'tanggal' => Carbon::now()->locale('id')->isoFormat('D MMMM Y'),
                 'nama_cp' => $mitra->nama_cp,
                 'alamat_perusahaan' => $mitra->alamat_perusahaan,
-                'jabatan' => 'Direktur', // You can modify this as needed
+                'jabatan' => $mitra->jabatan ?? 'Direktur',
                 'nama_perusahaan' => $mitra->nama_perusahaan
             ];
 

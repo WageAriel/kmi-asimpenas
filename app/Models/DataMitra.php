@@ -40,6 +40,7 @@ class DataMitra extends Model
         'email',
         'no_vms',
         'kode_mitra',
+        'jabatan',
     ];
 
     protected $dates = [

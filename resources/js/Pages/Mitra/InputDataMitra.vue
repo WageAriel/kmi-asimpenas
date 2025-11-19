@@ -12,6 +12,7 @@ const form = ref({
   kota_kabupaten: "",
   provinsi: "",
   nama_cp: "",
+  jabatan: "",
   nik:"",
   tempat_lahir: "",
   tanggal_lahir: "",
@@ -87,6 +88,7 @@ const isFormValid = computed(() => {
     'kota_kabupaten',
     'provinsi',
     'nama_cp',
+    'jabatan',
     'nik',
     'tempat_lahir',
     'tanggal_lahir',
@@ -120,6 +122,7 @@ const getEmptyFields = () => {
     { key: 'kota_kabupaten', label: 'Kota/Kabupaten' },
     { key: 'provinsi', label: 'Provinsi' },
     { key: 'nama_cp', label: 'Nama Contact Person' },
+    { key: 'jabatan', label: 'Jabatan' },
     { key: 'nik', label: 'NIK' },
     { key: 'tempat_lahir', label: 'Tempat Lahir' },
     { key: 'tanggal_lahir', label: 'Tanggal Lahir' },
@@ -180,31 +183,36 @@ const submitForm = async () => {
 
   try {
     let response;
-    if (mitraId.value) {
+    const isUpdate = !!mitraId.value;
+    
+    if (isUpdate) {
       // update (PUT)
       response = await axios.put(`/data-mitra/${mitraId.value}`, form.value);
     } else {
       // create (POST)
       response = await axios.post('/data-mitra', form.value);
+      // Set mitraId dari response setelah POST berhasil
+      if (response.data && response.data.id_mitra) {
+        mitraId.value = response.data.id_mitra;
+      }
     }
-    successMessage.value = "Data mitra berhasil ditambahkan!";
+    
+    successMessage.value = isUpdate ? "Data mitra berhasil diperbarui!" : "Data mitra berhasil ditambahkan!";
     errorMessage.value = "";
     
     // Tampilkan notifikasi success
     showNotification(
       'success',
       'Berhasil!',
-      'Data mitra berhasil ditambahkan dan disimpan ke sistem.'
+      isUpdate ? 'Data mitra berhasil diperbarui dan disimpan ke sistem.' : 'Data mitra berhasil ditambahkan dan disimpan ke sistem. Anda dapat mengunduh dokumen sekarang.'
     );
 
-    router.reload();
-    
-    // Reset form setelah berhasil submit
-    
-    // Set ulang data user
-    if (user.value) {
-      form.value.nama_perusahaan = user.value.name;
-      form.value.email = user.value.email;
+    // Jika create, tidak perlu reload - button sudah bisa digunakan
+    // Jika update, reload setelah delay
+    if (isUpdate) {
+      setTimeout(() => {
+        router.reload();
+      }, 800);
     }
     
   } catch (error) {
@@ -446,7 +454,7 @@ const generatePaktaIntegritasPdf = async () => {
                 <option value="">Pilih Status Perusahaan</option>
                 <option value="Penggilingan">Penggilingan</option>
                 <option value="Distributor">Distributor</option>
-                <option value="lainnya">Lainnya</option>
+                <option value="Gapoktan">Gapoktan</option>
               </select>
             </div>
 
@@ -576,6 +584,23 @@ const generatePaktaIntegritasPdf = async () => {
                   form.nama_cp.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
                 ]"
                 placeholder="Masukkan nama contact person"
+              />
+            </div>
+
+            <!-- Jabatan -->
+            <div class="space-y-2">
+              <label for="jabatan" class="block text-sm font-medium">
+                Jabatan <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="jabatan"
+                v-model="form.jabatan"
+                :class="[
+                  'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
+                  form.jabatan.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                ]"
+                placeholder="Contoh: Direktur, Manajer, dll"
               />
             </div>
 
@@ -876,7 +901,8 @@ const generatePaktaIntegritasPdf = async () => {
         </div>
         
         <!-- Submit Button -->
-        <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+          <h3 class="text-md font-medium text-gray-900">Download Dokumen yang Dibutuhkan</h3>
+          <div class="flex justify-between items-center">
           <div class="flex gap-3">
             <button 
                 type="button" 
@@ -891,7 +917,7 @@ const generatePaktaIntegritasPdf = async () => {
             >
                 <span v-if="isSubmitting">Generating...</span>
                 <span v-else-if="!mitraId">Simpan Data Dulu</span>
-                <span v-else>Surat Permohonan</span>
+                <span v-else>Surat Permohonan MPP</span>
             </button>
 
             <button 
@@ -955,6 +981,7 @@ const generatePaktaIntegritasPdf = async () => {
             <span v-else>Simpan Data</span>
           </button>
         </div>
+        
       </form>
 
       <!-- Success/Error Messages -->

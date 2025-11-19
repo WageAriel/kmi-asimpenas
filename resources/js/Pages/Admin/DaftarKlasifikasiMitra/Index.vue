@@ -407,47 +407,6 @@ const exportData = () => {
     window.location.href = '/klasifikasi-mitra/export/data';
 };
 
-// Delete functionality
-const showDeleteModal = ref(false);
-const selectedItemToDelete = ref(null);
-const isDeleting = ref(false);
-const deleteError = ref(null);
-
-const openDeleteModal = (item) => {
-    selectedItemToDelete.value = item;
-    showDeleteModal.value = true;
-    deleteError.value = null;
-};
-
-const closeDeleteModal = () => {
-    showDeleteModal.value = false;
-    selectedItemToDelete.value = null;
-    deleteError.value = null;
-    isDeleting.value = false;
-};
-
-const confirmDelete = async () => {
-    if (!selectedItemToDelete.value) return;
-
-    isDeleting.value = true;
-    deleteError.value = null;
-
-    try {
-        await axios.delete(`/klasifikasi-mitra/${selectedItemToDelete.value.id_klasifikasi_mitra}`);
-        
-        // Reload page after successful deletion
-        window.location.reload();
-    } catch (error) {
-        console.error('Error deleting klasifikasi:', error);
-        if (error.response && error.response.data && error.response.data.message) {
-            deleteError.value = error.response.data.message;
-        } else {
-            deleteError.value = 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.';
-        }
-        isDeleting.value = false;
-    }
-};
-
 // Add new refs
 const showPdfModal = ref(false);
 const selectedItemForPdf = ref(null);
@@ -590,7 +549,7 @@ const generateBaPdf = async () => {
                             class="inline-flex items-center px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition-colors duration-200 font-medium shadow-sm"
                         >
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                             Import Excel
                         </button>
@@ -599,7 +558,7 @@ const generateBaPdf = async () => {
                             class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium shadow-sm"
                         >
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                             </svg>
                             Export Excel
                         </button>
@@ -671,15 +630,6 @@ const generateBaPdf = async () => {
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                             </svg>
                                             Lihat
-                                        </button>
-                                        <button
-                                            @click="openDeleteModal(item)"
-                                            class="inline-flex items-center px-2 py-1 text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded transition-colors duration-200 text-xs"
-                                        >
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
-                                            Hapus
                                         </button>
                                     </div>
                                 </td>
@@ -1171,57 +1121,6 @@ const generateBaPdf = async () => {
         </div>
 
         <!-- Delete Confirmation Modal -->
-        <div v-if="showDeleteModal" @click="closeDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
-                <button @click="closeDeleteModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-
-                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                </div>
-
-                <h2 class="text-xl font-bold mb-2 text-center text-gray-900">Konfirmasi Hapus Data</h2>
-                <p class="text-sm text-gray-600 text-center mb-6">
-                    Apakah Anda yakin ingin menghapus data klasifikasi mitra untuk 
-                    <strong class="text-gray-900">{{ selectedItemToDelete?.mitra?.nama_perusahaan }}</strong>?
-                    <br><br>
-                    <span class="text-red-600 font-semibold">Tindakan ini tidak dapat dibatalkan!</span>
-                </p>
-
-                <!-- Error Message -->
-                <div v-if="deleteError" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
-                    {{ deleteError }}
-                </div>
-
-                <div class="flex justify-end gap-3">
-                    <button
-                        @click="closeDeleteModal"
-                        :disabled="isDeleting"
-                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        @click="confirmDelete"
-                        :disabled="isDeleting"
-                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
-                    >
-                        <svg v-if="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <svg v-else class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                        {{ isDeleting ? 'Menghapus...' : 'Ya, Hapus Data' }}
-                    </button>
-                </div>
-            </div>
-        </div>
+        
     </AdminLayout>
 </template>

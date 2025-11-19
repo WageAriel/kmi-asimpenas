@@ -43,6 +43,7 @@ return new class extends Migration
             $table->string('email')->unique()->nullable();
             $table->string('no_vms', 50)->nullable();
             $table->string('kode_mitra', 50)->unique()->nullable();
+            $table->string('jabatan')->nullable();
             $table->timestamps();
 
             // Setelah kolom ada, baru set foreign key
