@@ -32,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
 // ========================================
 // Route untuk mitra akses data mereka sendiri
 Route::middleware(['auth:sanctum', 'role:mitra'])->group(function () {
+    // Specific routes harus di atas dynamic routes
+    Route::get('/data-mitra/birthdays', [DataMitraController::class, 'getBirthdays']);
     Route::get('/data-mitra/my', [DataMitraController::class, 'myMitra']);
     Route::get('/data-seleksi-mitra/my', [DataSeleksiMitraController::class, 'mySeleksi']);
     Route::get('/klasifikasi-mitra/my', [KlasifikasiMitraController::class, 'myKlasifikasi']);
@@ -43,6 +45,7 @@ Route::middleware(['auth:sanctum', 'role:mitra'])->group(function () {
 // ========================================
 Route::middleware(['auth:sanctum', 'role:mitra,admin,super admin'])->group(function () {
     // Data Mitra - CRUD (Semua role bisa POST, GET, PUT)
+    // Dynamic routes {id} harus di bawah specific routes
     Route::post('/data-mitra', [DataMitraController::class, 'store'])->name('data-mitra.store');
     Route::get('/data-mitra/{id}', [DataMitraController::class, 'show'])->name('data-mitra.show');
     Route::put('/data-mitra/{id}', [DataMitraController::class, 'update'])->name('data-mitra.update');
@@ -68,14 +71,15 @@ Route::middleware(['auth:sanctum', 'role:mitra,admin,super admin'])->group(funct
 // ========================================
 Route::middleware(['auth:sanctum', 'role:admin,super admin'])->group(function () {
     // Data Mitra - Admin & Super Admin bisa lihat semua & birthdays
+    // Specific routes HARUS di atas dynamic routes
     Route::get('/data-mitra', [DataMitraController::class, 'index'])->name('data-mitra.index');
-    Route::get('/data-mitra/birthdays', [DataMitraController::class, 'getBirthdays']);
     
     // Import/Export routes for Data Seleksi Mitra
     Route::post('/data-seleksi-mitra/import', [DataSeleksiMitraController::class, 'import'])->name('data-seleksi-mitra.import');
     Route::get('/data-seleksi-mitra/export/data', [DataSeleksiMitraController::class, 'export'])->name('data-seleksi-mitra.export');
     Route::get('/data-seleksi-mitra/export/template', [DataSeleksiMitraController::class, 'downloadTemplate'])->name('data-seleksi-mitra.template');
     
+
     // Hasil Seleksi Mitra - Admin & Super Admin full CRUD
     Route::get('/hasil-seleksi-mitra', [HasilSeleksiMitraController::class, 'index']);
     Route::post('/hasil-seleksi-mitra', [HasilSeleksiMitraController::class, 'store']);

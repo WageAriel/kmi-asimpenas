@@ -10,11 +10,11 @@ return [
          * The default configurations to be used by the meta generator.
          */
         'defaults'       => [
-            'title'        => "ASIMPENAS - Sistem Informasi Manajemen Mitra Pangan", // set false to total remove
+            'title'        => "ASIMPENAS", // set false to total remove
             'titleBefore'  => false, // Put defaults.title before page title, like 'It's Over 9000! - Dashboard'
-            'description'  => 'Aplikasi Sistem Informasi Manajemen Mitra Pangan (ASIMPENAS) - Perum BULOG Kantor Cabang Surakarta untuk pengelolaan data mitra gabah dan beras dalam negeri', // set false to total remove
+            'description'  => 'Aplikasi Seleksi Mitra dan Penawaran Komoditas - Perum BULOG Kantor Cabang Surakarta untuk pengelolaan data mitra gabah dan beras dalam negeri', // set false to total remove
             'separator'    => ' | ',
-            'keywords'     => ['ASIMPENAS', 'Bulog', 'Mitra Pangan', 'Gabah', 'Beras', 'Surakarta', 'Sistem Informasi', 'Manajemen Mitra'],
+            'keywords'     => ['ASIMPENAS','asimpenas', 'Bulog', 'Mitra Pangan', 'Gabah', 'Beras', 'Surakarta', 'Sistem Informasi', 'Manajemen Mitra'],
             'canonical'    => 'current', // Set to null or 'full' to use Url::full(), set to 'current' to use Url::current(), set false to total remove
             'robots'       => 'index,follow', // Set to 'all', 'none' or any combination of index/noindex and follow/nofollow
         ],
@@ -38,7 +38,7 @@ return [
          */
         'defaults' => [
             'title'       => 'ASIMPENAS - Sistem Informasi Manajemen Mitra Pangan', // set false to total remove
-            'description' => 'Aplikasi Sistem Informasi Manajemen Mitra Pangan (ASIMPENAS) - Perum BULOG Kantor Cabang Surakarta untuk pengelolaan data mitra gabah dan beras dalam negeri', // set false to total remove
+            'description' => 'Aplikasi Seleksi Mitra dan Penawaran Komoditas - Perum BULOG Kantor Cabang Surakarta untuk pengelolaan data mitra gabah dan beras dalam negeri', // set false to total remove
             'url'         => null, // Set null for using Url::current(), set false to total remove
             'type'        => 'website',
             'site_name'   => 'ASIMPENAS',

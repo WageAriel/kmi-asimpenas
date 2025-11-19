@@ -1,11 +1,12 @@
 <script setup>
-import { Link, router, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { Link, router, usePage, Head } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import logoImg from '@/../../resources/assets/Images/bulog.png';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 const isAuthenticated = computed(() => !!user.value);
+const mobileMenuOpen = ref(false);
 
 // Get dashboard route based on user role
 const dashboardRoute = computed(() => {
@@ -34,9 +35,20 @@ const handleLogout = () => {
         }
     });
 };
+
+// Toggle mobile menu
+const toggleMobileMenu = () => {
+    mobileMenuOpen.value = !mobileMenuOpen.value;
+};
 </script>
 
 <template>
+    <Head>
+        <title>ASIMPENAS - Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG Surakarta</title>
+        <meta name="description" content="Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Surakarta. Daftar sebagai mitra pangan sekarang!" />
+        <meta name="keywords" content="ASIMPENAS, Bulog, Mitra Pangan, Gabah, Beras, Surakarta, Seleksi Mitra, Komoditas" />
+    </Head>
+
     <section class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <!-- Header dengan Logo dan Auth Buttons -->
         <div class="w-full px-4 py-6">
@@ -46,13 +58,13 @@ const handleLogout = () => {
                         <img :src="logoImg" alt="Logo Bulog" class="w-7 h-7 object-contain" />
                     </div>
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">ASIMPENAS</span>
-                        <p class="text-xs text-gray-500">Aplikasi Seleksi Mitra</p>
+                        <span class="text-xl sm:text-2xl font-bold text-gray-800">ASIMPENAS</span>
+                        <p class="text-xs text-gray-500 hidden sm:block">Aplikasi Seleksi Mitra</p>
                     </div>
                 </div>
 
-                <!-- Conditional Buttons: Show different buttons based on auth status -->
-                <div class="flex gap-3 items-center">
+                <!-- Desktop Menu - Hidden on mobile -->
+                <div class="hidden lg:flex gap-3 items-center">
                     <!-- When user is NOT logged in -->
                     <template v-if="!isAuthenticated">
                         <Link 
@@ -73,7 +85,7 @@ const handleLogout = () => {
                     <template v-else>
                         <div class="flex items-center gap-3">
                             <!-- User Info -->
-                            <div class="hidden sm:block text-right">
+                            <div class="text-right">
                                 <p class="text-sm font-medium text-gray-800">{{ user.name }}</p>
                                 <p class="text-xs text-gray-500 capitalize">{{ user.role }}</p>
                             </div>
@@ -102,18 +114,95 @@ const handleLogout = () => {
                         </div>
                     </template>
                 </div>
+
+                <!-- Mobile Menu Button - Visible on mobile only -->
+                <button 
+                    @click="toggleMobileMenu"
+                    class="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                    <svg v-if="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
+
+            <!-- Mobile Menu Dropdown -->
+            <Transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="opacity-0 -translate-y-2"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 -translate-y-2"
+            >
+                <div v-if="mobileMenuOpen" class="lg:hidden mt-4 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <!-- When user is NOT logged in -->
+                    <template v-if="!isAuthenticated">
+                        <div class="p-4 space-y-2">
+                            <Link 
+                                href="/login" 
+                                class="block w-full px-4 py-3 text-center text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                                @click="mobileMenuOpen = false"
+                            >
+                                Login
+                            </Link>
+                            <Link 
+                                href="/register" 
+                                class="block w-full px-4 py-3 text-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                @click="mobileMenuOpen = false"
+                            >
+                                Register
+                            </Link>
+                        </div>
+                    </template>
+
+                    <!-- When user IS logged in -->
+                    <template v-else>
+                        <div class="p-4 border-b border-gray-200 bg-gray-50">
+                            <p class="text-sm font-medium text-gray-800">{{ user.name }}</p>
+                            <p class="text-xs text-gray-500 capitalize">{{ user.role }}</p>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <Link 
+                                :href="dashboardRoute" 
+                                class="flex items-center justify-center gap-2 w-full px-4 py-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                                @click="mobileMenuOpen = false"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                Dashboard
+                            </Link>
+                            <button 
+                                @click="handleLogout(); mobileMenuOpen = false"
+                                class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Logout
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </Transition>
         </div>
 
         <!-- Main Content -->
         <div class="max-w-6xl mx-auto px-4 py-12">
-            <!-- Intro Section -->
+            <!-- Intro Section with Proper SEO Headings -->
             <div class="text-center mb-16">
                 <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
                     Selamat Datang di <span class="text-blue-600">ASIMPENAS</span>
                 </h1>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                    Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG untuk seleksi calon mitra, klasifikasi mitra, dan penawaran komoditas
+                <h2 class="text-xl md:text-2xl text-gray-700 font-semibold max-w-3xl mx-auto mb-4">
+                    Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG
+                </h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+                    Platform digital untuk seleksi calon mitra pangan, klasifikasi mitra, dan penawaran komoditas gabah dan beras
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">

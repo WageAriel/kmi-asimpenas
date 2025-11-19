@@ -364,7 +364,11 @@ const goToAction = (action) => {
 </script>
 
 <template>
-    <Head title="Dashboard Mitra - ASIMPENAS" />
+    <Head>
+        <title>Dashboard Mitra - ASIMPENAS | Perum BULOG Surakarta</title>
+        <meta name="description" content="Dashboard mitra ASIMPENAS untuk mengelola pengajuan seleksi, klasifikasi, dan penawaran komoditas gabah beras dari Perum BULOG Surakarta" />
+        <meta name="robots" content="noindex, nofollow" />
+    </Head>
 
     <MitraLayout>
         <!-- Dashboard Content -->
@@ -502,6 +506,9 @@ const goToAction = (action) => {
                 </div>
 
                 <!-- Quick Stats -->
+                <h2 class="text-xl font-bold text-gray-900 mb-6 px-2">
+                    Statistik Pengajuan Mitra
+                </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <!-- Total Pengajuan Seleksi -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">

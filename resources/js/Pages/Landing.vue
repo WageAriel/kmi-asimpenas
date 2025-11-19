@@ -4,7 +4,7 @@ import Hero from '@/Components/Hero.vue';
 </script>
 
 <template>
-    <Head title="ASIMPENAS - Aplikasi Seleksi Mitra dan Penawaran Komoditas" />
+    <Head title="ASIMPENAS" />
     
     <LandingLayout>
         <Hero />
