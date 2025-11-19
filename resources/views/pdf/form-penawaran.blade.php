@@ -2,248 +2,281 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Penawaran</title>
     <style>
         @page {
-            margin: 2cm;
+            margin: 1.5cm 2cm;
             size: A4;
         }
         
         body {
-            font-family: 'Times New Roman', serif;
-            font-size: 12pt;
-            line-height: 1.2;
+            font-family: Calibri, sans-serif;
+            font-size: 9pt;
+            line-height: 1.4;
             margin: 0;
             padding: 0;
         }
         
         .header {
-            text-align: center;
-            margin-bottom: 30px;
+            text-align: left;
+            margin-bottom: 15px;
         }
         
         .company-name {
-            font-size: 16pt;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 9pt;
+            font-weight: normal;
         }
         
         .address {
-            font-size: 10pt;
-            margin-bottom: 10px;
+            font-size: 9pt;
         }
         
         .title {
             text-align: center;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 15px 0;
+            font-size: 11pt;
+        }
+        
+        .info-section {
+            margin: 15px 0;
+            font-size: 9pt;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 8px;
             text-decoration: underline;
-            font-size: 14pt;
         }
         
-        .form-section {
-            margin-bottom: 20px;
-        }
-        
-        .form-row {
-            display: flex;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-        
-        .form-label {
-            width: 30%;
-            font-weight: bold;
-        }
-        
-        .form-value {
-            width: 70%;
-            border-bottom: 1px solid #000;
-            padding-bottom: 2px;
-            min-height: 20px;
-        }
-        
-        .commodity-table {
+        .info-grid {
+            display: table;
             width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
         }
         
-        .commodity-table th,
-        .commodity-table td {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: center;
+        .info-row {
+            display: table-row;
         }
         
-        .commodity-table th {
-            background-color: #f0f0f0;
-            font-weight: bold;
-            font-size: 10pt;
+        .info-label {
+            display: table-cell;
+            width: 18%;
+            padding: 1px 0;
+            white-space: nowrap;
         }
         
-        .commodity-table td {
-            font-size: 10pt;
+        .info-separator {
+            display: table-cell;
+            width: 1%;
         }
         
-        .terms {
-            margin: 20px 0;
+        .info-value {
+            display: table-cell;
+            width: 31%;
+            padding: 1px 0;
+        }
+        
+        .statement-section {
+            margin: 2px 0;
             text-align: justify;
-            line-height: 1.5;
+            line-height: 1.3;
         }
         
-        .signature {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
+        .statement-section ol {
+            margin: 2px 0;
+            padding-left: 20px;
         }
         
-        .signature-section {
-            width: 45%;
+        .statement-section li {
+            margin: 2px 0;
+        }
+        
+        .signature-container {
+            margin-top: 20px;
+            display: table;
+            width: 100%;
+        }
+        
+        .signature-box {
+            display: table-cell;
+            width: 2%;
+            border: 1px solid #000;
+            padding: 3px 5px;
+            vertical-align: top;
+            font-size: 8pt;
+        }
+        
+        .signature-box-right {
+            display: table-cell;
+            width: 2%;
+            border: 1px solid #000;
+            padding: 3px 5px;
+            vertical-align: top;
+            font-size: 8pt;
+        }
+        
+        .signature-title {
             text-align: center;
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 8pt;
+        }
+        
+        .signature-label {
+            margin-top: 2px;
+            font-size: 8pt;
+        }
+        
+        .signature-space {
+            height: 50px;
+        }
+        
+        .signature-name {
+            text-align: center;
+            margin-top: 2px;
+            font-size: 7pt;
         }
         
         .signature-line {
-            margin-top: 60px;
             border-bottom: 1px solid #000;
-            margin-bottom: 10px;
-        }
-        
-        .checkbox-item {
-            margin: 5px 0;
-        }
-        
-        .checkbox-item input[type="checkbox"] {
-            margin-right: 5px;
+            margin-bottom: 2px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="company-name">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
-        <div class="address">{{ $mitra->alamat_perusahaan ?? 'Alamat Perusahaan' }}</div>
+        <div class="company-name">Perum BULOG</div>
+        <div class="address">Kantor Cabang Surakarta</div>
     </div>
 
     <div class="title">
-        FORM PENAWARAN<br>
-        PENGADAAN {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}
+        FORM PENAWARAN {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} DALAM NEGERI
     </div>
 
-    <div class="form-section">
-        <div class="form-row">
-            <div class="form-label">Nama Perusahaan:</div>
-            <div class="form-value">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-label">Jenis Komoditas:</div>
-            <div class="form-value">{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-label">Jenis Pengadaan:</div>
-            <div class="form-value">{{ $purchaseOrder->jenis_pengadaan }}</div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-label">Jumlah Item:</div>
-            <div class="form-value">{{ $purchaseOrder->items->count() }} item</div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-label">Total Nilai:</div>
-            <div class="form-value">Rp {{ number_format($purchaseOrder->total_nilai, 0, ',', '.') }}</div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-label">Tanggal Penawaran:</div>
-            <div class="form-value">{{ $tanggal }}</div>
+    <div class="info-section">
+        <div class="info-title">DATA INFORMASI PEMASOK</div>
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-label">Nama Pemasok</div>
+                <div class="info-separator">:</div>
+                <div class="info-value">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+                <div class="info-label" style="padding-left: 50px;">Nama Bank</div>
+                <div class="info-separator" style="padding-left: 25px;">:</div>
+                <div class="info-value" style="padding-left: 15px;">{{ $mitra->bank_korespondensi ?? '' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Alamat Pemasok</div>
+                <div class="info-separator">:</div>
+                <div class="info-value">{{ $mitra->alamat_perusahaan ?? '' }}</div>
+                <div class="info-label" style="padding-left: 50px;">Nomor Rekening</div>
+                <div class="info-separator" style="padding-left: 25px;">:</div>
+                <div class="info-value" style="padding-left: 15px;">{{ $mitra->no_rekening ?? '' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Nomor KTP</div>
+                <div class="info-separator">:</div>
+                <div class="info-value">{{ $mitra->nik ?? '' }}</div>
+                <div class="info-label" style="padding-left: 50px;">Nama Pemilik</div>
+                <div class="info-separator" style="padding-left: 25px;">:</div>
+                <div class="info-value" style="padding-left: 15px;">{{ $mitra->nama_cp ?? '' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Nomor Telepon/HP</div>
+                <div class="info-separator">:</div>
+                <div class="info-value">{{ $mitra->no_telp_cp ?? $mitra->no_telp_perusahaan ?? '' }}</div>
+                <div class="info-label" style="padding-left: 50px;">NPWP</div>
+                <div class="info-separator" style="padding-left: 25px;">:</div>
+                <div class="info-value" style="padding-left: 15px;">{{ $mitra->npwp ?? '' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Kota</div>
+                <div class="info-separator">:</div>
+                <div class="info-value">{{ $mitra->kota_kabupaten ?? '' }}</div>
+                <div class="info-label" style="padding-left: 50px;">NPPK</div>
+                <div class="info-separator" style="padding-left: 25px;">:</div>
+                <div class="info-value" style="padding-left: 15px;">{{ strtoupper($mitra->pkp ?? '') }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Nama Pejabat</div>
+                <div class="info-separator">:</div>
+                <div class="info-value">{{ $mitra->nama_cp ?? '' }}</div>
+                <div class="info-label"></div>
+                <div class="info-separator"></div>
+                <div class="info-value"></div>
+            </div>
+            
         </div>
     </div>
 
-    <table class="commodity-table">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Jenis Komoditas</th>
-                <th>Harga (Rp/Kg)</th>
-                <th>Kuantum (Kg)</th>
-                <th>Nilai (Rp)</th>
-                <th>Komp. Pergud.</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($purchaseOrder->items as $index => $item)
-            <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} - {{ $item->kualitas_lengkap }}</td>
-                <td>{{ number_format($item->harga, 0, ',', '.') }}</td>
-                <td>{{ number_format($item->kuantum, 0, ',', '.') }}</td>
-                <td>{{ number_format($item->nilai, 0, ',', '.') }}</td>
-                <td>{{ $item->komplek_pergudangan_lengkap }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="6" style="text-align: center; color: #999;">Tidak ada data item</td>
-            </tr>
-            @endforelse
-            @if($purchaseOrder->items->count() > 0)
-            <tr style="font-weight: bold; background-color: #f5f5f5;">
-                <td colspan="4" style="text-align: right;">TOTAL:</td>
-                <td>{{ number_format($purchaseOrder->total_nilai, 0, ',', '.') }}</td>
-                <td>-</td>
-            </tr>
-            @endif
-        </tbody>
-    </table>
+    <div style="margin-bottom: 60px;"></div>
 
-    <div class="terms">
-        <p><strong>SYARAT DAN KETENTUAN:</strong></p>
+    <div class="statement-section">
+        <div class="info-title">PERNYATAAN PEMASOK</div>
         <ol>
-            <li>Harga yang ditawarkan sudah termasuk semua biaya sampai dengan gudang BULOG.</li>
-            <li>Pembayaran dilakukan setelah barang diterima dan sesuai dengan spesifikasi yang diminta.</li>
-            <li>Waktu pengiriman maksimal 7 (tujuh) hari setelah kontrak ditandatangani.</li>
-            <li>Barang yang tidak sesuai spesifikasi akan ditolak dan menjadi tanggung jawab pemasok.</li>
-            <li>Penawaran ini berlaku selama 30 (tiga puluh) hari sejak tanggal penawaran.</li>
+            <li>Bersedia tunduk dan patuh terhadap seluruh pernyataan, ketentuan, prosedur maupun instruksi yang berlaku dalam Pengadaan Gabah/Beras/Beras Negeri Perum BULOG maupun instruksi yang berlaku dalam Pengadaan Gabah/Beras/Beras Negeri Perum BULOG secara mutlak dan/atau tidak akan menggugat secara hukum.</li>
+            <li>Menyampaikan penawaran komoditi sebagai berikut:</li>
         </ol>
     </div>
 
-    <div class="signature">
-        <div class="signature-section">
-            <p><strong>PENAWAR</strong></p>
-            <div class="signature-line"></div>
-            <p><strong>{{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? 'NAMA CP') }}</strong><br>
-            {{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</p>
-        </div>
+    @php
+        // Gabungkan semua kualitas dengan pemisah /
+        $kualitasList = $purchaseOrder->items->pluck('kualitas_lengkap')->unique()->filter()->implode(' / ');
         
-        <div class="signature-section">
-            <p><strong>PERUSAHAAN UMUM BULOG</strong></p>
-            <div class="signature-line"></div>
-            <p><strong>(.............................)</strong><br>
-            Pejabat yang Berwenang</p>
+        // Gabungkan semua kuantum dengan pemisah /
+        $kuantumList = $purchaseOrder->items->pluck('kuantum')->map(function($k) {
+            return number_format($k, 0, ',', '.') . ' Kg';
+        })->implode(' / ');
+    @endphp
+
+    <div style="margin: 5px 0; padding-left: 40px;">
+        <div style="margin-bottom: 3px; display: table; width: 100%;">
+            <div style="display: table-row;">
+                <div style="display: table-cell; width: 120px;">a. Jenis Komoditi</div>
+                <div style="display: table-cell; width: 10px;">:</div>
+                <div style="display: table-cell;">{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</div>
+            </div>
+        </div>
+        <div style="margin-bottom: 5px; display: table; width: 100%;">
+            <div style="display: table-row;">
+                <div style="display: table-cell; width: 120px;">b. Kualitas</div>
+                <div style="display: table-cell; width: 10px;">:</div>
+                <div style="display: table-cell;">{{ $kualitasList }}</div>
+            </div>
+        </div>
+        <div style="margin-bottom: 5px; display: table; width: 100%;">
+            <div style="display: table-row;">
+                <div style="display: table-cell; width: 120px;">c. Kuantum</div>
+                <div style="display: table-cell; width: 10px;">:</div>
+                <div style="display: table-cell;">{{ $kuantumList }}</div>
+            </div>
         </div>
     </div>
 
-    <div style="margin-top: 30px; border: 1px solid #000; padding: 10px;">
-        <p><strong>PERSETUJUAN / DISPOSISI:</strong></p>
-        <div class="checkbox-item">
-            <input type="checkbox"> Disetujui untuk dilanjutkan ke proses kontrak
+    <div class="statement-section" style="margin-top: 10px;">
+        <ol start="3">
+            <li>Bersedia menerima hasil pemeriksaan kualitas yang dilakukan oleh pemeriksa yang ditunjuk Perum BULOG secara mutlak dan/atau tidak akan menggugat secara hukum.</li>
+        </ol>
+    </div>
+
+    <div class="signature-container" style="margin-top: 100px;">
+        <div class="signature-box" style="height: 110px; position: relative;">
+            <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; font-weight: normal;">Tempat :</div>
+            <div style="position: absolute; top: 18px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
+            <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; font-weight: normal;">Tanggal :</div>
+            <div style="position: absolute; top: 36px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
+            <div style="flex-grow: 1;"></div>
+            <div style="position: absolute; bottom: 20px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
+            <div style="position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: 7pt;">Tanda tangan dan nama lengkap</div>
         </div>
-        <div class="checkbox-item">
-            <input type="checkbox"> Perlu klarifikasi teknis
-        </div>
-        <div class="checkbox-item">
-            <input type="checkbox"> Perlu negosiasi harga
-        </div>
-        <div class="checkbox-item">
-            <input type="checkbox"> Ditolak dengan alasan: _________________________
-        </div>
-        
-        <div style="margin-top: 20px;">
-            <p>Tanggal: _______________</p>
-            <p>Paraf: _______________</p>
+        <div style="display: table-cell; width: 4%;"></div>
+        <div class="signature-box-right" style="height: 105px; position: relative;">
+            <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; text-align: center; font-weight: normal;">Pengadaan</div>
+            <div style="position: absolute; top: 25px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
+            <div style="flex-grow: 1;"></div>
+            <div style="position: absolute; bottom: 15px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
+            <div style="position: absolute; bottom: 1px; left: 0; right: 0; text-align: center; font-size: 7pt;">Tanda tangan dan nama lengkap</div>
         </div>
     </div>
+
 </body>
 </html>
