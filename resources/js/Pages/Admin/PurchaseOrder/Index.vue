@@ -1,14 +1,40 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
-import MitraLayout from '@/Layouts/MitraLayout.vue';
-import { ref } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
-    purchaseOrders: Object
+    purchaseOrders: Object,
+    filters: Object
 });
 
 const showDeleteModal = ref(false);
 const selectedPO = ref(null);
+
+// Filter state
+const filterMonth = ref(props.filters?.month || '');
+const filterYear = ref(props.filters?.year || new Date().getFullYear());
+
+// Generate month options
+const monthOptions = [
+    { value: '', label: 'Semua Bulan' },
+    { value: '1', label: 'Januari' },
+    { value: '2', label: 'Februari' },
+    { value: '3', label: 'Maret' },
+    { value: '4', label: 'April' },
+    { value: '5', label: 'Mei' },
+    { value: '6', label: 'Juni' },
+    { value: '7', label: 'Juli' },
+    { value: '8', label: 'Agustus' },
+    { value: '9', label: 'September' },
+    { value: '10', label: 'Oktober' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'Desember' },
+];
+
+// Generate year options (current year and 5 years back)
+const currentYear = new Date().getFullYear();
+const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
 
 const confirmDelete = (po) => {
     selectedPO.value = po;
@@ -17,15 +43,36 @@ const confirmDelete = (po) => {
 
 const deletePO = () => {
     if (selectedPO.value) {
-        window.location.href = route('mitra.purchase-orders.destroy', selectedPO.value.id);
+        router.delete(route('admin.purchase-orders.destroy', selectedPO.value.id), {
+            onSuccess: () => {
+                showDeleteModal.value = false;
+                selectedPO.value = null;
+            }
+        });
     }
+};
+
+const applyFilter = () => {
+    router.get(route('admin.purchase-orders.index'), {
+        month: filterMonth.value,
+        year: filterYear.value
+    }, {
+        preserveState: true,
+        preserveScroll: true
+    });
+};
+
+const resetFilter = () => {
+    filterMonth.value = '';
+    filterYear.value = currentYear;
+    router.get(route('admin.purchase-orders.index'));
 };
 </script>
 
 <template>
     <Head title="Purchase Order - ASIMPENAS" />
 
-    <MitraLayout>
+    <AdminLayout>
         <div class="min-h-screen bg-gray-50 py-6">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Header -->
@@ -37,7 +84,7 @@ const deletePO = () => {
                                 <p class="text-gray-600 mt-1">Kelola surat permohonan order pembelian komoditas</p>
                             </div>
                             <Link 
-                                :href="route('mitra.purchase-orders.create')"
+                                :href="route('admin.purchase-orders.create')"
                                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
                             >
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,6 +92,55 @@ const deletePO = () => {
                                 </svg>
                                 <span>Buat PO Baru</span>
                             </Link>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="bg-white shadow rounded-lg mb-6 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Filter Purchase Order</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="filter-month" class="block text-sm font-medium text-gray-700 mb-2">
+                                Bulan
+                            </label>
+                            <select
+                                id="filter-month"
+                                v-model="filterMonth"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            >
+                                <option v-for="month in monthOptions" :key="month.value" :value="month.value">
+                                    {{ month.label }}
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="filter-year" class="block text-sm font-medium text-gray-700 mb-2">
+                                Tahun
+                            </label>
+                            <select
+                                id="filter-year"
+                                v-model="filterYear"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            >
+                                <option v-for="year in yearOptions" :key="year" :value="year">
+                                    {{ year }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button
+                                @click="applyFilter"
+                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                            >
+                                Terapkan Filter
+                            </button>
+                            <button
+                                @click="resetFilter"
+                                class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                            >
+                                Reset
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -107,13 +203,13 @@ const deletePO = () => {
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                         <Link 
-                                            :href="route('mitra.purchase-orders.show', po.id)"
+                                            :href="route('admin.purchase-orders.show', po.id)"
                                             class="text-blue-600 hover:text-blue-900"
                                         >
                                             Lihat
                                         </Link>
                                         <Link 
-                                            :href="route('mitra.purchase-orders.edit', po.id)"
+                                            :href="route('admin.purchase-orders.edit', po.id)"
                                             class="text-indigo-600 hover:text-indigo-900"
                                         >
                                             Edit
@@ -242,5 +338,5 @@ const deletePO = () => {
                 </div>
             </div>
         </div>
-    </MitraLayout>
+    </AdminLayout>
 </template>

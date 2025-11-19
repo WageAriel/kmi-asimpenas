@@ -121,8 +121,8 @@
 </head>
 <body>
     <div class="header">
-        <div class="form-value">{{ $purchaseOrder->nama_perusahaan }}</div>
-        <div class="form-value">{{ $validated->alamat_perusahaan }}</div>
+        <div class="company-name">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
+        <div class="address">{{ $mitra->alamat_perusahaan ?? 'Alamat Perusahaan' }}</div>
     </div>
 
     <div class="title">
@@ -133,12 +133,12 @@
     <div class="form-section">
         <div class="form-row">
             <div class="form-label">Nama Perusahaan:</div>
-            <div class="form-value">{{ $purchaseOrder->nama_perusahaan }}</div>
+            <div class="form-value">{{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</div>
         </div>
         
         <div class="form-row">
             <div class="form-label">Jenis Komoditas:</div>
-            <div class="form-value">{{ $purchaseOrder->jenis_komoditas_lengkap }}</div>
+            <div class="form-value">{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</div>
         </div>
         
         <div class="form-row">
@@ -177,7 +177,7 @@
             @forelse($purchaseOrder->items as $index => $item)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $item->jenis_komoditas_lengkap }} - {{ $item->kualitas_lengkap }}</td>
+                <td>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} - {{ $item->kualitas_lengkap }}</td>
                 <td>{{ number_format($item->harga, 0, ',', '.') }}</td>
                 <td>{{ number_format($item->kuantum, 0, ',', '.') }}</td>
                 <td>{{ number_format($item->nilai, 0, ',', '.') }}</td>
@@ -213,8 +213,8 @@
         <div class="signature-section">
             <p><strong>PENAWAR</strong></p>
             <div class="signature-line"></div>
-            <p><strong>{{ strtoupper($purchaseOrder->created_by ?? 'BAGYO SUPRAPTO') }}</strong><br>
-            {{ $purchaseOrder->nama_perusahaan }}</p>
+            <p><strong>{{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? 'NAMA CP') }}</strong><br>
+            {{ $mitra->nama_perusahaan ?? $purchaseOrder->nama_perusahaan }}</p>
         </div>
         
         <div class="signature-section">

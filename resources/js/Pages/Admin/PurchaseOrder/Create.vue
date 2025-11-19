@@ -1,6 +1,6 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/vue3';
-import MitraLayout from '@/Layouts/MitraLayout.vue';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -8,6 +8,7 @@ import TextInput from '@/Components/TextInput.vue';
 import { ref, computed, watch } from 'vue';
 
 const props = defineProps({
+    mitras: Array,
     jenisKomoditasOptions: Array,
     komplekPergudanganOptions: Array
 });
@@ -165,7 +166,7 @@ watch(() => form.jenis_komoditas, (newValue) => {
 });
 
 const submit = () => {
-    form.post(route('mitra.purchase-orders.store'), {
+    form.post(route('admin.purchase-orders.store'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
@@ -174,7 +175,7 @@ const submit = () => {
 <template>
     <Head title="Buat Purchase Order - ASIMPENAS" />
 
-    <MitraLayout>
+    <AdminLayout>
         <div class="min-h-screen bg-gray-50 py-6">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Header -->
@@ -182,7 +183,7 @@ const submit = () => {
                     <div class="px-6 py-4 border-b border-gray-200">
                         <div class="flex items-center space-x-4">
                             <button 
-                                @click="$inertia.visit(route('mitra.purchase-orders.index'))"
+                                @click="$inertia.visit(route('admin.purchase-orders.index'))"
                                 class="text-gray-400 hover:text-gray-600"
                             >
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,14 +204,17 @@ const submit = () => {
                         <!-- Nama Perusahaan -->
                         <div>
                             <InputLabel for="nama_perusahaan" value="Nama Perusahaan" />
-                            <TextInput
+                            <select
                                 id="nama_perusahaan"
-                                type="text"
-                                class="mt-1 block w-full"
                                 v-model="form.nama_perusahaan"
+                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 required
-                                placeholder="Masukkan nama perusahaan"
-                            />
+                            >
+                                <option value="">Pilih Nama Perusahaan</option>
+                                <option v-for="mitra in mitras" :key="mitra.id" :value="mitra.nama_perusahaan">
+                                    {{ mitra.nama_perusahaan }}
+                                </option>
+                            </select>
                             <InputError class="mt-2" :message="form.errors.nama_perusahaan" />
                         </div>
 
@@ -424,7 +428,7 @@ const submit = () => {
                         <div class="flex items-center justify-end pt-6 border-t border-gray-200">
                             <button
                                 type="button"
-                                @click="$inertia.visit(route('mitra.purchase-orders.index'))"
+                                @click="$inertia.visit(route('admin.purchase-orders.index'))"
                                 class="mr-4 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                                 Batal
@@ -445,5 +449,5 @@ const submit = () => {
                 </div>
             </div>
         </div>
-    </MitraLayout>
+    </AdminLayout>
 </template>

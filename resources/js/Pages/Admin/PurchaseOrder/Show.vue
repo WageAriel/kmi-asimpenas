@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import MitraLayout from '@/Layouts/MitraLayout.vue';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
 
 const props = defineProps({
     purchaseOrder: Object
@@ -28,22 +28,22 @@ const formatCurrency = (value) => {
 };
 
 const downloadSuratPermohonan = () => {
-    window.open(route('mitra.purchase-orders.surat-permohonan', props.purchaseOrder.id), '_blank');
+    window.open(route('admin.purchase-orders.surat-permohonan', props.purchaseOrder.id), '_blank');
 };
 
 const downloadFormPenawaran = () => {
-    window.open(route('mitra.purchase-orders.form-penawaran', props.purchaseOrder.id), '_blank');
+    window.open(route('admin.purchase-orders.form-penawaran', props.purchaseOrder.id), '_blank');
 };
 
 const downloadCombinedPdf = () => {
-    window.open(route('mitra.purchase-orders.combined-pdf', props.purchaseOrder.id), '_blank');
+    window.open(route('admin.purchase-orders.combined-pdf', props.purchaseOrder.id), '_blank');
 };
 </script>
 
 <template>
     <Head title="Detail Purchase Order - ASIMPENAS" />
 
-    <MitraLayout>
+    <AdminLayout>
         <div class="min-h-screen bg-gray-50 py-6">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Header -->
@@ -52,7 +52,7 @@ const downloadCombinedPdf = () => {
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-4">
                                 <button 
-                                    @click="$inertia.visit(route('mitra.purchase-orders.index'))"
+                                    @click="$inertia.visit(route('admin.purchase-orders.index'))"
                                     class="text-gray-400 hover:text-gray-600"
                                 >
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +66,7 @@ const downloadCombinedPdf = () => {
                             </div>
                             <div class="flex space-x-3">
                                 <Link 
-                                    :href="route('mitra.purchase-orders.edit', purchaseOrder.id)"
+                                    :href="route('admin.purchase-orders.edit', purchaseOrder.id)"
                                     class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
                                 >
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,5 +306,5 @@ const downloadCombinedPdf = () => {
                 </div>
             </div>
         </div>
-    </MitraLayout>
+    </AdminLayout>
 </template>

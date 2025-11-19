@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('jenis_komoditas');
             $table->string('jenis_komoditas_custom')->nullable(); // untuk input manual
             $table->enum('jenis_pengadaan', ['PSO', 'Komersial']);
+            $table->string('no_surat')->nullable(); // Nomor surat auto-generated
             // Field harga, kuantum, nilai, komplek_pergudangan, kualitas dipindah ke items table
             $table->string('agenda_no')->nullable();
             $table->date('tanggal_terima')->nullable();

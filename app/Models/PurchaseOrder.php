@@ -15,6 +15,7 @@ class PurchaseOrder extends Model
         'jenis_komoditas',
         'jenis_komoditas_custom',
         'jenis_pengadaan',
+        'no_surat',
         'agenda_no',
         'tanggal_terima',
         'paraf',
@@ -30,6 +31,12 @@ class PurchaseOrder extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Relationship dengan DataMitra
+    public function mitra()
+    {
+        return $this->belongsTo(DataMitra::class, 'nama_perusahaan', 'nama_perusahaan');
     }
 
     // Relationship dengan PurchaseOrderItem
@@ -97,6 +104,51 @@ class PurchaseOrder extends Model
     {
         return $query->whereMonth('created_at', $month)
                     ->whereYear('created_at', $year);
+    }
+
+    // Method untuk generate nomor surat otomatis
+    // Format: NO_VMS/XXX/KODE_MITRA/MM/YYYY
+    // NO_VMS = no_vms dari data_mitra (sesuai yang ada di database)
+    // XXX = urutan nomor surat (reset tiap bulan, 3 digit)
+    // KODE_MITRA = kode_mitra dari data_mitra (sesuai yang ada di database)
+    // MM = bulan (2 digit)
+    // YYYY = tahun (4 digit)
+    public static function generateNoSurat($nama_perusahaan)
+    {
+        $now = now();
+        $month = $now->month;
+        $year = $now->year;
+        
+        // Cari data mitra berdasarkan nama perusahaan
+        $mitra = DataMitra::where('nama_perusahaan', $nama_perusahaan)->first();
+        
+        if (!$mitra) {
+            // Jika mitra tidak ditemukan, gunakan default
+            $noVms = '000000';
+            $kodeMitra = 'XXX';
+        } else {
+            // Gunakan data langsung dari mitra, jika kosong baru pakai default
+            $noVms = !empty($mitra->no_vms) ? $mitra->no_vms : '000000';
+            $kodeMitra = !empty($mitra->kode_mitra) ? $mitra->kode_mitra : 'XXX';
+        }
+        
+        // Hitung urutan PO bulan ini untuk mitra tertentu
+        $count = self::where('nama_perusahaan', $nama_perusahaan)
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year)
+                    ->count() + 1;
+        
+        // Format nomor surat: NO_VMS/XXX/KODE_MITRA/MM/YYYY
+        $noSurat = sprintf(
+            "%s/%03d/%s/%02d/%s",
+            $noVms,
+            $count,
+            strtoupper($kodeMitra),
+            $month,
+            $year
+        );
+        
+        return $noSurat;
     }
 
     // Static method untuk mendapatkan opsi jenis komoditas

@@ -115,6 +115,45 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Generate PDF Berita Acara Hasil Seleksi Mitra Pangan
     Route::get('/hasil-seleksi-mitra/{id}/berita-acara', [PdfGeneratorController::class, 'generateBeritaAcara'])
     ->name('hasil-seleksi-mitra.berita-acara');
+
+    // 7. Purchase Orders (Admin Only)
+    Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])
+        ->name('purchase-orders.index');
+
+    Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'create'])
+        ->name('purchase-orders.create');
+
+    Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])
+        ->name('purchase-orders.store');
+
+    Route::get('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show'])
+        ->name('purchase-orders.show');
+
+    Route::get('/purchase-orders/{purchaseOrder}/edit', [PurchaseOrderController::class, 'edit'])
+        ->name('purchase-orders.edit');
+
+    Route::put('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update'])
+        ->name('purchase-orders.update');
+
+    Route::delete('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])
+        ->name('purchase-orders.destroy');
+
+    // Generate PDF Routes
+    Route::get('/purchase-orders/{purchaseOrder}/surat-permohonan', 
+        [PurchaseOrderController::class, 'generateSuratPermohonan'])
+        ->name('purchase-orders.surat-permohonan');
+
+    Route::get('/purchase-orders/{purchaseOrder}/form-penawaran', 
+        [PurchaseOrderController::class, 'generateFormPenawaran'])
+        ->name('purchase-orders.form-penawaran');
+
+    Route::get('/purchase-orders/{purchaseOrder}/combined-pdf', 
+        [PurchaseOrderController::class, 'generateCombinedPdf'])
+        ->name('purchase-orders.combined-pdf');
+
+    // Helper Route for Dynamic Options
+    Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])
+        ->name('purchase-orders.kualitas-options');
 });
 
 // 1. Routes Dashboard Mitra tanpa middleware (untuk testing)
@@ -201,75 +240,8 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
             ->with('success', 'Data klasifikasi mitra berhasil disimpan!');
     })->name('klasifikasi-mitra.store');
 
-    //4. untuk mengakses tabel puschase order
-    Route::get('/purchase-orders', function () {
-        $purchaseOrders = App\Models\PurchaseOrder::with('items')
-            ->where('user_id', auth()->id())
-            ->orderBy('created_at', 'desc')
-            ->get();
-            
-        return Inertia::render('Mitra/PurchaseOrder/Index', [
-            'purchaseOrders' => $purchaseOrders
-        ]);
-    })->name('purchase-orders.index');
-
-    // Form Create Purchase Order
-    Route::get('/purchase-orders/create', function () {
-        return Inertia::render('Mitra/PurchaseOrder/Create');
-    })->name('purchase-orders.create');
-
-    // Store Purchase Order
-    Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])
-        ->name('purchase-orders.store');
-
-    // Show Purchase Order
-    Route::get('/purchase-orders/{purchaseOrder}', function (App\Models\PurchaseOrder $purchaseOrder) {
-        // Pastikan user hanya bisa melihat PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-        
-        return Inertia::render('Mitra/PurchaseOrder/Show', [
-            'purchaseOrder' => $purchaseOrder->load('items')
-        ]);
-    })->name('purchase-orders.show');
-
-    // Edit Purchase Order
-    Route::get('/purchase-orders/{purchaseOrder}/edit', function (App\Models\PurchaseOrder $purchaseOrder) {
-        // Pastikan user hanya bisa edit PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-        
-        return Inertia::render('Mitra/PurchaseOrder/Edit', [
-            'purchaseOrder' => $purchaseOrder->load('items')
-        ]);
-    })->name('purchase-orders.edit');
-
-    // Update Purchase Order
-    Route::put('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update'])
-        ->name('purchase-orders.update');
-
-    // Delete Purchase Order
-    Route::delete('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])
-        ->name('purchase-orders.destroy');
-
-    // Generate PDF Routes
-    Route::get('/purchase-orders/{purchaseOrder}/surat-permohonan', 
-        [PdfGeneratorController::class, 'downloadSuratPermohonanPdf'])
-        ->name('purchase-orders.surat-permohonan');
-
-    Route::get('/purchase-orders/{purchaseOrder}/form-penawaran', 
-        [PdfGeneratorController::class, 'downloadFormPenawaranPdf'])
-        ->name('purchase-orders.form-penawaran');
-
-    Route::get('/purchase-orders/{purchaseOrder}/combined-pdf', 
-        [PdfGeneratorController::class, 'downloadCombinedPdf'])
-        ->name('purchase-orders.combined-pdf');
-
-    // Helper Route for Dynamic Options
-    Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])
-        ->name('purchase-orders.kualitas-options');
+    //4. untuk mengakses tabel puschase order - DEPRECATED (Moved to Admin)
+    // Purchase Order now managed by Admin only
 
     //5. untuk mengakses tabel hasil seleksi
     Route::get('/hasil-seleksi', function () {
@@ -284,13 +256,6 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
             ]
         ]);
     })->name('hasil-seleksi');
-
-    // Purchase Order routes
-    Route::resource('purchase-orders', PurchaseOrderController::class);
-    Route::get('/purchase-orders/{purchaseOrder}/surat-permohonan', [PurchaseOrderController::class, 'generateSuratPermohonan'])->name('purchase-orders.surat-permohonan');
-    Route::get('/purchase-orders/{purchaseOrder}/form-penawaran', [PurchaseOrderController::class, 'generateFormPenawaran'])->name('purchase-orders.form-penawaran');
-    Route::get('/purchase-orders/{purchaseOrder}/combined-pdf', [PurchaseOrderController::class, 'generateCombinedPdf'])->name('purchase-orders.combined-pdf');
-    Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])->name('purchase-orders.kualitas-options');
 });
 
 //Route Dashboard Super Admin

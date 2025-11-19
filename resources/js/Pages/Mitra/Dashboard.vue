@@ -125,7 +125,7 @@ onMounted(async () => {
                 id: 1,
                 type: 'warning',
                 title: 'Data Mitra Diperlukan',
-                message: 'Lengkapi data mitra terlebih dahulu sebelum mengajukan Purchase Order (PO)',
+                message: 'Lengkapi data mitra untuk dapat mengikuti proses seleksi dan klasifikasi',
                 action: 'Lengkapi Data',
                 route: 'input-data-mitra',
                 urgent: true

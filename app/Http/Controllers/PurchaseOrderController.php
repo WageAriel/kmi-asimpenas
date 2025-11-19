@@ -15,12 +15,21 @@ class PurchaseOrderController extends Controller
      */
     public function index()
     {
-        $purchaseOrders = PurchaseOrder::with('items')
-            ->where('user_id', auth()->id())
-            ->latest()
+        $month = request('month');
+        $year = request('year');
+        
+        $query = PurchaseOrder::with('items');
+        
+        if ($month && $year) {
+            $query->whereMonth('created_at', $month)
+                  ->whereYear('created_at', $year);
+        }
+        
+        $purchaseOrders = $query->orderBy('created_at', 'desc')
             ->paginate(10)
             ->through(fn ($po) => [
                 'id' => $po->id,
+                'no_surat' => $po->no_surat,
                 'nama_perusahaan' => $po->nama_perusahaan,
                 'jenis_komoditas' => $po->jenis_komoditas_lengkap,
                 'jenis_pengadaan' => $po->jenis_pengadaan,
@@ -29,10 +38,18 @@ class PurchaseOrderController extends Controller
                 'total_nilai' => number_format($po->total_nilai, 0, ',', '.'),
                 'items_count' => $po->items->count(),
                 'created_at' => $po->created_at->format('d/m/Y H:i'),
+                'created_by' => $po->created_by,
             ]);
 
-        return Inertia::render('Mitra/PurchaseOrder/Index', [
-            'purchaseOrders' => $purchaseOrders
+        $mitras = \App\Models\DataMitra::orderBy('nama_perusahaan')->get();
+
+        return Inertia::render('Admin/PurchaseOrder/Index', [
+            'purchaseOrders' => $purchaseOrders,
+            'mitras' => $mitras,
+            'filters' => [
+                'month' => $month,
+                'year' => $year
+            ]
         ]);
     }
 
@@ -41,7 +58,10 @@ class PurchaseOrderController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Mitra/PurchaseOrder/Create', [
+        $mitras = \App\Models\DataMitra::orderBy('nama_perusahaan')->get();
+        
+        return Inertia::render('Admin/PurchaseOrder/Create', [
+            'mitras' => $mitras,
             'jenisKomoditasOptions' => PurchaseOrder::getJenisKomoditasOptions(),
             'komplekPergudanganOptions' => PurchaseOrder::getKomplekPergudanganOptions(),
         ]);
@@ -66,15 +86,17 @@ class PurchaseOrderController extends Controller
             'kualitas_items.*.kualitas_custom' => 'nullable|string|max:255',
         ]);
 
-        $validated['created_by'] = auth()->user()->name ?? 'System';
+        $validated['created_by'] = auth()->user()->name ?? 'Admin';
+        $validated['no_surat'] = PurchaseOrder::generateNoSurat($validated['nama_perusahaan']);
 
-        // Create the main Purchase Order
+        // Create the main Purchase Order (no need for user_id since admin creates it)
         $purchaseOrder = PurchaseOrder::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id(), // Admin's ID
             'nama_perusahaan' => $validated['nama_perusahaan'],
             'jenis_komoditas' => $validated['jenis_komoditas'],
             'jenis_komoditas_custom' => $validated['jenis_komoditas_custom'],
             'jenis_pengadaan' => $validated['jenis_pengadaan'],
+            'no_surat' => $validated['no_surat'],
             'created_by' => $validated['created_by'],
         ]);
 
@@ -85,7 +107,7 @@ class PurchaseOrderController extends Controller
             \App\Models\PurchaseOrderItem::create($item);
         }
 
-        return redirect()->route('mitra.purchase-orders.show', $purchaseOrder)
+        return redirect()->route('admin.purchase-orders.show', $purchaseOrder)
             ->with('success', 'Purchase Order berhasil dibuat!');
     }
 
@@ -94,16 +116,12 @@ class PurchaseOrderController extends Controller
      */
     public function show(PurchaseOrder $purchaseOrder)
     {
-        // Pastikan user hanya bisa melihat PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-
         $purchaseOrder->load('items');
         
-        return Inertia::render('Mitra/PurchaseOrder/Show', [
+        return Inertia::render('Admin/PurchaseOrder/Show', [
             'purchaseOrder' => [
                 'id' => $purchaseOrder->id,
+                'no_surat' => $purchaseOrder->no_surat,
                 'nama_perusahaan' => $purchaseOrder->nama_perusahaan,
                 'jenis_komoditas' => $purchaseOrder->jenis_komoditas_lengkap,
                 'jenis_pengadaan' => $purchaseOrder->jenis_pengadaan,
@@ -135,16 +153,13 @@ class PurchaseOrderController extends Controller
      */
     public function edit(PurchaseOrder $purchaseOrder)
     {
-        // Pastikan user hanya bisa edit PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-
         $purchaseOrder->load('items');
+        $mitras = \App\Models\DataMitra::orderBy('nama_perusahaan')->get();
 
-        return Inertia::render('Mitra/PurchaseOrder/Edit', [
+        return Inertia::render('Admin/PurchaseOrder/Edit', [
             'purchaseOrder' => [
                 'id' => $purchaseOrder->id,
+                'no_surat' => $purchaseOrder->no_surat,
                 'nama_perusahaan' => $purchaseOrder->nama_perusahaan,
                 'jenis_komoditas' => $purchaseOrder->jenis_komoditas,
                 'jenis_komoditas_custom' => $purchaseOrder->jenis_komoditas_custom,
@@ -166,6 +181,7 @@ class PurchaseOrderController extends Controller
                     ];
                 })
             ],
+            'mitras' => $mitras,
             'jenisKomoditasOptions' => PurchaseOrder::getJenisKomoditasOptions(),
             'komplekPergudanganOptions' => PurchaseOrder::getKomplekPergudanganOptions(),
         ]);
@@ -176,11 +192,6 @@ class PurchaseOrderController extends Controller
      */
     public function update(Request $request, PurchaseOrder $purchaseOrder)
     {
-        // Pastikan user hanya bisa update PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-
         $validated = $request->validate([
             'nama_perusahaan' => 'required|string|max:255',
             'jenis_komoditas' => 'required|string',
@@ -242,7 +253,7 @@ class PurchaseOrderController extends Controller
             \App\Models\PurchaseOrderItem::whereIn('id', $itemsToDelete)->delete();
         }
 
-        return redirect()->route('mitra.purchase-orders.show', $purchaseOrder)
+        return redirect()->route('admin.purchase-orders.show', $purchaseOrder)
             ->with('success', 'Purchase Order berhasil diupdate!');
     }
 
@@ -251,14 +262,13 @@ class PurchaseOrderController extends Controller
      */
     public function destroy(PurchaseOrder $purchaseOrder)
     {
-        // Pastikan user hanya bisa delete PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-
+        // Delete all related items first
+        $purchaseOrder->items()->delete();
+        
+        // Then delete the purchase order
         $purchaseOrder->delete();
 
-        return redirect()->route('mitra.purchase-orders.index')
+        return redirect()->route('admin.purchase-orders.index')
             ->with('success', 'Purchase Order berhasil dihapus!');
     }
 
@@ -267,18 +277,14 @@ class PurchaseOrderController extends Controller
      */
     public function generateSuratPermohonan(PurchaseOrder $purchaseOrder)
     {
-        // Pastikan user hanya bisa generate PDF PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-
-        // Load relasi items untuk PDF
-        $purchaseOrder->load('items');
+        // Load relasi items dan mitra untuk PDF
+        $purchaseOrder->load(['items', 'mitra']);
 
         $data = [
             'purchaseOrder' => $purchaseOrder,
+            'mitra' => $purchaseOrder->mitra,
             'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
-            'no_surat' => 'NO Test',
+            'no_surat' => $purchaseOrder->no_surat ?? 'NO Test',
         ];
 
         $pdf = Pdf::loadView('pdf.surat-permohonan', $data);
@@ -292,16 +298,12 @@ class PurchaseOrderController extends Controller
      */
     public function generateFormPenawaran(PurchaseOrder $purchaseOrder)
     {
-        // Pastikan user hanya bisa generate PDF PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-
-        // Load relasi items untuk PDF
-        $purchaseOrder->load('items');
+        // Load relasi items dan mitra untuk PDF
+        $purchaseOrder->load(['items', 'mitra']);
 
         $data = [
             'purchaseOrder' => $purchaseOrder,
+            'mitra' => $purchaseOrder->mitra,
             'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
         ];
 
@@ -314,23 +316,15 @@ class PurchaseOrderController extends Controller
     /**
      * Generate Combined PDF (Surat Permohonan + Form Penawaran)
      */
-    /**
-     * Generate Combined PDF (Surat Permohonan + Form Penawaran)
-     */
     public function generateCombinedPdf(PurchaseOrder $purchaseOrder)
     {
-        // Pastikan user hanya bisa generate PDF PO mereka sendiri
-        if ($purchaseOrder->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this Purchase Order.');
-        }
-
         // Load relasi items untuk PDF
         $purchaseOrder->load('items');
 
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
-            'no_surat' => 'NO Test',
+            'no_surat' => $purchaseOrder->no_surat ?? 'NO Test',
         ];
 
         $pdf = Pdf::loadView('pdf.combined-purchase-order', $data);

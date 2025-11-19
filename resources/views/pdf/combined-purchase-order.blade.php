@@ -225,7 +225,7 @@
 
     <div class="title">
         SURAT PERMOHONAN ORDER PEMBELIAN (OP)<br>
-        PENGADAAN {{ $purchaseOrder->jenis_komoditas }} DALAM NEGERI TAHUN 2025
+        PENGADAAN {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} DALAM NEGERI TAHUN 2025
     </div>
 
     <div class="content">
@@ -233,7 +233,7 @@
         Pemimpin/Wakil Pemimpin Cabang Surakarta<br>
         Di Tempat</p>
 
-        <p>Bersama ini kami <strong>{{ $purchaseOrder->nama_perusahaan }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ $purchaseOrder->jenis_komoditas_lengkap }}</strong>*) dalam negeri tahun 2025 dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :</p>
+        <p>Bersama ini kami <strong>{{ $purchaseOrder->nama_perusahaan }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong>*) dalam negeri tahun 2025 dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :</p>
     </div>
 
     <table class="commodity-table">
@@ -251,7 +251,7 @@
             @forelse($purchaseOrder->items as $index => $item)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $item->jenis_komoditas_lengkap }} - {{ $item->kualitas_lengkap }}</td>
+                <td>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} - {{ $item->kualitas_lengkap }}</td>
                 <td>{{ number_format($item->harga, 0, ',', '.') }}</td>
                 <td>{{ number_format($item->kuantum, 0, ',', '.') }}</td>
                 <td>{{ number_format($item->nilai, 0, ',', '.') }}</td>
@@ -376,7 +376,7 @@
                 @forelse($purchaseOrder->items as $index => $item)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->jenis_komoditas_lengkap }} - {{ $item->kualitas_lengkap }}</td>
+                    <td>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} - {{ $item->kualitas_lengkap }}</td>
                     <td>{{ number_format($item->harga, 0, ',', '.') }}</td>
                     <td>{{ number_format($item->kuantum, 0, ',', '.') }}</td>
                     <td>{{ number_format($item->nilai, 0, ',', '.') }}</td>
