@@ -271,7 +271,7 @@
     <!-- Title -->
     <div class="title">
         SURAT PERMOHONAN ORDER PEMBELIAN (OP)<br>
-        PENGADAAN {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} DALAM NEGERI TAHUN {{ date('Y') }}
+        PENGADAAN <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> DALAM NEGERI TAHUN {{ date('Y') }}
     </div>
 
     <!-- Content -->
@@ -282,7 +282,7 @@
     </div>
 
     <div class="content">
-        Bersama ini kami {{ $namaPerusahaanLengkap }} bermohon untuk ikut serta dalam rangka pengadaan {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
+        Bersama ini kami <strong>{{ $namaPerusahaanLengkap }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
     </div>
 
     <!-- Table -->
@@ -313,7 +313,7 @@
 
     <!-- Footer Text -->
     <div class="footer-text">
-        Kami bersedia tunduk dan patuh terhadap ketentuan yang tercantum dalam order pembelian {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} Dalam Negeri dan peraturan yang berlaku di Perusahaan Umum (Perum) BULOG.
+        Kami bersedia tunduk dan patuh terhadap ketentuan yang tercantum dalam order pembelian <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> Dalam Negeri dan peraturan yang berlaku di Perusahaan Umum (Perum) BULOG.
     </div>
 
     <div class="footer-text">

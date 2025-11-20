@@ -153,7 +153,7 @@
     </div>
 
     <div class="title">
-        FORM PENAWARAN {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} DALAM NEGERI
+        FORM PENAWARAN <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> DALAM NEGERI
     </div>
 
     <div class="info-section">
@@ -216,14 +216,22 @@
     <div class="statement-section">
         <div class="info-title">PERNYATAAN PEMASOK</div>
         <ol>
-            <li>Bersedia tunduk dan patuh terhadap seluruh pernyataan, ketentuan, prosedur maupun instruksi yang berlaku dalam Pengadaan {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} Dalam Negeri Perum BULOG.</li>
+            <li>Bersedia tunduk dan patuh terhadap seluruh pernyataan, ketentuan, prosedur maupun instruksi yang berlaku dalam Pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> Dalam Negeri Perum BULOG.</li>
             <li>Menyampaikan penawaran komoditi sebagai berikut:</li>
         </ol>
     </div>
 
     @php
         // Gabungkan semua kualitas dengan pemisah /
-        $kualitasList = $purchaseOrder->items->pluck('kualitas_lengkap')->unique()->filter()->implode(' / ');
+        $kualitasCollection = $purchaseOrder->items->pluck('kualitas_lengkap')->unique()->filter();
+        $kualitasList = $kualitasCollection->implode(' / ');
+        $commodityUpper = strtoupper($purchaseOrder->jenis_komoditas_lengkap);
+        $jenisKomoditiDenganKualitasList = $kualitasCollection->map(function($k) use ($commodityUpper) {
+            return $commodityUpper.' - '.$k;
+        })->implode(' / ');
+        if (empty($jenisKomoditiDenganKualitasList)) {
+            $jenisKomoditiDenganKualitasList = $commodityUpper;
+        }
         
         // Gabungkan semua kuantum dengan pemisah /
         $kuantumList = $purchaseOrder->items->pluck('kuantum')->map(function($k) {
@@ -236,7 +244,7 @@
             <div style="display: table-row;">
                 <div style="display: table-cell; width: 120px;">a. Jenis Komoditi</div>
                 <div style="display: table-cell; width: 10px;">:</div>
-                <div style="display: table-cell;">{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</div>
+                <div style="display: table-cell;">{{ $jenisKomoditiDenganKualitasList }}</div>
             </div>
         </div>
         <div style="margin-bottom: 5px; display: table; width: 100%;">

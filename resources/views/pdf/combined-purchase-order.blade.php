@@ -298,7 +298,7 @@
 
     <div class="title">
         SURAT PERMOHONAN ORDER PEMBELIAN (OP)<br>
-        PENGADAAN {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} DALAM NEGERI TAHUN {{ date('Y') }}
+        PENGADAAN <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> DALAM NEGERI TAHUN {{ date('Y') }}
     </div>
 
     <div class="content">
@@ -337,7 +337,7 @@
     </table>
 
     <div class="footer-text">
-        Kami bersedia tunduk dan patuh terhadap ketentuan yang tercantum dalam order pembelian {{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }} Dalam Negeri dan peraturan yang berlaku di Perusahaan Umum (Perum) BULOG.
+        Kami bersedia tunduk dan patuh terhadap ketentuan yang tercantum dalam order pembelian <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> Dalam Negeri dan peraturan yang berlaku di Perusahaan Umum (Perum) BULOG.
     </div>
 
     <div class="footer-text">
@@ -457,7 +457,15 @@
             <div style="display: table-row;">
                 <div style="display: table-cell; width: 120px;">a. Jenis Komoditi</div>
                 <div style="display: table-cell; width: 10px;">:</div>
-                <div style="display: table-cell;">{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</div>
+                @php
+                    $commodityUpper = strtoupper($purchaseOrder->jenis_komoditas_lengkap);
+                    $kualitasCollection = $purchaseOrder->items->pluck('kualitas_lengkap')->unique()->filter();
+                    $jenisKomoditiDenganKualitasList = $kualitasCollection->map(function($k) use ($commodityUpper) {
+                        return $commodityUpper.' - '.$k;
+                    })->implode(' / ');
+                    if (empty($jenisKomoditiDenganKualitasList)) { $jenisKomoditiDenganKualitasList = $commodityUpper; }
+                @endphp
+                <div style="display: table-cell;">{{ $jenisKomoditiDenganKualitasList }}</div>
             </div>
         </div>
         <div style="margin-bottom: 5px; display: table; width: 100%;">
