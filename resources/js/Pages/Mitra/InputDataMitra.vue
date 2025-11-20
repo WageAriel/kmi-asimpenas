@@ -901,15 +901,17 @@ const generatePaktaIntegritasPdf = async () => {
         </div>
         
         <!-- Submit Button -->
-          <h3 class="text-md font-medium text-gray-900">Download Dokumen yang Dibutuhkan</h3>
-          <div class="flex justify-between items-center">
-          <div class="flex gap-3">
+        <h3 class="text-md font-medium text-gray-900 mb-4">Download Dokumen yang Dibutuhkan</h3>
+        
+        <div class="space-y-4">
+          <!-- Document Download Buttons -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <button 
                 type="button" 
                 @click="generateSuratPermohonanPdf"
                 :disabled="!mitraId || isSubmitting"
                 :class="[
-                  'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                  'w-full px-4 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
                   mitraId && !isSubmitting
                     ? 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'
                     : 'bg-gray-400 text-gray-200 cursor-not-allowed'
@@ -925,7 +927,7 @@ const generatePaktaIntegritasPdf = async () => {
                 @click="generateSuratPernyataanNonPkpPdf"
                 :disabled="!mitraId || isSubmitting"
                 :class="[
-                  'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                  'w-full px-4 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
                   mitraId && !isSubmitting
                     ? 'bg-purple-600 text-white hover:bg-purple-700 cursor-pointer'
                     : 'bg-gray-400 text-gray-200 cursor-not-allowed'
@@ -941,7 +943,7 @@ const generatePaktaIntegritasPdf = async () => {
                 @click="generatePaktaIntegritasPdf"
                 :disabled="!mitraId || isSubmitting"
                 :class="[
-                  'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                  'w-full px-4 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
                   mitraId && !isSubmitting
                     ? 'bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer'
                     : 'bg-gray-400 text-gray-200 cursor-not-allowed'
@@ -955,9 +957,9 @@ const generatePaktaIntegritasPdf = async () => {
             <button 
                 type="button" 
                 @click="downloadTemplateSuratKuasa"
-                class="px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors bg-orange-600 text-white hover:bg-orange-700 cursor-pointer"
+                class="w-full px-4 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors bg-orange-600 text-white hover:bg-orange-700 cursor-pointer"
             >
-                <span class="flex items-center">
+                <span class="flex items-center justify-center">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                   </svg>
@@ -966,20 +968,23 @@ const generatePaktaIntegritasPdf = async () => {
             </button>
           </div>
 
-          <button 
-            type="submit" 
-            :disabled="!isFormValid || isSubmitting"
-            :class="[
-              'px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
-              isFormValid && !isSubmitting
-                ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-            ]"
-          >
-            <span v-if="isSubmitting">Mengirim...</span>
-            <span v-else-if="!isFormValid">Lengkapi Data</span>
-            <span v-else>Simpan Data</span>
-          </button>
+          <!-- Submit Button -->
+          <div class="flex justify-end pt-2">
+            <button 
+              type="submit" 
+              :disabled="!isFormValid || isSubmitting"
+              :class="[
+                'w-full sm:w-auto px-8 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors',
+                isFormValid && !isSubmitting
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              ]"
+            >
+              <span v-if="isSubmitting">Mengirim...</span>
+              <span v-else-if="!isFormValid">Lengkapi Data</span>
+              <span v-else>Simpan Data</span>
+            </button>
+          </div>
         </div>
         
       </form>
