@@ -661,8 +661,31 @@ class PdfGeneratorController extends Controller
     {
         try {
             $mitra = DataMitra::where('id_mitra', $id)
-                            ->where('user_id', auth()->id()) // Use user_id as per your model
+                            ->where('user_id', auth()->id())
                             ->firstOrFail();
+            
+            // Buat daftar lampiran berdasarkan data mitra
+            $lampiranList = [
+                '1. Permohonan',
+                '2. KTP',
+                '3. NPWP',
+                '4. NIB',
+                '5. Akta Pendirian',
+                '6. No Rekening'
+            ];
+            
+            $nomorLampiran = 7; // Mulai dari nomor 7 untuk lampiran selanjutnya
+            
+            // Tambahkan lampiran berdasarkan data PKP (hanya jika ada)
+            if (!empty($mitra->pkp) && $mitra->pkp === 'Pkp') {
+                $lampiranList[] = $nomorLampiran . '. Surat Pernyataan PKP/Non PKP';
+                $nomorLampiran++;
+            }
+            
+            // Tambahkan Surat Kuasa jika ada
+            if (!empty($mitra->surat_kuasa) && $mitra->surat_kuasa === 'Ada') {
+                $lampiranList[] = $nomorLampiran . '. Surat Kuasa';
+            }
             
             $data = [
                 'tanggal_permohonan' => \Carbon\Carbon::now()->locale('id')->isoFormat('D MMMM Y'),
@@ -670,7 +693,9 @@ class PdfGeneratorController extends Controller
                 'nama_cp' => $mitra->nama_cp,
                 'alamat_perusahaan' => $mitra->alamat_perusahaan,
                 'jabatan' => $mitra->jabatan ?? 'Direktur',
-                'nama_perusahaan' => $mitra->nama_perusahaan
+                'nama_perusahaan' => $mitra->nama_perusahaan,
+                'lampiran_list' => $lampiranList,
+                'mitra' => $mitra
             ];
 
             $pdf = PDF::loadView('pdf.surat-permohonan-mpp', $data);

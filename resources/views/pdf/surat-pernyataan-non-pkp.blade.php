@@ -95,6 +95,11 @@
             <td class="value">{{ $nama_cp }}</td>
         </tr>
         <tr>
+            <td class="label">Perusahaan</td>
+            <td class="colon">:</td>
+            <td class="value">{{ $nama_perusahaan }}</td>
+        </tr>
+        <tr>
             <td class="label">Alamat</td>
             <td class="colon">:</td>
             <td class="value">{{ $alamat_perusahaan }}</td>

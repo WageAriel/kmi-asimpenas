@@ -192,31 +192,31 @@ const toggleMobileMenu = () => {
         </div>
 
         <!-- Main Content -->
-        <div class="max-w-6xl mx-auto px-4 py-12">
+        <div class="max-w-6xl mx-auto px-4 py-8">
             <!-- Intro Section with Proper SEO Headings -->
-            <div class="text-center mb-16">
-                <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <div class="text-center mb-8">
+                <h1 class="text-xl md:text-3xl font-bold text-gray-900 mb-6">
                     Selamat Datang di <span class="text-blue-600">ASIMPENAS</span>
                 </h1>
-                <h2 class="text-xl md:text-2xl text-gray-700 font-semibold max-w-3xl mx-auto mb-4">
+                <h2 class="text-lg md:text-xl text-gray-700 font-semibold max-w-3xl mx-auto mb-4">
                     Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG
                 </h2>
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+                <p class="text-base text-gray-600 max-w-3xl mx-auto mb-8">
                     Platform digital untuk seleksi calon mitra pangan, klasifikasi mitra, dan penawaran komoditas gabah dan beras
                 </p>
                 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <div class="flex flex-col sm:flex-row gap-3 justify-center mb-8">
                     <!-- When NOT logged in -->
                     <template v-if="!isAuthenticated">
                         <Link 
                             href="/register"
-                            class="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg"
+                            class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-base hover:bg-blue-700 transition-colors shadow-lg"
                         >
                             Daftar Sebagai Mitra Pangan
                         </Link>
                         <Link 
                             href="/login"
-                            class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-colors"
+                            class="border-2 border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg font-semibold text-base hover:bg-gray-50 transition-colors"
                         >
                             Sudah Punya Akun?
                         </Link>
@@ -226,7 +226,7 @@ const toggleMobileMenu = () => {
                     <template v-else>
                         <Link 
                             :href="dashboardRoute"
-                            class="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg inline-flex items-center justify-center gap-2"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg inline-flex items-center justify-center gap-2"
                         >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -239,14 +239,114 @@ const toggleMobileMenu = () => {
 
             <!-- Main Information Sections -->
             <div class="space-y-16">
+                <!-- 1. Pengadaan Gabah dan Beras Dalam Negeri Tahun 2025 -->
+                 <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">🌾 PENGADAAN GABAH DAN BERAS DALAM NEGERI TAHUN 2025</h2>
+                        <p class="text-gray-600">Dengan Persyaratan dibawah ini</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- A. Perusahaan Penggilingan Padi -->
+                        <div class="bg-blue-50 p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">A. Perusahaan Penggilingan Padi</h3>
+                            <div class="space-y-3">
+                                <ul class="space-y-3 text-sm text-gray-700">
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">1.</span>
+                                        <span><strong>Surat Permohonan</strong> menjadi <strong>Mitra Pangan Pengadaan (MPP)</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">2.</span>
+                                        <span><strong>Kartu Tanda Penduduk / KTP</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">3.</span>
+                                        <span><strong>NPWP (Nomor Pokok Wajib Pajak)</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">4.</span>
+                                        <span><strong>Akta Notaris Pendirian Perusahaan</strong> bagi <strong>MPP</strong> berbadan hukum atau berbadan usaha</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">5.</span>
+                                        <span><strong>Nomor Induk Berusaha / NIB</strong> dengan KBLI yang sesuai</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">6.</span>
+                                        <span><strong>No Rekening</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">7.</span>
+                                        <span><strong>Surat Pengukuhan Pengusaha Kena Pajak (PKP)</strong> dan/atau <strong>Surat Pernyataan Non Pengusaha Kena Pajak (Non PKP) bermaterai</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">8.</span>
+                                        <span><strong>Kontrak atau Surat Kuasa</strong> yang dinotarilkan dari pemilik penggilingan, bagi yang tidak memiliki tetapi menguasai sarana penggilingan. menguasai sarana</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-blue-600 mt-0.5">9.</span>
+                                        <span><strong>Surat Kuasa</strong> apabila dikuasakan orang lain bermaterai</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- B. Poktan/Gapoktan -->
+                        <div class="bg-green-50 p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">B. Poktan/Gapoktan</h3>
+                            <div class="space-y-3">
+                                <ul class="space-y-3 text-sm text-gray-700">
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">1.</span>
+                                        <span><strong>Surat Permohonan</strong> menjadi <strong>Mitra Pangan Pengadaan (MPP)</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">2.</span>
+                                        <span><strong>Surat Rekomendasi</strong> dari Dinas yang membidangi Pertanian</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">3.</span>
+                                        <span><strong>Daftar Nama dan Alamat petani Anggota Poktan/Gapoktan</strong> sesuai <strong>Kartu Tanda Penduduk (KTP) </strong>yang dibuat oleh Pengurus Poktan/Gapoktan</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">4.</span>
+                                        <span>Keterangan lokasi dan luas lahan yang dikuasai yang dikeluarkan setempat <strong>oleh Pemerintah Desa/Kecamatan</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">5.</span>
+                                        <span><strong>Poktan/Gapoktan</strong> yang memiliki sarana penggilingan/pengolahan dapat diikutkan dalam pengadaan gabah, beras, dan pangan pokok lainnya seperti kedelai dan jagung</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">6.</span>
+                                        <span><strong>Poktan/Gapoktan</strong> yang belum memiliki sarana penggilingan dan pengolahan pangan lainnya hanya diikutkan dalam pengadaan gabah</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">7.</span>
+                                        <span><strong>No Rekening</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">8.</span>
+                                        <span><strong>NPWP</strong> Gapoktan/Pengurus yang ditunjuk</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="font-medium text-green-600 mt-0.5">9.</span>
+                                        <span><strong>Surat Pengukuhan Pengusaha Kena Pajak (PKP)</strong> dan/atau <strong>Surat Pernyataan Non Pengusaha Kena Pajak (Non PKP) bermaterai</strong></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 
-                <!-- 1. Apa itu ASIMPENAS -->
+                <!-- 2. Apa itu ASIMPENAS -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
                             <span class="text-2xl">❓</span>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-900">Apa itu ASIMPENAS?</h2>
+                        <h2 class="text-2xl font-bold text-gray-900">Apa itu ASIMPENAS?</h2>
                     </div>
                     
                     <div class="grid md:grid-cols-2 gap-8 items-center">
@@ -287,13 +387,13 @@ const toggleMobileMenu = () => {
                     </div>
                 </div>
 
-                <!-- 2. Kenapa Perlu Mendaftar -->
+                <!-- 3. Kenapa Perlu Mendaftar -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
                             <span class="text-2xl">💡</span>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-900">Kenapa Perlu Mendaftar?</h2>
+                        <h2 class="text-2xl font-bold text-gray-900">Kenapa Perlu Mendaftar?</h2>
                     </div>
                     
                     <div class="grid md:grid-cols-3 gap-6">
@@ -329,13 +429,13 @@ const toggleMobileMenu = () => {
                     </div>
                 </div>
 
-                <!-- 3. Bagaimana Langkah Seleksi -->
+                <!-- 4. Bagaimana Langkah Seleksi -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
                             <span class="text-2xl">📋</span>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-900">Tahapan Proses Menjadi Mitra</h2>
+                        <h2 class="text-2xl font-bold text-gray-900">Tahapan Proses Menjadi Mitra</h2>
                     </div>
                     
                     <div class="relative">
@@ -419,13 +519,13 @@ const toggleMobileMenu = () => {
                 <!-- Call to Action -->
                 <div class="text-center bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-12 text-white">
                     <template v-if="!isAuthenticated">
-                        <h2 class="text-3xl font-bold mb-4">Siap Menjadi Mitra Pangan BULOG?</h2>
-                        <p class="text-xl mb-8 text-blue-100">
+                        <h2 class="text-xl font-semibold mb-4">Siap Menjadi Mitra Pangan BULOG?</h2>
+                        <p class="text-lg mb-8 text-blue-100">
                             Daftarkan perusahaan Anda sekarang dan bergabung dengan jaringan mitra pangan Perum BULOG untuk penawaran komoditas gabah dan beras
                         </p>
                         <Link 
                             href="/register"
-                            class="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors shadow-lg"
+                            class="inline-flex items-center bg-white text-blue-600 px-6 py-3 rounded-xl font-bold text-base hover:bg-gray-50 transition-colors shadow-lg"
                         >
                             Daftar Sebagai Mitra Sekarang
                             <svg class="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

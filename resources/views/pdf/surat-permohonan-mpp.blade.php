@@ -142,6 +142,11 @@
             <td class="value">{{ $nama_cp }}</td>
         </tr>
         <tr>
+            <td class="label">Perusahaan</td>
+            <td class="colon">:</td>
+            <td class="value">{{ $nama_perusahaan }}</td>
+        </tr>
+        <tr>
             <td class="label">Alamat</td>
             <td class="colon">:</td>
             <td class="value">{{ $alamat_perusahaan }}</td>
@@ -165,14 +170,9 @@
     
     <!-- Daftar Lampiran -->
     <div class="attachment-list">
-        &nbsp;&nbsp;&nbsp;&nbsp;1. Permohonan<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;2. KTP<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;3. NPWP<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;4. NIB<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;5. Akta Pendirian<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;6. No Rekening<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;7. Surat Pernyataan PKP/Non PKP<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;8. Surat Kuasa
+        @foreach($lampiran_list as $lampiran)
+            &nbsp;&nbsp;&nbsp;&nbsp;{{ $lampiran }}<br>
+        @endforeach
     </div>
     
     <!-- Penutup -->
