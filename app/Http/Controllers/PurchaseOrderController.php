@@ -89,7 +89,6 @@ class PurchaseOrderController extends Controller
         ]);
 
         $validated['created_by'] = auth()->user()->name ?? 'Admin';
-        $validated['no_surat'] = PurchaseOrder::generateNoSurat($validated['nama_perusahaan']);
 
         // Create the main Purchase Order (no need for user_id since admin creates it)
         $purchaseOrder = PurchaseOrder::create([
@@ -98,9 +97,12 @@ class PurchaseOrderController extends Controller
             'jenis_komoditas' => $validated['jenis_komoditas'],
             'jenis_komoditas_custom' => $validated['jenis_komoditas_custom'],
             'jenis_pengadaan' => $validated['jenis_pengadaan'],
-            'no_surat' => $validated['no_surat'],
             'created_by' => $validated['created_by'],
         ]);
+        
+        // Generate no_surat setelah PO dibuat (supaya ada ID)
+        $purchaseOrder->no_surat = $purchaseOrder->generateNoSurat();
+        $purchaseOrder->save();
 
         // Create the quality items
         foreach ($validated['kualitas_items'] as $item) {

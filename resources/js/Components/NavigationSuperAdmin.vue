@@ -1,7 +1,7 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { HomeIcon, UsersIcon, DocumentIcon, ClipboardDocumentCheckIcon, DocumentChartBarIcon, DocumentCheckIcon } from '@heroicons/vue/24/outline';
+import { HomeIcon, UsersIcon, DocumentIcon, ClipboardDocumentCheckIcon, DocumentChartBarIcon, DocumentCheckIcon, ShoppingCartIcon } from '@heroicons/vue/24/outline';
 import logoImg from '@/../../resources/assets/Images/bulog.png'; 
 
 const page = usePage();
@@ -66,6 +66,11 @@ const menuItems = [
         name: 'Daftar Hasil Seleksi Mitra',
         route: 'super-admin.hasil-seleksi-mitra.index',
         icon: DocumentCheckIcon
+    },
+    {
+        name: 'Purchase Orders',
+        route: 'admin.purchase-orders.index',
+        icon: ShoppingCartIcon
     }
 ];
 </script>

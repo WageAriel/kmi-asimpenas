@@ -116,6 +116,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     ->name('hasil-seleksi-mitra.berita-acara');
 
     // 7. Purchase Orders (Admin Only)
+    // NOTE: purchase order routes moved to a separate group below that allows both admin and super admin.
+});
+// Purchase Orders (Admin OR Super Admin)
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,super admin'])->group(function () {
     Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])
         ->name('purchase-orders.index');
 
