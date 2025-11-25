@@ -5,23 +5,30 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         
+        <!-- Google Site Verification -->
+        <!-- Jika pakai metode HTML File, tidak perlu meta tag ini -->
+        <!-- Jika pakai metode HTML Tag, uncomment baris berikut dan ganti YOUR_CODE dengan code dari Google -->
+        <!-- <meta name="google-site-verification" content="YOUR_CODE" /> -->
+        
         <!-- SEO Meta Tags -->
-        <meta name="description" content="ASIMPENAS - Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Surakarta. Daftar sebagai mitra pangan sekarang!">
+        <meta name="description" content="ASIMPENAS - Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Kantor Cabang Surakarta. Daftar sebagai mitra pangan sekarang!">
         <meta name="keywords" content="ASIMPENAS, Bulog, Mitra Pangan, Gabah, Beras, Surakarta, Sistem Informasi, Manajemen Mitra, Seleksi Mitra, Komoditas">
         <meta name="author" content="Perum BULOG Kantor Cabang Surakarta">
         <meta name="robots" content="index, follow">
+        <meta name="googlebot" content="index, follow">
+        <meta name="bingbot" content="index, follow">
         
         <!-- Open Graph Meta Tags -->
-        <meta property="og:title" content="ASIMPENAS - Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG">
-        <meta property="og:description" content="Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Surakarta. Daftar sebagai mitra pangan sekarang!">
+        <meta property="og:title" content="ASIMPENAS - Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG Kantor Cabang Surakarta">
+        <meta property="og:description" content="Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Kantor Cabang Surakarta. Daftar sebagai mitra pangan sekarang!">
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:site_name" content="ASIMPENAS - Perum BULOG Surakarta">
+        <meta property="og:site_name" content="ASIMPENAS - Perum BULOG Kantor Cabang Surakarta">
         
         <!-- Twitter Card Meta Tags -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="ASIMPENAS - Aplikasi Seleksi Mitra dan Penawaran Komoditas">
-        <meta name="twitter:description" content="Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Surakarta">
+        <meta name="twitter:description" content="Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Kantor Cabang Surakarta">
 
         <title inertia>{{ config('app.name', 'ASIMPENAS') }}</title>
         <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">

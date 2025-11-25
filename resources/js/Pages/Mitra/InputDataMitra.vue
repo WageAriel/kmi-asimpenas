@@ -923,6 +923,7 @@ const generatePaktaIntegritasPdf = async () => {
             </button>
 
             <button 
+                v-if="form.pkp === 'Non Pkp'"
                 type="button" 
                 @click="generateSuratPernyataanNonPkpPdf"
                 :disabled="!mitraId || isSubmitting"
@@ -955,6 +956,7 @@ const generatePaktaIntegritasPdf = async () => {
             </button>
 
             <button 
+                v-if="form.surat_kuasa === 'Ada'"
                 type="button" 
                 @click="downloadTemplateSuratKuasa"
                 class="w-full px-4 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors bg-orange-600 text-white hover:bg-orange-700 cursor-pointer"

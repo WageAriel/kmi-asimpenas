@@ -670,15 +670,29 @@ class PdfGeneratorController extends Controller
                 '2. KTP',
                 '3. NPWP',
                 '4. NIB',
-                '5. Akta Pendirian',
-                '6. No Rekening'
             ];
             
-            $nomorLampiran = 7; // Mulai dari nomor 7 untuk lampiran selanjutnya
+            $nomorLampiran = 5;
+            
+            // Tambahkan Akta Pendirian hanya untuk CV atau PT
+            if (!empty($mitra->badan_hukum_usaha) && 
+                (strtoupper($mitra->badan_hukum_usaha) === 'CV' || 
+                 strtoupper($mitra->badan_hukum_usaha) === 'PT')) {
+                $lampiranList[] = $nomorLampiran . '. Akta Pendirian';
+                $nomorLampiran++;
+            }
+            
+            // Tambahkan No Rekening
+            $lampiranList[] = $nomorLampiran . '. No Rekening';
+            $nomorLampiran++;
             
             // Tambahkan lampiran berdasarkan data PKP (hanya jika ada)
-            if (!empty($mitra->pkp) && $mitra->pkp === 'Pkp') {
-                $lampiranList[] = $nomorLampiran . '. Surat Pernyataan PKP/Non PKP';
+            if (!empty($mitra->pkp) && $mitra->pkp === 'Non Pkp') {
+                $lampiranList[] = $nomorLampiran . '. Surat Pernyataan Non PKP';
+                $nomorLampiran++;
+            }
+            else if (!empty($mitra->pkp) && $mitra->pkp === 'Pkp') {
+                $lampiranList[] = $nomorLampiran . '. Surat Pernyataan PKP';
                 $nomorLampiran++;
             }
             

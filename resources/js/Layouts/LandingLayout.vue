@@ -3,7 +3,7 @@ import Footer from '@/Components/Footer.vue';
 </script>
 
 <template>
-    <div class="min-h-screen bg-white">
+    <div class="min-h-screen">
         <!-- Main Content Full Width -->
         <main>
             <slot />

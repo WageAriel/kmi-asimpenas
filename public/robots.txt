@@ -11,5 +11,15 @@ Allow: /
 Allow: /login
 Allow: /register
 
+# Crawl-delay
+Crawl-delay: 10
+
 # Sitemap
 Sitemap: https://asimpenas.com/sitemap.xml
+
+# Google Bot
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /super-admin/
+Disallow: /mitra/

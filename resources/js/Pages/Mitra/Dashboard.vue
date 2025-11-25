@@ -365,8 +365,8 @@ const goToAction = (action) => {
 
 <template>
     <Head>
-        <title>Dashboard Mitra - ASIMPENAS | Perum BULOG Surakarta</title>
-        <meta name="description" content="Dashboard mitra ASIMPENAS untuk mengelola pengajuan seleksi, klasifikasi, dan penawaran komoditas gabah beras dari Perum BULOG Surakarta" />
+        <title>Dashboard Mitra - ASIMPENAS | Perum BULOG Kantor Cabang Surakarta</title>
+        <meta name="description" content="Dashboard mitra ASIMPENAS untuk mengelola pengajuan seleksi, klasifikasi, dan penawaran komoditas gabah beras dari Perum BULOG Kantor Cabang Surakarta" />
         <meta name="robots" content="noindex, nofollow" />
     </Head>
 

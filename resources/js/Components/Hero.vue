@@ -45,7 +45,7 @@ const toggleMobileMenu = () => {
 <template>
     <Head>
         <title>ASIMPENAS - Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG Surakarta</title>
-        <meta name="description" content="Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Surakarta. Daftar sebagai mitra pangan sekarang!" />
+        <meta name="description" content="Platform digital seleksi mitra pangan dan penawaran komoditas gabah beras Perum BULOG Kantor Cabang Surakarta. Daftar sebagai mitra pangan sekarang!" />
         <meta name="keywords" content="ASIMPENAS, Bulog, Mitra Pangan, Gabah, Beras, Surakarta, Seleksi Mitra, Komoditas" />
     </Head>
 
@@ -199,7 +199,9 @@ const toggleMobileMenu = () => {
                     Selamat Datang di <span class="text-blue-600">ASIMPENAS</span>
                 </h1>
                 <h2 class="text-lg md:text-xl text-gray-700 font-semibold max-w-3xl mx-auto mb-4">
-                    Aplikasi Seleksi Mitra dan Penawaran Komoditas Perum BULOG
+                    Aplikasi Seleksi Mitra dan Penawaran Komoditas 
+                    <br />
+                    Perum BULOG Kantor Cabang Surakarta
                 </h2>
                 <p class="text-base text-gray-600 max-w-3xl mx-auto mb-8">
                     Platform digital untuk seleksi calon mitra pangan, klasifikasi mitra, dan penawaran komoditas gabah dan beras
@@ -352,7 +354,7 @@ const toggleMobileMenu = () => {
                     <div class="grid md:grid-cols-2 gap-8 items-center">
                         <div>
                             <p class="text-lg text-gray-600 mb-4 leading-relaxed">
-                                <strong>ASIMPENAS</strong> (Aplikasi Seleksi Mitra dan Penawaran Komoditas) adalah platform digital yang dikelola oleh Perum BULOG untuk mengelola proses seleksi calon mitra pangan, klasifikasi mitra berdasarkan kapasitas dan kualitas, serta penawaran komoditas pangan seperti gabah dan beras sesuai dengan standar dan ketentuan yang berlaku.
+                                <strong>ASIMPENAS</strong> (Aplikasi Seleksi Mitra dan Penawaran Komoditas) adalah platform digital yang dikelola oleh Perum BULOG Kantor Cabang Surakarta untuk mengelola proses seleksi calon mitra pangan, klasifikasi mitra berdasarkan kapasitas dan kualitas, serta penawaran komoditas pangan seperti gabah dan beras sesuai dengan standar dan ketentuan yang berlaku.
                             </p>
                             <ul class="space-y-3 text-gray-600">
                                 <li class="flex items-center">
@@ -403,7 +405,7 @@ const toggleMobileMenu = () => {
                             </div>
                             <h4 class="font-semibold text-gray-800 mb-2">Menjadi Mitra Resmi BULOG</h4>
                             <p class="text-gray-600 text-sm">
-                                Menjadi bagian dari jaringan mitra pangan Perum BULOG dengan status resmi dan terverifikasi
+                                Menjadi bagian dari jaringan mitra pangan Perum BULOG Kantor Cabang Surakarta dengan status resmi dan terverifikasi
                             </p>
                         </div>
                         
@@ -423,7 +425,7 @@ const toggleMobileMenu = () => {
                             </div>
                             <h4 class="font-semibold text-gray-800 mb-2">Kemitraan Berkelanjutan</h4>
                             <p class="text-gray-600 text-sm">
-                                Peluang kemitraan jangka panjang dengan Perum BULOG untuk stabilitas usaha
+                                Peluang kemitraan jangka panjang dengan Perum BULOG Kantor Cabang Surakarta untuk stabilitas usaha
                             </p>
                         </div>
                     </div>
@@ -519,9 +521,9 @@ const toggleMobileMenu = () => {
                 <!-- Call to Action -->
                 <div class="text-center bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-12 text-white">
                     <template v-if="!isAuthenticated">
-                        <h2 class="text-xl font-semibold mb-4">Siap Menjadi Mitra Pangan BULOG?</h2>
+                        <h2 class="text-xl font-semibold mb-4">Siap Menjadi Mitra Pangan BULOG Kantor Cabang Surakarta?</h2>
                         <p class="text-lg mb-8 text-blue-100">
-                            Daftarkan perusahaan Anda sekarang dan bergabung dengan jaringan mitra pangan Perum BULOG untuk penawaran komoditas gabah dan beras
+                            Daftarkan perusahaan Anda sekarang dan bergabung dengan jaringan mitra pangan Perum BULOG Kantor Cabang Surakarta untuk penawaran komoditas gabah dan beras
                         </p>
                         <Link 
                             href="/register"
