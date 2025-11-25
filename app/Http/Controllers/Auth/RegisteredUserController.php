@@ -47,6 +47,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('mitra.dashboard', absolute: false));
+        // Redirect ke halaman verify email dengan notifikasi
+        return redirect()->route('verification.notice');
     }
 }

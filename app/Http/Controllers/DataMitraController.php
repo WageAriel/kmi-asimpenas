@@ -6,6 +6,7 @@ use App\Models\DataMitra;
 use Illuminate\Http\Request;
 use App\Services\ActivityAggregatorService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use App\Imports\DataMitraImport;
 use App\Exports\DataMitraExport;
@@ -52,7 +53,7 @@ class DataMitraController extends Controller
                 ], 400);
             }
 
-            \Log::info('Starting import', [
+            Log::info('Starting import', [
                 'filename' => $file->getClientOriginalName(),
                 'size' => $file->getSize(),
                 'mime' => $file->getMimeType(),
@@ -77,7 +78,7 @@ class DataMitraController extends Controller
                     ];
                 }
 
-                \Log::warning('Import completed with errors', [
+                Log::warning('Import completed with errors', [
                     'failures_count' => count($failureMessages),
                     'errors_count' => count($errors),
                 ]);
@@ -91,14 +92,14 @@ class DataMitraController extends Controller
 
             ActivityAggregatorService::clearAllActivitiesCache();
 
-            \Log::info('Import completed successfully');
+            Log::info('Import completed successfully');
 
             return response()->json([
                 'message' => 'Data mitra berhasil diimport',
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation error during import', [
+            Log::error('Validation error during import', [
                 'errors' => $e->errors(),
             ]);
 
@@ -119,7 +120,7 @@ class DataMitraController extends Controller
                 ];
             }
 
-            \Log::error('Excel validation error', [
+            Log::error('Excel validation error', [
                 'failures_count' => count($failureMessages),
             ]);
 
@@ -129,7 +130,7 @@ class DataMitraController extends Controller
             ], 422);
 
         } catch (\Exception $e) {
-            \Log::error('Import exception', [
+            Log::error('Import exception', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -193,7 +194,7 @@ class DataMitraController extends Controller
             'Bank Mandiri',
             'Jl. Bank No. 1',
             '1234567890',
-            'Distributor',
+            'Penggilingan Padi',
             '01.234.567.8-901.000',
             'Pkp',
             'Ada',
@@ -273,12 +274,12 @@ class DataMitraController extends Controller
         try {
             $fileName = 'data_mitra_' . date('Y-m-d_His') . '.xlsx';
             
-            \Log::info('Starting export data mitra');
+            Log::info('Starting export data mitra');
             
             return Excel::download(new DataMitraExport, $fileName);
             
         } catch (\Exception $e) {
-            \Log::error('Export exception', [
+            Log::error('Export exception', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

@@ -150,8 +150,6 @@ onMounted(async () => {
   try {
     const response = await axios.get('/user')
     user.value = response.data
-    form.value.nama_perusahaan = user.value.name // sesuaikan field dari user
-    form.value.email = user.value.email
 
     const mitraRes = await axios.get('/data-mitra/my');
     if (mitraRes.data && mitraRes.data.id_mitra) {
@@ -452,9 +450,8 @@ const generatePaktaIntegritasPdf = async () => {
                 ]"
               >
                 <option value="">Pilih Status Perusahaan</option>
-                <option value="Penggilingan">Penggilingan</option>
-                <option value="Distributor">Distributor</option>
-                <option value="Gapoktan">Gapoktan</option>
+                <option value="Penggilingan Padi">Penggilingan Padi</option>
+                <option value="Poktan/Gapoktan">Poktan/Gapoktan</option>
               </select>
             </div>
 

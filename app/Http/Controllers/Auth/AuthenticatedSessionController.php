@@ -36,6 +36,11 @@
 
     $user = Auth::user();
 
+    // Cek verifikasi email untuk mitra
+    if ($user->role === 'mitra' && !$user->hasVerifiedEmail()) {
+        return redirect()->route('verification.notice');
+    }
+
     // Redirect sesuai role
     if ($user->role === 'mitra') {
         return redirect()->intended(route('mitra.dashboard', absolute: false));

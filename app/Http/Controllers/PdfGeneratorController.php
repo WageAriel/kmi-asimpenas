@@ -640,7 +640,7 @@ class PdfGeneratorController extends Controller
                 'nama_perusahaan' => $klasifikasi->mitra->nama_perusahaan,
                 'badan_usaha' => $klasifikasi->mitra->badan_hukum_usaha,
                 'alamat_perusahaan' => $klasifikasi->mitra->alamat_perusahaan,
-                'status_mitra' => $klasifikasi->mitra->status ?? 'Penggilingan',
+                'status_mitra' => $klasifikasi->mitra->status_perusahaan ?? 'Penggilingan',
                 'nomor_urut_klasifikasi' => sprintf("%02d", $urutanDataKlasifikasi),
                 'hasil_klasifikasi' => $klasifikasi->hasil_klasifikasi,
                 'kantor_cabang' => 'Surakarta',

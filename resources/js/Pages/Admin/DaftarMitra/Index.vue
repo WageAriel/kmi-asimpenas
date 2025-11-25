@@ -101,8 +101,8 @@ const getStatusClass = (status) => {
     if (!status) return 'bg-gray-100 text-gray-800';
     
     switch (status.toLowerCase()) {
-        case 'penggilingan': return 'bg-green-100 text-green-800';
-        case 'distributor': return 'bg-red-100 text-red-800';
+        case 'penggilingan padi': return 'bg-green-100 text-green-800';
+        case 'poktan/gapoktan': return 'bg-red-100 text-red-800';
         default: return 'bg-blue-100 text-blue-800';
     }
 };
@@ -700,6 +700,7 @@ const formatDate = (dateString) => {
                                     <li>• Ukuran file maksimal 5MB</li>
                                     <li>• Download template untuk melihat format yang benar</li>
                                     <li>• Pastikan kolom sesuai dengan template</li>
+                                    <li>• Untuk status perusahaan diisi "Penggilingan Padi" atau "Poktan/Gapoktan"</li>
                                 </ul>
                             </div>
                         </div>

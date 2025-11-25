@@ -70,7 +70,7 @@ const submit = () => {
                 <!-- Header -->
                 <div class="text-center mt-4 mb-6">
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Bergabung Sebagai Mitra</h2>
-                    <p class="text-gray-500">Silakan lengkapi informasi perusahaan Anda</p>
+                    <p class="text-gray-500">Silakan lengkapi informasi akun anda</p>
                 </div>
 
                 <!-- Form -->
@@ -78,7 +78,7 @@ const submit = () => {
                     <!-- Name -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                            Nama Perusahaan
+                            Username
                         </label>
                         <input
                             id="name"
@@ -87,7 +87,7 @@ const submit = () => {
                             required
                             autofocus
                             autocomplete="name"
-                            placeholder="Masukkan nama perusahaan"
+                            placeholder="Masukkan username"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             :class="{ 'border-red-300': form.errors.name }"
                         />
@@ -99,7 +99,7 @@ const submit = () => {
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-                            Alamat Email Perusahaan
+                            Alamat Email
                         </label>
                         <input
                             id="email"
@@ -107,7 +107,7 @@ const submit = () => {
                             v-model="form.email"
                             required
                             autocomplete="username"
-                            placeholder="Masukkan email perusahaan"
+                            placeholder="Masukkan email"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             :class="{ 'border-red-300': form.errors.email }"
                         />

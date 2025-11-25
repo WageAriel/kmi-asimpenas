@@ -93,7 +93,7 @@
             <tr>
                 <td>4. Status</td>
                 <td>:</td>
-                <td>{{ $mitra->status ?? 'Penggilingan' }}</td>
+                <td>{{ $mitra->status_perusahaan ?? 'Penggilingan' }}</td>
             </tr>
             <tr>
                 <td>5. Nomor Urut Seleksi</td>
