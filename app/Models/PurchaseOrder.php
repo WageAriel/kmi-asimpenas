@@ -109,7 +109,7 @@ class PurchaseOrder extends Model
     // Method untuk generate nomor surat otomatis
     // Format: NO_VMS/XXX/KODE_MITRA/MM/YYYY
     // NO_VMS = no_vms dari data_mitra (sesuai yang ada di database)
-    // XXX = ID Purchase Order dari database (3 digit)
+    // XXX = urutan nomor (reset setiap bulan, 3 digit)
     // KODE_MITRA = kode_mitra dari data_mitra (sesuai yang ada di database)
     // MM = bulan (2 digit)
     // YYYY = tahun (4 digit)
@@ -132,9 +132,11 @@ class PurchaseOrder extends Model
             $kodeMitra = !empty($mitra->kode_mitra) ? $mitra->kode_mitra : 'XXX';
         }
         
-        // Gunakan ID database sebagai nomor urut
-        // Ini memastikan konsistensi antara ID PO di show.vue dan nomor di surat
-        $count = $this->id;
+        // Hitung urutan PO bulan ini untuk mitra tertentu (reset setiap bulan)
+        $count = self::where('nama_perusahaan', $this->nama_perusahaan)
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year)
+                    ->count() + 1;
         
         // Format nomor surat: NO_VMS/XXX/KODE_MITRA/MM/YYYY
         $noSurat = sprintf(

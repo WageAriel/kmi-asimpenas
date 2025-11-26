@@ -38,6 +38,15 @@ const downloadFormPenawaran = () => {
 const downloadCombinedPdf = () => {
     window.open(route('admin.purchase-orders.combined-pdf', props.purchaseOrder.id), '_blank');
 };
+
+// Extract nomor urut saja dari no_surat
+// Format: NO_VMS/001/MITRA/11/2025 -> ambil hanya 001
+const getPoNumber = () => {
+    if (!props.purchaseOrder.no_surat) return '-';
+    const parts = props.purchaseOrder.no_surat.split('/');
+    // Ambil bagian kedua (index 1) yang merupakan nomor urut
+    return parts[1] || '-';
+};
 </script>
 
 <template>
@@ -61,7 +70,7 @@ const downloadCombinedPdf = () => {
                                 </button>
                                 <div>
                                     <h1 class="text-2xl font-bold text-gray-900">Detail Purchase Order</h1>
-                                    <p class="text-gray-600 mt-1">PO #{{ purchaseOrder.id }} - {{ purchaseOrder.nama_perusahaan }}</p>
+                                    <p class="text-gray-600 mt-1">PO ID #{{ getPoNumber() }} - {{ purchaseOrder.nama_perusahaan }}</p>
                                 </div>
                             </div>
                             <div class="flex space-x-3">
@@ -229,13 +238,13 @@ const downloadCombinedPdf = () => {
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tanggal Dibuat</h3>
-                                <p class="mt-1 text-lg font-semibold text-gray-900">{{ purchaseOrder.created_at }}</p>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">ID Purchase Order</h3>
+                                <p class="mt-1 text-lg font-semibold text-gray-900">#{{ getPoNumber() }}</p>
                             </div>
                             
                             <div>
-                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">ID Purchase Order</h3>
-                                <p class="mt-1 text-lg font-semibold text-gray-900">#{{ purchaseOrder.id }}</p>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tanggal Dibuat</h3>
+                                <p class="mt-1 text-lg font-semibold text-gray-900">{{ purchaseOrder.created_at }}</p>
                             </div>
                         </div>
                     </div>
