@@ -165,6 +165,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,super ad
     // Helper Route for Dynamic Options
     Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])
         ->name('purchase-orders.kualitas-options');
+
+    // HPP Management Routes
+    Route::get('/hpp', [App\Http\Controllers\HppController::class, 'index'])
+        ->name('hpp.index');
+    Route::post('/hpp', [App\Http\Controllers\HppController::class, 'store'])
+        ->name('hpp.store');
+    Route::get('/hpp/{id}', [App\Http\Controllers\HppController::class, 'show'])
+        ->name('hpp.show');
+    Route::put('/hpp/{id}', [App\Http\Controllers\HppController::class, 'update'])
+        ->name('hpp.update');
+    Route::delete('/hpp/{id}', [App\Http\Controllers\HppController::class, 'destroy'])
+        ->name('hpp.destroy');
+    Route::patch('/hpp/{id}/toggle-active', [App\Http\Controllers\HppController::class, 'toggleActive'])
+        ->name('hpp.toggle-active');
 });
 
 // 1. Routes Dashboard Mitra tanpa middleware (untuk testing)

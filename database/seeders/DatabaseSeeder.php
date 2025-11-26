@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
 
         // Akun Mitra
         User::factory()->create([
-            'name' => 'Mitra User',
+            'name' => 'Mitra',
             'email' => 'mitra@example.com',
             'role' => 'mitra',
             'password' => bcrypt('password'),
@@ -25,16 +25,16 @@ class DatabaseSeeder extends Seeder
 
         // Akun Admin
         User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
+            'name' => 'Admin',
+            'email' => 'admin@asimpenas.com',
             'role' => 'admin',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('adminada'),
         ]);
 
         // Akun Super Admin
         User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@example.com',
+            'name' => 'SuperAdmin',
+            'email' => 'superadmin@asimpenas.com',
             'role' => 'super admin',
             'password' => bcrypt('password'),
         ]);

@@ -1,12 +1,17 @@
 <script setup>
 import { Link, router, usePage, Head } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
+import axios from 'axios';
 import logoImg from '@/../../resources/assets/Images/bulog.png';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 const isAuthenticated = computed(() => !!user.value);
 const mobileMenuOpen = ref(false);
+
+// HPP Data State
+const hppData = ref([]);
+const isLoadingHpp = ref(true);
 
 // Get dashboard route based on user role
 const dashboardRoute = computed(() => {
@@ -40,6 +45,43 @@ const handleLogout = () => {
 const toggleMobileMenu = () => {
     mobileMenuOpen.value = !mobileMenuOpen.value;
 };
+
+// Fetch HPP Data from API
+const fetchHppData = async () => {
+    try {
+        isLoadingHpp.value = true;
+        const response = await axios.get('/hpp');
+        hppData.value = response.data;
+    } catch (error) {
+        console.error('Error fetching HPP data:', error);
+    } finally {
+        isLoadingHpp.value = false;
+    }
+};
+
+// Computed properties for filtered HPP data
+const hppGabahBeras = computed(() => {
+    return hppData.value.find(doc => doc.jenis_hpp === 'Gabah dan Beras');
+});
+
+const hppJagung = computed(() => {
+    return hppData.value.find(doc => doc.jenis_hpp === 'Jagung');
+});
+
+// Format currency helper
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(value);
+};
+
+// Load HPP data on component mount
+onMounted(() => {
+    fetchHppData();
+});
 </script>
 
 <template>
@@ -244,7 +286,7 @@ const toggleMobileMenu = () => {
                 <!-- 1. Pengadaan Gabah dan Beras Dalam Negeri Tahun 2025 -->
                  <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <div class="text-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-2">🌾 PENGADAAN GABAH DAN BERAS DALAM NEGERI TAHUN 2025</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">🌾 PENGADAAN GABAH DAN BERAS DALAM NEGERI</h2>
                         <p class="text-gray-600">Dengan Persyaratan dibawah ini</p>
                     </div>
                     
@@ -344,51 +386,69 @@ const toggleMobileMenu = () => {
                 <!-- 2. Harga Pembelian Sesuai Keputusan Pemerintah -->
                  <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <div class="text-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-2"> HARGA PEMBELIAN PEMERINTAH (HPP)</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">💰 HARGA PEMBELIAN PEMERINTAH (HPP)</h2>
                     </div>
                     
-                    <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Loading State -->
+                    <div v-if="isLoadingHpp" class="text-center py-8">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <p class="mt-2 text-gray-600">Memuat data HPP...</p>
+                    </div>
+
+                    <!-- HPP Data -->
+                    <div v-else class="grid md:grid-cols-2 gap-8">
                         <!-- A. HPP Gabah dan Beras -->
                         <div class="bg-green-50 p-6 rounded-xl">
                             <h3 class="text-xl font-bold text-gray-900 mb-4">A. Harga Pembelian Pemerintah Gabah dan Beras</h3>
-                            <p class="text-base text-black mb-2">
-                                Sesuai dengan Keputusan Kepala Badan Pangan Nasional Republik Indonesia Nomor 14 Tahun 2025 tentang Perubahan
-                                Atas Keputusan Kepala Badan Pangan Nasional Nomor 2 Tahun 2025 Tentang Perubahan Atas Harga Pembelian Pemerintah dan Rafraksi Harga Gabah dan Beras 
-                            </p>
-                            <div class="space-y-3">
-                                <ul class="space-y-3 text-sm text-black">
-                                    <li class="flex items-start gap-2">
-                                        <span>-</span>
-                                        <span>Harga <strong>GKP </strong>di <strong>Tingkat Petani </strong>sebesar <strong>Rp. 6.500,-/kg</strong></span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span>-</span>
-                                        <span>Harga <strong>Beras </strong>di <strong>Gudang Perum BULOG </strong>sebesar <strong>Rp. 12.000,-/kg </strong>dengan ketentuan
-                                        (Derajat Sosoh Min 95%, Kadar Air maks 14%, Butir Patah maks 25%, Butir Menir maks 2%)</span>
-                                    </li>
-                                </ul>
-                            </div>
+                            
+                            <template v-if="hppGabahBeras">
+                                <p class="text-base text-black mb-2"> 
+                                    Sesuai dengan Keputusan Kepala Badan Pangan Nasional Republik Indonesia 
+                                    <strong>Nomor {{ hppGabahBeras.nomor_keputusan }} Tahun {{ hppGabahBeras.tahun }}</strong>
+                                    tentang {{ hppGabahBeras.tentang }}
+                                </p>
+                                <div class="space-y-3 mt-4">
+                                    <ul class="space-y-3 text-sm text-black">
+                                        <li v-for="komoditas in hppGabahBeras.komoditas" :key="komoditas.id" class="flex items-start gap-2">
+                                            <span>-</span>
+                                            <span>
+                                                Harga <strong>{{ komoditas.nama_komoditas }} </strong>
+                                                di <strong>{{ komoditas.tempat }} </strong>
+                                                sebesar <strong>{{ formatCurrency(komoditas.harga_per_kg) }},-/kg</strong>
+                                                <span v-if="komoditas.ketentuan"> dengan ketentuan ({{ komoditas.ketentuan }})</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </template>
+                            <p v-else class="text-gray-500 text-center py-4">Data HPP Gabah dan Beras belum tersedia</p>
                         </div>
 
                         <!-- B. HPP Jagung -->
                         <div class="bg-green-50 p-6 rounded-xl">
                             <h3 class="text-xl font-bold text-gray-900 mb-4">B. Harga Pembelian Pemerintah Jagung</h3>
-                            <p class="text-base text-black mb-2">
-                                Sesuai dengan Keputusan Kepala Badan Pangan Nasional Republik Indonesia Nomor 216 Tahun 2025
-                                Tentang Harga Pembelian Pemerintah Komoditas Jagung
-                            </p>
-                            <div class="space-y-3">
-                                <ul class="space-y-3 text-sm text-black">
-                                    <li class="flex items-start gap-2">
-                                        <span>-</span>
-                                        <span>Harga <strong>Jagung Pipil Kering </strong>di <strong>Tingkat Petani </strong>sebesar <strong>Rp. 5.500,-/kg </strong>(Kadar Air 18-20%)</span>
-                                    </li>
-                                    <li class="flex items-start gap-2">
-                                        <span>-</span>
-                                        <span>Harga <strong>Jagung Pipil Kering </strong>di <strong>Gudang Perum BULOG </strong>sebesar <strong>Rp. 6.400,-/kg </strong>(Kadar Air maks 14%, aflatoksin maks 50 ppb)</span>
-                                    </li>
-                                </ul>
-                            </div>
+                            
+                            <template v-if="hppJagung">
+                                <p class="text-base text-black mb-2">
+                                    Sesuai dengan Keputusan Kepala Badan Pangan Nasional Republik Indonesia 
+                                    <strong>Nomor {{ hppJagung.nomor_keputusan }} Tahun {{ hppJagung.tahun }}</strong>
+                                    Tentang {{ hppJagung.tentang }}
+                                </p>
+                                <div class="space-y-3 mt-4">
+                                    <ul class="space-y-3 text-sm text-black">
+                                        <li v-for="komoditas in hppJagung.komoditas" :key="komoditas.id" class="flex items-start gap-2">
+                                            <span>-</span>
+                                            <span>
+                                                Harga <strong>{{ komoditas.nama_komoditas }} </strong>
+                                                di <strong>{{ komoditas.tempat }} </strong>
+                                                sebesar <strong>{{ formatCurrency(komoditas.harga_per_kg) }},-/kg</strong>
+                                                <span v-if="komoditas.ketentuan"> ({{ komoditas.ketentuan }})</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </template>
+                            <p v-else class="text-gray-500 text-center py-4">Data HPP Jagung belum tersedia</p>
                         </div>
                     </div>
                 </div>

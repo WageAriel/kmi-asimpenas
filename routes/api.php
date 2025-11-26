@@ -7,12 +7,20 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\HppController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// ========================================
+// PUBLIC API ROUTES (untuk Landing Page)
+// ========================================
+// HPP Routes - Public access untuk landing page
+Route::get('/hpp', [HppController::class, 'getAllDocuments']);
+Route::get('/hpp/{jenis}', [HppController::class, 'getByJenis']);
 
 // ========================================
 // ROUTES UNTUK SEMUA AUTHENTICATED USERS
