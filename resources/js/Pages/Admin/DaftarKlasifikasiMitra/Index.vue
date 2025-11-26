@@ -499,6 +499,19 @@ const generatePdf = async () => {
     }
 };
 
+const downloadKlasifikasiMitra = (classificationId) => {
+  if (!classificationId) {
+    console.error('Classification ID is undefined');
+    return;
+  }
+  
+  const downloadUrl = `/admin/klasifikasi-mitra/${classificationId}/download-form`;
+  console.log('Attempting to download from:', downloadUrl);
+  
+  // Using window.open for direct download
+  window.open(downloadUrl, '_blank');
+};
+
 // Add new function for BA Klasifikasi modal
 const showBaPdfDownloadModal = async (item) => {
     selectedItemForBaPdf.value = item;
@@ -650,6 +663,7 @@ const generateBaPdf = async () => {
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Klasifikasi Mitra</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Surat Penetapan</th>
                             </tr>
@@ -676,6 +690,17 @@ const generateBaPdf = async () => {
                                             Lihat
                                         </button>
                                     </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <button
+                                        @click="downloadKlasifikasiMitra(item.id_klasifikasi_mitra)"
+                                        class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
+                                >
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Download
+                                    </button>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <button

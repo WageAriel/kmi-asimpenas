@@ -81,6 +81,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/seleksi-mitra/{id}/surat-penetapan', [PdfGeneratorController::class, 'generateSuratPenetapan'])
         ->name('seleksi-mitra.surat-penetapan');
 
+    // Download Pengajuan Seleksi Mitra
+    Route::get('/seleksi-mitra/{id}/download-form', [PdfGeneratorController::class, 'downloadSeleksiMitraPdf'])
+        ->name('seleksi-mitra.download-form');
+
     // 5. Daftar Klasifikasi Mitra
     Route::get('/klasifikasi-mitra', function () {
         $klasifikasiMitras = App\Models\KlasifikasiMitra::with('mitra')
@@ -99,6 +103,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     //Generate PDF Berita Acara Klasifikasi
     Route::get('/klasifikasi-mitra/{id}/berita-acara', [PdfGeneratorController::class, 'generateBeritaAcaraKlasifikasi'])
     ->name('klasifikasi-mitra.berita-acara');
+
+    // Download Klasifikasi Mitra
+    Route::get('/klasifikasi-mitra/{id}/download-form', [PdfGeneratorController::class, 'downloadKlasifikasiMitraPdf'])
+        ->name('klasifikasi-mitra.download-form');
 
     // 6. Daftar Hasil Seleksi Mitra
     Route::get('/hasil-seleksi-mitra', function () {

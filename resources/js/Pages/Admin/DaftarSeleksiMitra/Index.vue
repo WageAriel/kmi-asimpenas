@@ -310,6 +310,31 @@ const generatePdf = async () => {
     }
 };
 
+const downloadFormMitra = (submissionId) => {
+  if (!submissionId) {
+    console.error('Submission ID is undefined');
+    return;
+  }
+  
+  const downloadUrl = `/admin/seleksi-mitra/${submissionId}/download-form`;
+  console.log('Attempting to download form mitra from:', downloadUrl);
+  
+  // Option 1: Using window.open (simpler approach)
+  window.open(downloadUrl, '_blank');
+  
+  /* 
+  // Option 2: Using iframe (if window.open is blocked)
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = downloadUrl;
+  document.body.appendChild(iframe);
+  
+  setTimeout(() => {
+    document.body.removeChild(iframe);
+  }, 2000);
+  */
+};
+
 // Function to update status seleksi to "lolos"
 const approveSeleksi = async () => {
     if (!selectedItem.value || isLoading.value) return;
@@ -616,6 +641,7 @@ const exportData = () => {
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Alat Pemisah Beras</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Status Seleksi</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Aksi</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Pengajuan Mitra</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Surat Penetapan</th>
                         </tr>
                     </thead>
@@ -728,6 +754,18 @@ const exportData = () => {
                                         Lihat
                                     </button>
                                 </div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <button
+                                    @click="downloadFormMitra(item.id_seleksi_mitra)"
+                                    class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
+                                    title="Download form mitra"
+                                >
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Download
+                                </button>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <button
