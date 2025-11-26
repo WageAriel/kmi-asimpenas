@@ -195,7 +195,7 @@ const toggleMobileMenu = () => {
         <div class="max-w-6xl mx-auto px-4 py-8">
             <!-- Intro Section with Proper SEO Headings -->
             <div class="text-center mb-8">
-                <h1 class="text-xl md:text-3xl font-bold text-gray-900 mb-6">
+                <h1 class="text-xl md:text-3xl font-bold text-gray-900 mb-4">
                     Selamat Datang di <span class="text-blue-600">ASIMPENAS</span>
                 </h1>
                 <h2 class="text-lg md:text-xl text-gray-700 font-semibold max-w-3xl mx-auto mb-4">
@@ -341,8 +341,60 @@ const toggleMobileMenu = () => {
                     </div>
                 </div>
 
+                <!-- 2. Harga Pembelian Sesuai Keputusan Pemerintah -->
+                 <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2"> HARGA PEMBELIAN PEMERINTAH (HPP)</h2>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- A. HPP Gabah dan Beras -->
+                        <div class="bg-green-50 p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">A. Harga Pembelian Pemerintah Gabah dan Beras</h3>
+                            <p class="text-base text-black mb-2">
+                                Sesuai dengan Keputusan Kepala Badan Pangan Nasional Republik Indonesia Nomor 14 Tahun 2025 tentang Perubahan
+                                Atas Keputusan Kepala Badan Pangan Nasional Nomor 2 Tahun 2025 Tentang Perubahan Atas Harga Pembelian Pemerintah dan Rafraksi Harga Gabah dan Beras 
+                            </p>
+                            <div class="space-y-3">
+                                <ul class="space-y-3 text-sm text-black">
+                                    <li class="flex items-start gap-2">
+                                        <span>-</span>
+                                        <span>Harga <strong>GKP </strong>di <strong>Tingkat Petani </strong>sebesar <strong>Rp. 6.500,-/kg</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span>-</span>
+                                        <span>Harga <strong>Beras </strong>di <strong>Gudang Perum BULOG </strong>sebesar <strong>Rp. 12.000,-/kg </strong>dengan ketentuan
+                                        (Derajat Sosoh Min 95%, Kadar Air maks 14%, Butir Patah maks 25%, Butir Menir maks 2%)</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- B. HPP Jagung -->
+                        <div class="bg-green-50 p-6 rounded-xl">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4">B. Harga Pembelian Pemerintah Jagung</h3>
+                            <p class="text-base text-black mb-2">
+                                Sesuai dengan Keputusan Kepala Badan Pangan Nasional Republik Indonesia Nomor 216 Tahun 2025
+                                Tentang Harga Pembelian Pemerintah Komoditas Jagung
+                            </p>
+                            <div class="space-y-3">
+                                <ul class="space-y-3 text-sm text-black">
+                                    <li class="flex items-start gap-2">
+                                        <span>-</span>
+                                        <span>Harga <strong>Jagung Pipil Kering </strong>di <strong>Tingkat Petani </strong>sebesar <strong>Rp. 5.500,-/kg </strong>(Kadar Air 18-20%)</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span>-</span>
+                                        <span>Harga <strong>Jagung Pipil Kering </strong>di <strong>Gudang Perum BULOG </strong>sebesar <strong>Rp. 6.400,-/kg </strong>(Kadar Air maks 14%, aflatoksin maks 50 ppb)</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 
-                <!-- 2. Apa itu ASIMPENAS -->
+                <!-- 3. Apa itu ASIMPENAS -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
@@ -389,7 +441,7 @@ const toggleMobileMenu = () => {
                     </div>
                 </div>
 
-                <!-- 3. Kenapa Perlu Mendaftar -->
+                <!-- 4. Kenapa Perlu Mendaftar -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
@@ -431,7 +483,7 @@ const toggleMobileMenu = () => {
                     </div>
                 </div>
 
-                <!-- 4. Bagaimana Langkah Seleksi -->
+                <!-- 5. Bagaimana Langkah Seleksi -->
                 <div class="bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
