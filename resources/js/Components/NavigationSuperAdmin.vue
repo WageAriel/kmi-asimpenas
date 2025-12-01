@@ -69,7 +69,7 @@ const menuItems = [
     },
     {
         name: 'Purchase Orders',
-        route: 'admin.purchase-orders.index',
+        route: 'super-admin.purchase-orders.index',
         icon: ShoppingCartIcon
     }
 ];

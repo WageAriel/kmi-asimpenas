@@ -45,7 +45,13 @@ class PurchaseOrderController extends Controller
 
         $mitras = \App\Models\DataMitra::orderBy('nama_perusahaan')->get();
 
-        return Inertia::render('Admin/PurchaseOrder/Index', [
+        // Detect user role and render appropriate view
+        $userRole = auth()->user()->role;
+        $viewPath = $userRole === 'super admin' 
+            ? 'SuperAdmin/PurchaseOrder/Index' 
+            : 'Admin/PurchaseOrder/Index';
+
+        return Inertia::render($viewPath, [
             'purchaseOrders' => $purchaseOrders,
             'mitras' => $mitras,
             'filters' => [
@@ -62,7 +68,13 @@ class PurchaseOrderController extends Controller
     {
         $mitras = \App\Models\DataMitra::orderBy('nama_perusahaan')->get();
         
-        return Inertia::render('Admin/PurchaseOrder/Create', [
+        // Detect user role and render appropriate view
+        $userRole = auth()->user()->role;
+        $viewPath = $userRole === 'super admin' 
+            ? 'SuperAdmin/PurchaseOrder/Create' 
+            : 'Admin/PurchaseOrder/Create';
+
+        return Inertia::render($viewPath, [
             'mitras' => $mitras,
             'jenisKomoditasOptions' => PurchaseOrder::getJenisKomoditasOptions(),
             'komplekPergudanganOptions' => PurchaseOrder::getKomplekPergudanganOptions(),
@@ -111,7 +123,13 @@ class PurchaseOrderController extends Controller
             \App\Models\PurchaseOrderItem::create($item);
         }
 
-        return redirect()->route('admin.purchase-orders.show', $purchaseOrder)
+        // Detect user role for redirect
+        $userRole = auth()->user()->role;
+        $routeName = $userRole === 'super admin' 
+            ? 'super-admin.purchase-orders.show' 
+            : 'admin.purchase-orders.show';
+
+        return redirect()->route($routeName, $purchaseOrder)
             ->with('success', 'Purchase Order berhasil dibuat!');
     }
 
@@ -122,7 +140,13 @@ class PurchaseOrderController extends Controller
     {
         $purchaseOrder->load('items');
         
-        return Inertia::render('Admin/PurchaseOrder/Show', [
+        // Detect user role and render appropriate view
+        $userRole = auth()->user()->role;
+        $viewPath = $userRole === 'super admin' 
+            ? 'SuperAdmin/PurchaseOrder/Show' 
+            : 'Admin/PurchaseOrder/Show';
+
+        return Inertia::render($viewPath, [
             'purchaseOrder' => [
                 'id' => $purchaseOrder->id,
                 'no_surat' => $purchaseOrder->no_surat,
@@ -160,7 +184,12 @@ class PurchaseOrderController extends Controller
         $purchaseOrder->load('items');
         $mitras = \App\Models\DataMitra::orderBy('nama_perusahaan')->get();
 
-        return Inertia::render('Admin/PurchaseOrder/Edit', [
+        $userRole = auth()->user()->role;
+        $viewPath = $userRole === 'super admin' 
+            ? 'SuperAdmin/PurchaseOrder/Edit' 
+            : 'Admin/PurchaseOrder/Edit';
+
+        return Inertia::render($viewPath, [
             'purchaseOrder' => [
                 'id' => $purchaseOrder->id,
                 'no_surat' => $purchaseOrder->no_surat,
@@ -257,7 +286,12 @@ class PurchaseOrderController extends Controller
             \App\Models\PurchaseOrderItem::whereIn('id', $itemsToDelete)->delete();
         }
 
-        return redirect()->route('admin.purchase-orders.show', $purchaseOrder)
+        $userRole = auth()->user()->role;
+        $routeName = $userRole === 'super admin' 
+            ? 'super-admin.purchase-orders.show' 
+            : 'admin.purchase-orders.show';
+
+        return redirect()->route($routeName, $purchaseOrder)
             ->with('success', 'Purchase Order berhasil diupdate!');
     }
 
@@ -272,7 +306,12 @@ class PurchaseOrderController extends Controller
         // Then delete the purchase order
         $purchaseOrder->delete();
 
-        return redirect()->route('admin.purchase-orders.index')
+        $userRole = auth()->user()->role;
+        $routeName = $userRole === 'super admin' 
+            ? 'super-admin.purchase-orders.index' 
+            : 'admin.purchase-orders.index';
+
+        return redirect()->route($routeName)
             ->with('success', 'Purchase Order berhasil dihapus!');
     }
 

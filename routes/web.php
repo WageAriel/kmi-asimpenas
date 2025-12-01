@@ -123,11 +123,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/hasil-seleksi-mitra/{id}/berita-acara', [PdfGeneratorController::class, 'generateBeritaAcara'])
     ->name('hasil-seleksi-mitra.berita-acara');
 
-    // 7. Purchase Orders (Admin Only)
-    // NOTE: purchase order routes moved to a separate group below that allows both admin and super admin.
-});
-// Purchase Orders (Admin OR Super Admin)
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,super admin'])->group(function () {
+    // 7. Purchase Orders
     Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])
         ->name('purchase-orders.index');
 
@@ -166,7 +162,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,super ad
     Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])
         ->name('purchase-orders.kualitas-options');
 
-    // HPP Management Routes
+    // 8. HPP Management Routes (Admin Only)
     Route::get('/hpp', [App\Http\Controllers\HppController::class, 'index'])
         ->name('hpp.index');
     Route::post('/hpp', [App\Http\Controllers\HppController::class, 'store'])
@@ -360,6 +356,45 @@ Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'role:su
     // Generate PDF Berita Acara Hasil Seleksi Mitra (Super Admin)
     Route::get('/hasil-seleksi-mitra/{id}/berita-acara', [PdfGeneratorController::class, 'generateBeritaAcara'])
         ->name('hasil-seleksi-mitra.berita-acara');
+
+    // 7. Purchase Orders (Super Admin)
+    Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])
+        ->name('purchase-orders.index');
+
+    Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'create'])
+        ->name('purchase-orders.create');
+
+    Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])
+        ->name('purchase-orders.store');
+
+    Route::get('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show'])
+        ->name('purchase-orders.show');
+
+    Route::get('/purchase-orders/{purchaseOrder}/edit', [PurchaseOrderController::class, 'edit'])
+        ->name('purchase-orders.edit');
+
+    Route::put('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update'])
+        ->name('purchase-orders.update');
+
+    Route::delete('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy'])
+        ->name('purchase-orders.destroy');
+
+    // Generate PDF Routes
+    Route::get('/purchase-orders/{purchaseOrder}/surat-permohonan', 
+        [PurchaseOrderController::class, 'generateSuratPermohonan'])
+        ->name('purchase-orders.surat-permohonan');
+
+    Route::get('/purchase-orders/{purchaseOrder}/form-penawaran', 
+        [PurchaseOrderController::class, 'generateFormPenawaran'])
+        ->name('purchase-orders.form-penawaran');
+
+    Route::get('/purchase-orders/{purchaseOrder}/combined-pdf', 
+        [PurchaseOrderController::class, 'generateCombinedPdf'])
+        ->name('purchase-orders.combined-pdf');
+
+    // Helper Route for Dynamic Options
+    Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])
+        ->name('purchase-orders.kualitas-options');
 });
 
 Route::middleware('auth')->group(function () {
