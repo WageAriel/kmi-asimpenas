@@ -148,14 +148,14 @@
 
         .footer-text {
             margin: 8px 0;
-            font-size: 9pt;
+            font-size: 10pt;
             line-height: 1.3;
         }
 
         .signature { 
             margin-top: 10px; 
             text-align: right;
-            font-size: 9pt;
+            font-size: 10pt;
             line-height: 1.5;
             display: inline-block;
             float: right;
@@ -180,7 +180,7 @@
         .approval-box {
             margin-top: 140px;
             border: 1px solid #000;
-            padding: 8px;
+            padding: 0;
             page-break-inside: avoid;
             width: 50%;
             float: left;
@@ -191,12 +191,14 @@
             text-align: center; 
             font-weight: bold;
             margin-bottom: 5px;
+            margin-top: 5px;
             font-size: 9pt;
         }
         
         .approval-content {
             font-size: 9pt;
             line-height: 1.4;
+            padding: 0 8px 8px 8px;
         }
         
         .checkbox-item {
@@ -219,49 +221,52 @@
 <body>
 
     @php
-        $namaPerusahaanLengkap = isset($mitra) && $mitra ? $mitra->nama_perusahaan_lengkap : ($purchaseOrder->nama_perusahaan ?? '');
+        // Hitung total kuantum
+        $totalKuantum = $purchaseOrder->items->sum('kuantum');
+        // Ambil nama gudang dari item pertama (karena biasanya sama untuk satu komoditas)
+        $namaGudang = $purchaseOrder->items->first()->komplek_pergudangan_lengkap ?? '';
     @endphp
 
     <!-- Header -->
     <div class="header">
-        <div class="company-name">{{ $namaPerusahaanLengkap }}</div>
+        <div class="company-name">{{ $purchaseOrder->nama_perusahaan }}</div>
         <div class="address">{{ $mitra->alamat_perusahaan ?? '' }}</div>
         <div class="document-number">NO {{ $purchaseOrder->no_surat }}</div>
     </div>
 
     <!-- Box Container (Left: Agenda/Tgl/Paraf | Right: Kontrak/Realisasi/Disetujui) -->
-    <table>
+    <table style="margin-top: 8px; margin-bottom: 8px;">
         <tr>
-            <td style="width:45%; vertical-align:top; padding:0;">
+            <td style="width:30%; vertical-align:top; padding:0;">
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
-                        <td style="width:55%; border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">Agenda No.</td>
-                        <td style="width:45%; border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                        <td style="width:55%; border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">Agenda No.</td>
+                        <td style="width:45%; border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                     <tr>
-                        <td style="border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">Tgl. Terima</td>
-                        <td style="border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">Tgl. Terima</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                     <tr>
-                        <td style="border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">Paraf</td>
-                        <td style="border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">Paraf</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                 </table>
             </td>
-            <td style="width:10%; border:1px solid #fff"></td>
-            <td style="width:45%; vertical-align:top; padding:0;">
+            <td style="width:20%;"></td>
+            <td style="width:30%; vertical-align:top; padding:0;">
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
-                        <td style="width:55%; border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">KONTRAK YLL</td>
-                        <td style="width:45%; border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                        <td style="width:55%; border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">KONTRAK YLL</td>
+                        <td style="width:45%; border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                     <tr>
-                        <td style="border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">REALISASI S/D</td>
-                        <td style="border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">REALISASI S/D</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                     <tr>
-                        <td style="border:1px solid #000; padding:4px; font-size:9pt; font-weight:bold;">DISETUJUI/TIDAK</td>
-                        <td style="border:1px solid #000; padding:4px; font-size:9pt;">&nbsp;</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">DISETUJUI/TIDAK</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                 </table>
             </td>
@@ -276,13 +281,13 @@
 
     <!-- Content -->
     <div class="content">
-        Kepada yth,<br>
+        Kepada Yth.<br>
         Pemimpin/Wakil Pemimpin Cabang Surakarta<br>
         Di Tempat
     </div>
 
     <div class="content">
-        Bersama ini kami <strong>{{ $namaPerusahaanLengkap }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
+        Bersama ini kami <strong>{{ $purchaseOrder->nama_perusahaan }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
     </div>
 
     <!-- Table -->
@@ -326,16 +331,22 @@
         <div style="margin-top: 3px;">Pemohon</div>
         <div class="signature-space"></div>
         <div style="margin-top: 5px;"><strong>{{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? '') }}</strong></div>
-        <div style="margin-top: 3px;">{{ $namaPerusahaanLengkap }}</div>
+        <div style="margin-top: 3px;">{{ $purchaseOrder->nama_perusahaan }}</div>
     </div>
 
     <!-- Approval Box -->
     <div class="approval-box">
-        <div class="approval-title">ASSMAN PENGADAAN</div>
-        <div class="approval-content">
-            <strong>PERSETUJUAN</strong><br>
-            <strong>GUDANG</strong>
-        </div>
+        <div class="approval-title">AM. PENGADAAN KOMODITAS</div>
+        <table style="width:100%; border-collapse:collapse; margin:0;">
+            <tr>
+                <td style="border-top:1px solid #000; border-bottom:1px solid #000; border-left:0; border-right:1px solid #000; padding:3px; font-size:9pt; font-weight:bold; width:50%; margin:0;">PERSETUJUAN</td>
+                <td style="border-top:1px solid #000; border-bottom:1px solid #000; border-left:0; border-right:0; padding:3px; font-size:9pt; text-align:center; margin:0;">{{ number_format($totalKuantum, 0, ',', '.') }} Kg</td>
+            </tr>
+            <tr>
+                <td style="border-top:0; border-bottom:1px solid #000; border-left:0; border-right:1px solid #000; padding:3px; font-size:9pt; font-weight:bold; margin:0;">GUDANG</td>
+                <td style="border-top:0; border-bottom:1px solid #000; border-left:0; border-right:0; padding:3px; font-size:9pt; text-align:center; margin:0;">{{ $namaGudang }}</td>
+            </tr>
+        </table>
         <div class="approval-content" style="margin-top: 6px;">
             <strong>Disposisi:</strong><br>
             <div class="checkbox-item"><span class="checkbox-box"></span> Cek dan Koordinasikan</div>

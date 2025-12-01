@@ -144,9 +144,6 @@
     </style>
 </head>
 <body>
-    @php
-        $namaPerusahaanLengkap = isset($mitra) && $mitra ? $mitra->nama_perusahaan_lengkap : ($purchaseOrder->nama_perusahaan ?? '');
-    @endphp
     <div class="header">
         <div class="company-name">Perum BULOG</div>
         <div class="address">Kantor Cabang Surakarta</div>
@@ -162,7 +159,7 @@
             <div class="info-row">
                 <div class="info-label">Nama Pemasok</div>
                 <div class="info-separator">:</div>
-                <div class="info-value">{{ $namaPerusahaanLengkap }}</div>
+                <div class="info-value">{{ $purchaseOrder->nama_perusahaan }}</div>
                 <div class="info-label" style="padding-left: 50px;">Nama Bank</div>
                 <div class="info-separator" style="padding-left: 25px;">:</div>
                 <div class="info-value" style="padding-left: 15px;">{{ $mitra->bank_korespondensi ?? '' }}</div>
@@ -270,22 +267,23 @@
     </div>
 
     <div class="signature-container" style="margin-top: 100px;">
-        <div class="signature-box" style="height: 110px; position: relative;">
-            <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; font-weight: normal;">Tempat :</div>
+        <div class="signature-box" style="height: 125px; position: relative;">
+            <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; font-weight: normal;">Tempat : Surakarta</div>
             <div style="position: absolute; top: 18px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
-            <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; font-weight: normal;">Tanggal :</div>
+            <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; font-weight: normal;">Tanggal : {{ $tanggal }}</div>
             <div style="position: absolute; top: 36px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
             <div style="flex-grow: 1;"></div>
-            <div style="position: absolute; bottom: 20px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
-            <div style="position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: 7pt;">Tanda tangan dan nama lengkap</div>
+            <div style="position: absolute; bottom: 30px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
+            <div style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; font-size: 7pt;"><strong>{{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? '') }}</strong></div>
+            <div style="position: absolute; bottom: 1px; left: 0; right: 0; text-align: center; font-size: 7pt;">{{ $purchaseOrder->nama_perusahaan }}</div>
         </div>
         <div style="display: table-cell; width: 4%;"></div>
         <div class="signature-box-right" style="height: 105px; position: relative;">
             <div style="padding-bottom: 2px; margin: 0 -1px; font-size: 8pt; text-align: center; font-weight: normal;">Pengadaan</div>
-            <div style="position: absolute; top: 25px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
+            <div style="position: absolute; top: 30px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
             <div style="flex-grow: 1;"></div>
-            <div style="position: absolute; bottom: 15px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
-            <div style="position: absolute; bottom: 1px; left: 0; right: 0; text-align: center; font-size: 7pt;">Tanda tangan dan nama lengkap</div>
+            <div style="position: absolute; bottom: 12px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
+            <div style="position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 7pt;">Tanda tangan dan nama lengkap</div>
         </div>
     </div>
 
