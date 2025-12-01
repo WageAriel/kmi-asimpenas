@@ -548,17 +548,17 @@ class PdfGeneratorController extends Controller
         // Format baru: '1. Tidak Ada', '2. Ada | ≤ 20', '3. Ada | > 20'
         if (is_string($value) && strpos($value, '.') !== false) {
             // Ganti simbol matematika yang tidak didukung PDF dengan karakter ASCII
-            $value = str_replace('≤', '<=', $value);
-            $value = str_replace('≥', '>=', $value);
+            $value = str_replace('≤', '<', $value);
+            $value = str_replace('≥', '>', $value);
             return $value;
         }
         
         // Fallback: Mapping untuk backward compatibility dengan data lama (angka 1, 2, 3)
         $legacyMapping = [
-            'mesin_pembersih_gabah' => [3 => '3. Ada | > 20', 2 => '2. Ada | <= 20', 1 => '1. Tidak Ada'],
+            'mesin_pembersih_gabah' => [3 => '3. Ada | > 20', 2 => '2. Ada | < 20', 1 => '1. Tidak Ada'],
             'lantai_jemur' => [3 => '3. Ada | > 10', 2 => '2. Ada | 1 s/d 10', 1 => '1. Tidak ada'],
-            'mesin_pengering' => [3 => '3. Ada | > 20', 2 => '2. Ada | <= 20', 1 => '1. Tidak ada'],
-            'alat_pengering_lainnya' => [3 => '3. Tidak Disyaratkan', 2 => '2. Tidak Disyaratkan', 1 => '1. Ada | <= 1'],
+            'mesin_pengering' => [3 => '3. Ada | > 20', 2 => '2. Ada | < 20', 1 => '1. Tidak ada'],
+            'alat_pengering_lainnya' => [3 => '3. Tidak Disyaratkan', 2 => '2. Tidak Disyaratkan', 1 => '1. Ada | < 1'],
             'mesin_pembersih_awal' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
             'mesin_pemecah_kulit' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
             'mesin_pembersih_sekam' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
@@ -570,7 +570,7 @@ class PdfGeneratorController extends Controller
             'mesin_pemisah_katul' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
             'mesin_pemisah_berdasarkan_ukuran' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
             'mesin_pemisah_berdasarkan_warna' => [3 => '3. Ada | > 3', 2 => '2. Ada | 1 s/d 3', 1 => '1. Tidak ada'],
-            'tangki_penyimpanan' => [3 => '3. Ada | > 10', 2 => '2. Ada | <= 10', 1 => '1. Tidak ada'],
+            'tangki_penyimpanan' => [3 => '3. Ada | > 10', 2 => '2. Ada | < 10', 1 => '1. Tidak ada'],
             'mesin_pengemas' => [3 => '3. Ada | Full Otomatis', 2 => '2. Ada | Semi Otomatis', 1 => '1. Tidak ada'],
             'mesin_jahit' => [3 => '3. Ada | Full Otomatis', 2 => '2. Ada | Semi Otomatis', 1 => '1. Tidak ada'],
             'gudang_konvensional' => [3 => '3. Ada | > 3000', 2 => '2. Ada | < 3000', 1 => '1. Tidak ada'],
@@ -589,8 +589,8 @@ class PdfGeneratorController extends Controller
 
         // Jika tidak ada mapping, return value dengan konversi simbol atau '-'
         if (is_string($value)) {
-            $value = str_replace('≤', '<=', $value);
-            $value = str_replace('≥', '>=', $value);
+            $value = str_replace('≤', '<', $value);
+            $value = str_replace('≥', '>', $value);
             return $value;
         }
         
@@ -707,6 +707,7 @@ class PdfGeneratorController extends Controller
                 'nama_cp' => $mitra->nama_cp,
                 'alamat_perusahaan' => $mitra->alamat_perusahaan,
                 'jabatan' => $mitra->jabatan ?? 'Direktur',
+                'no_telp' => $mitra->no_telp_cp ?? '-',
                 'nama_perusahaan' => $mitra->nama_perusahaan,
                 'lampiran_list' => $lampiranList,
                 'mitra' => $mitra

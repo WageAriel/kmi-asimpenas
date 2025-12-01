@@ -156,6 +156,11 @@
             <td class="colon">:</td>
             <td class="value">{{ $jabatan }}</td>
         </tr>
+        <tr>
+            <td class="label">No. Telp</td>
+            <td class="colon">:</td>
+            <td class="value">{{ $no_telp }}</td>
+        </tr>
     </table>
     
     <!-- Isi Surat Paragraf 1 -->

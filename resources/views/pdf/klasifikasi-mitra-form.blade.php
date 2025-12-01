@@ -2,16 +2,16 @@
     // Helper function untuk mengkonversi simbol Unicode ke ASCII untuk perbandingan dan display
     function normalizeValue($value) {
         if (!$value) return $value;
-        $value = str_replace('≤', '<=', $value);
-        $value = str_replace('≥', '>=', $value);
+        $value = str_replace('≤', '<', $value);
+        $value = str_replace('≥', '>', $value);
         return $value;
     }
     
     // Helper function untuk display - konversi simbol untuk ditampilkan di PDF
     function displayValue($value) {
         if (!$value) return $value;
-        $value = str_replace('≤', '<=', $value);
-        $value = str_replace('≥', '>=', $value);
+        $value = str_replace('≤', '<', $value);
+        $value = str_replace('≥', '>', $value);
         return $value;
     }
 @endphp
@@ -199,10 +199,10 @@
             </tr>
             @php $no = 1; @endphp
             @foreach([
-                ['name' => 'Mesin Pembersih Gabah', 'field' => 'mesin_pembersih_gabah', 'unit' => 'ton/hari', 'options' => ['1. Tidak Ada', '2. Ada | <= 20', '3. Ada | > 20']],
+                ['name' => 'Mesin Pembersih Gabah', 'field' => 'mesin_pembersih_gabah', 'unit' => 'ton/hari', 'options' => ['1. Tidak Ada', '2. Ada | < 20', '3. Ada | > 20']],
                 ['name' => 'Lantai Jemur', 'field' => 'lantai_jemur', 'unit' => 'ton/hari', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 10', '3. Ada | > 10']],
-                ['name' => 'Mesin Pengering', 'field' => 'mesin_pengering', 'unit' => 'ton/hari', 'options' => ['1. Tidak ada', '2. Ada | <= 20', '3. Ada | > 20']],
-                ['name' => 'Alat Pengering Lainnya', 'field' => 'alat_pengering_lainnya', 'unit' => 'ton/hari', 'options' => ['1. Ada | <= 1', '2. Tidak Disyaratkan', '3. Tidak Disyaratkan']]
+                ['name' => 'Mesin Pengering', 'field' => 'mesin_pengering', 'unit' => 'ton/hari', 'options' => ['1. Tidak ada', '2. Ada | < 20', '3. Ada | > 20']],
+                ['name' => 'Alat Pengering Lainnya', 'field' => 'alat_pengering_lainnya', 'unit' => 'ton/hari', 'options' => ['1. Ada | < 1', '2. Tidak Disyaratkan', '3. Tidak Disyaratkan']]
             ] as $item)
             <tr>
                 <td style="text-align: center;">{{ $no++ }}</td>
@@ -236,13 +236,13 @@
                 ['name' => 'Mesin Pembersih Sekam', 'field' => 'mesin_pembersih_sekam', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
                 ['name' => 'Mesin Pemisah Gabah Pecah Kulit', 'field' => 'mesin_pemisah_gabah_pecah_kulit', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
                 ['name' => 'Mesin Pemisah Batu', 'field' => 'mesin_pemisah_batu', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
-                ['name' => 'Mesin Penyosoh', 'field' => 'mesin_penyosoh', 'unit' => 'ton/jam; pass', 'options' => ['1. Ada | <= 1 | 1', '2. Ada | 1 s/d 3 | 1', '3. Ada | > 3 | 2']],
-                ['name' => 'Mesin Pengkabut', 'field' => 'mesin_pengkabut', 'unit' => 'ton/jam; pass', 'options' => ['1. Ada | <= 1 | 1', '2. Ada | 1 s/d 3 | 1', '3. Ada | > 3 | 2']],
+                ['name' => 'Mesin Penyosoh', 'field' => 'mesin_penyosoh', 'unit' => 'ton/jam; pass', 'options' => ['1. Ada | < 1 | 1', '2. Ada | 1 s/d 3 | 1', '3. Ada | > 3 | 2']],
+                ['name' => 'Mesin Pengkabut', 'field' => 'mesin_pengkabut', 'unit' => 'ton/jam; pass', 'options' => ['1. Ada | < 1 | 1', '2. Ada | 1 s/d 3 | 1', '3. Ada | > 3 | 2']],
                 ['name' => 'Mesin Pemisah Menir', 'field' => 'mesin_pemesah_menir', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
                 ['name' => 'Mesin Pemisah Katul', 'field' => 'mesin_pemisah_katul', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
-                ['name' => 'Mesin Pemisah Berdasarkan Ukuran', 'field' => 'mesin_pemisah_berdasarkan_ukuran', 'unit' => 'ton/jam', 'options' => ['1. Ada | <= 1', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
+                ['name' => 'Mesin Pemisah Berdasarkan Ukuran', 'field' => 'mesin_pemisah_berdasarkan_ukuran', 'unit' => 'ton/jam', 'options' => ['1. Ada | < 1', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
                 ['name' => 'Mesin Pemisah Berdasarkan Warna', 'field' => 'mesin_pemisah_berdasarkan_warna', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | 1 s/d 3', '3. Ada | > 3']],
-                ['name' => 'Tangki Penyimpanan', 'field' => 'tangki_penyimpanan', 'unit' => 'ton/unit', 'options' => ['1. Tidak ada', '2. Ada | <= 10', '3. Ada | > 10']],
+                ['name' => 'Tangki Penyimpanan', 'field' => 'tangki_penyimpanan', 'unit' => 'ton/unit', 'options' => ['1. Tidak ada', '2. Ada | < 10', '3. Ada | > 10']],
                 ['name' => 'Mesin Pengemas', 'field' => 'mesin_pengemas', 'unit' => 'ton/jam', 'options' => ['1. Tidak ada', '2. Ada | Semi Otomatis', '3. Ada | Full Otomatis']],
                 ['name' => 'Mesin Jahit', 'field' => 'mesin_jahit', 'unit' => 'unit', 'options' => ['1. Tidak ada', '2. Ada | Semi Otomatis', '3. Ada | Full Otomatis']]
             ] as $item)
