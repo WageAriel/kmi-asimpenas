@@ -18,6 +18,7 @@ const form = useForm({
     jenis_komoditas: '',
     jenis_komoditas_custom: '',
     jenis_pengadaan: '',
+    tanggal_pembuatan: new Date().toISOString().split('T')[0],
     kualitas_items: [
         {
             id: 1,
@@ -272,6 +273,19 @@ const submit = () => {
                                 </label>
                             </div>
                             <InputError class="mt-2" :message="form.errors.jenis_pengadaan" />
+                        </div>
+
+                        <!-- Tanggal Pembuatan -->
+                        <div>
+                            <InputLabel for="tanggal_pembuatan" value="Tanggal Pembuatan" />
+                            <TextInput
+                                id="tanggal_pembuatan"
+                                type="date"
+                                class="mt-1 block w-full"
+                                v-model="form.tanggal_pembuatan"
+                                required
+                            />
+                            <InputError class="mt-2" :message="form.errors.tanggal_pembuatan" />
                         </div>
 
                         <!-- Quality Items Section -->

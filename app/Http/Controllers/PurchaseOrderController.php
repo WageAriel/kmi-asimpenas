@@ -91,6 +91,7 @@ class PurchaseOrderController extends Controller
             'jenis_komoditas' => 'required|string',
             'jenis_komoditas_custom' => 'nullable|string|max:255',
             'jenis_pengadaan' => 'required|in:PSO,Komersial',
+            'tanggal_pembuatan' => 'required|date',
             'kualitas_items' => 'required|array|min:1',
             'kualitas_items.*.harga' => 'required|numeric|min:0',
             'kualitas_items.*.kuantum' => 'required|numeric|min:0',
@@ -109,6 +110,7 @@ class PurchaseOrderController extends Controller
             'jenis_komoditas' => $validated['jenis_komoditas'],
             'jenis_komoditas_custom' => $validated['jenis_komoditas_custom'],
             'jenis_pengadaan' => $validated['jenis_pengadaan'],
+            'tanggal_pembuatan' => $validated['tanggal_pembuatan'],
             'created_by' => $validated['created_by'],
         ]);
         
@@ -158,9 +160,10 @@ class PurchaseOrderController extends Controller
                 'total_nilai' => (int) $purchaseOrder->total_nilai,
                 'agenda_no' => $purchaseOrder->agenda_no,
                 'tanggal_terima' => $purchaseOrder->tanggal_terima?->format('Y-m-d'),
+                'tanggal_pembuatan' => $purchaseOrder->tanggal_pembuatan?->format('Y-m-d'),
                 'paraf' => $purchaseOrder->paraf,
                 'kontrak_yll' => $purchaseOrder->kontrak_yll,
-                'created_at' => $purchaseOrder->created_at->format('d/m/Y H:i'),
+                'created_at' => $purchaseOrder->created_at->format('d/m/Y'),
                 'created_by' => $purchaseOrder->created_by,
                 'items' => $purchaseOrder->items->map(function ($item) {
                     return [
@@ -197,6 +200,7 @@ class PurchaseOrderController extends Controller
                 'jenis_komoditas' => $purchaseOrder->jenis_komoditas,
                 'jenis_komoditas_custom' => $purchaseOrder->jenis_komoditas_custom,
                 'jenis_pengadaan' => $purchaseOrder->jenis_pengadaan,
+                'tanggal_pembuatan' => $purchaseOrder->tanggal_pembuatan?->format('Y-m-d'),
                 'agenda_no' => $purchaseOrder->agenda_no,
                 'tanggal_terima' => $purchaseOrder->tanggal_terima?->format('Y-m-d'),
                 'paraf' => $purchaseOrder->paraf,
@@ -230,6 +234,7 @@ class PurchaseOrderController extends Controller
             'jenis_komoditas' => 'required|string',
             'jenis_komoditas_custom' => 'nullable|string|max:255',
             'jenis_pengadaan' => 'required|in:PSO,Komersial',
+            'tanggal_pembuatan' => 'required|date',
             'kualitas_items' => 'required|array|min:1',
             'kualitas_items.*.id' => 'nullable|integer|exists:purchase_order_items,id',
             'kualitas_items.*.harga' => 'required|numeric|min:0',
@@ -244,17 +249,54 @@ class PurchaseOrderController extends Controller
             'kontrak_yll' => 'nullable|in:REALISASI S/D,DISETUJUI/TIDAK',
         ]);
 
+        // Cek apakah perlu regenerate nomor surat
+        $shouldRegenerateNoSurat = false;
+        
+        // 1. Cek apakah tanggal_pembuatan atau nama_perusahaan berubah
+        if ($purchaseOrder->tanggal_pembuatan != $validated['tanggal_pembuatan'] ||
+            $purchaseOrder->nama_perusahaan != $validated['nama_perusahaan']) {
+            $shouldRegenerateNoSurat = true;
+        }
+        
+        // 2. Cek apakah No VMS atau Kode Mitra di data mitra berubah
+        if (!$shouldRegenerateNoSurat && $purchaseOrder->no_surat) {
+            // Ambil data mitra terbaru
+            $mitra = \App\Models\DataMitra::where('nama_perusahaan', $purchaseOrder->nama_perusahaan)->first();
+            if ($mitra) {
+                // Extract No VMS dan Kode Mitra dari no_surat yang lama
+                $parts = explode('/', $purchaseOrder->no_surat);
+                if (count($parts) >= 3) {
+                    $oldNoVms = $parts[0];
+                    $oldKodeMitra = $parts[2];
+                    $newNoVms = !empty($mitra->no_vms) ? $mitra->no_vms : '000000';
+                    $newKodeMitra = !empty($mitra->kode_mitra) ? strtoupper($mitra->kode_mitra) : 'XXX';
+                    
+                    // Jika berbeda, regenerate
+                    if ($oldNoVms != $newNoVms || $oldKodeMitra != $newKodeMitra) {
+                        $shouldRegenerateNoSurat = true;
+                    }
+                }
+            }
+        }
+
         // Update main PO data
         $purchaseOrder->update([
             'nama_perusahaan' => $validated['nama_perusahaan'],
             'jenis_komoditas' => $validated['jenis_komoditas'],
             'jenis_komoditas_custom' => $validated['jenis_komoditas_custom'],
             'jenis_pengadaan' => $validated['jenis_pengadaan'],
+            'tanggal_pembuatan' => $validated['tanggal_pembuatan'],
             'agenda_no' => $validated['agenda_no'],
             'tanggal_terima' => $validated['tanggal_terima'],
             'paraf' => $validated['paraf'],
             'kontrak_yll' => $validated['kontrak_yll'],
         ]);
+
+        // Regenerate no_surat jika diperlukan
+        if ($shouldRegenerateNoSurat) {
+            $purchaseOrder->no_surat = $purchaseOrder->generateNoSurat();
+            $purchaseOrder->save();
+        }
 
         // Get existing item IDs
         $existingItemIds = $purchaseOrder->items->pluck('id')->toArray();
@@ -323,10 +365,15 @@ class PurchaseOrderController extends Controller
         // Load relasi items dan mitra untuk PDF
         $purchaseOrder->load(['items', 'mitra']);
 
+        // Gunakan tanggal_pembuatan dari PO, fallback ke Carbon::now() jika null
+        $tanggal = $purchaseOrder->tanggal_pembuatan 
+            ? $purchaseOrder->tanggal_pembuatan->locale('id')->translatedFormat('d F Y')
+            : Carbon::now()->locale('id')->translatedFormat('d F Y');
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'mitra' => $purchaseOrder->mitra,
-            'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
+            'tanggal' => $tanggal,
             'no_surat' => $purchaseOrder->no_surat ?? 'NO Test',
         ];
 
@@ -344,10 +391,15 @@ class PurchaseOrderController extends Controller
         // Load relasi items dan mitra untuk PDF
         $purchaseOrder->load(['items', 'mitra']);
 
+        // Gunakan tanggal_pembuatan dari PO, fallback ke Carbon::now() jika null
+        $tanggal = $purchaseOrder->tanggal_pembuatan 
+            ? $purchaseOrder->tanggal_pembuatan->locale('id')->translatedFormat('d F Y')
+            : Carbon::now()->locale('id')->translatedFormat('d F Y');
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'mitra' => $purchaseOrder->mitra,
-            'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
+            'tanggal' => $tanggal,
         ];
 
         $pdf = Pdf::loadView('pdf.form-penawaran', $data);
@@ -367,10 +419,15 @@ class PurchaseOrderController extends Controller
         // Ambil data mitra
         $mitra = \App\Models\DataMitra::where('nama_perusahaan', $purchaseOrder->nama_perusahaan)->first();
 
+        // Gunakan tanggal_pembuatan dari PO, fallback ke Carbon::now() jika null
+        $tanggal = $purchaseOrder->tanggal_pembuatan 
+            ? $purchaseOrder->tanggal_pembuatan->locale('id')->translatedFormat('d F Y')
+            : Carbon::now()->locale('id')->translatedFormat('d F Y');
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'mitra' => $mitra,
-            'tanggal' => Carbon::now()->locale('id')->translatedFormat('d F Y'),
+            'tanggal' => $tanggal,
         ];
 
         // Generate PDF 1: Surat Permohonan

@@ -45,6 +45,7 @@ const form = useForm({
     jenis_komoditas: props.purchaseOrder.jenis_komoditas || '',
     jenis_komoditas_custom: props.purchaseOrder.jenis_komoditas_custom || '',
     jenis_pengadaan: props.purchaseOrder.jenis_pengadaan || '',
+    tanggal_pembuatan: props.purchaseOrder.tanggal_pembuatan || '',
     agenda_no: props.purchaseOrder.agenda_no || '',
     tanggal_terima: props.purchaseOrder.tanggal_terima || '',
     paraf: props.purchaseOrder.paraf || '',
@@ -266,6 +267,19 @@ const submit = () => {
                                 </label>
                             </div>
                             <InputError class="mt-2" :message="form.errors.jenis_pengadaan" />
+                        </div>
+
+                        <!-- Tanggal Pembuatan -->
+                        <div>
+                            <InputLabel for="tanggal_pembuatan" value="Tanggal Pembuatan" />
+                            <TextInput
+                                id="tanggal_pembuatan"
+                                type="date"
+                                class="mt-1 block w-full"
+                                v-model="form.tanggal_pembuatan"
+                                required
+                            />
+                            <InputError class="mt-2" :message="form.errors.tanggal_pembuatan" />
                         </div>
 
                         <!-- Item Kualitas (Multi-item) -->

@@ -243,7 +243,12 @@ const getPoNumber = () => {
                             </div>
                             
                             <div>
-                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tanggal Dibuat</h3>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tanggal Pembuatan</h3>
+                                <p class="mt-1 text-lg font-semibold text-gray-900">{{ purchaseOrder.tanggal_pembuatan || '-' }}</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tanggal Dibuat di Sistem</h3>
                                 <p class="mt-1 text-lg font-semibold text-gray-900">{{ purchaseOrder.created_at }}</p>
                             </div>
                         </div>

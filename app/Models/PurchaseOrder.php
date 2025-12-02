@@ -16,6 +16,7 @@ class PurchaseOrder extends Model
         'jenis_komoditas_custom',
         'jenis_pengadaan',
         'no_surat',
+        'tanggal_pembuatan',
         'agenda_no',
         'tanggal_terima',
         'paraf',
@@ -24,7 +25,8 @@ class PurchaseOrder extends Model
     ];
 
     protected $casts = [
-        'tanggal_terima' => 'datetime'
+        'tanggal_terima' => 'datetime',
+        'tanggal_pembuatan' => 'datetime'
     ];
 
     // Relationship dengan User
@@ -115,9 +117,10 @@ class PurchaseOrder extends Model
     // YYYY = tahun (4 digit)
     public function generateNoSurat()
     {
-        $now = now();
-        $month = $now->month;
-        $year = $now->year;
+        // Gunakan tanggal_pembuatan jika ada, fallback ke created_at atau now()
+        $date = $this->tanggal_pembuatan ?? $this->created_at ?? now();
+        $month = $date->format('m');
+        $year = $date->format('Y');
         
         // Cari data mitra berdasarkan nama perusahaan
         $mitra = DataMitra::where('nama_perusahaan', $this->nama_perusahaan)->first();
@@ -133,9 +136,12 @@ class PurchaseOrder extends Model
         }
         
         // Hitung urutan PO bulan ini untuk mitra tertentu (reset setiap bulan)
+        // Gunakan tanggal_pembuatan untuk filter dan exclude current record saat update
         $count = self::where('nama_perusahaan', $this->nama_perusahaan)
-                    ->whereMonth('created_at', $month)
-                    ->whereYear('created_at', $year)
+                    ->where('id', '!=', $this->id ?? 0) // Exclude current record saat update
+                    ->whereNotNull('tanggal_pembuatan')
+                    ->whereMonth('tanggal_pembuatan', $month)
+                    ->whereYear('tanggal_pembuatan', $year)
                     ->count() + 1;
         
         // Format nomor surat: NO_VMS/XXX/KODE_MITRA/MM/YYYY

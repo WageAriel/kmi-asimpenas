@@ -240,15 +240,15 @@
             <td style="width:30%; vertical-align:top; padding:0;">
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
-                        <td style="width:55%; border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">Agenda No.</td>
+                        <td style="width:55%; border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">AGENDA NOMOR</td>
                         <td style="width:45%; border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                     <tr>
-                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">Tgl. Terima</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">TANGGAL TERIMA</td>
                         <td style="border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                     <tr>
-                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">Paraf</td>
+                        <td style="border:1px solid #000; padding:6px 4px; font-size:8pt; text-align:left;font-weight:bold;">PARAF</td>
                         <td style="border:1px solid #000; padding:6px 4px; font-size:8pt;">&nbsp;</td>
                     </tr>
                 </table>
@@ -299,7 +299,7 @@
                 <th style="border:1px solid #000;width: 15%;">Harga (Rp/Kg)</th>
                 <th style="border:1px solid #000;width: 15%;">Kuantum (Kg)</th>
                 <th style="border:1px solid #000;width: 20%;">Nilai (Rp)</th>
-                <th style="border:1px solid #000;width: 20%;">Komp. Pergud.</th>
+                <th style="border:1px solid #000;width: 20%;">Komplek Pergudangan</th>
             </tr>
         </thead>
         <tbody style="border:1px solid #000">
