@@ -1,6 +1,6 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 
 // Accept data from the controller as props
@@ -17,6 +17,10 @@ const searchQuery = ref('');
 // Sort state
 const sortBy = ref('created_at');
 const sortOrder = ref('desc');
+
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
 
 // Sort function
 const toggleSort = (column) => {
@@ -68,6 +72,80 @@ const filteredMitras = computed(() => {
     return filtered;
 });
 
+// Pagination computed properties
+const totalPages = computed(() => {
+    return Math.ceil(filteredMitras.value.length / itemsPerPage.value);
+});
+
+const paginatedMitras = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return filteredMitras.value.slice(start, end);
+});
+
+const visiblePages = computed(() => {
+    const pages = [];
+    const total = totalPages.value;
+    const current = currentPage.value;
+    
+    // Always show first page
+    pages.push(1);
+    
+    // Calculate range around current page
+    let rangeStart = Math.max(2, current - 2);
+    let rangeEnd = Math.min(total - 1, current + 2);
+    
+    // Add ellipsis after first page if needed
+    if (rangeStart > 2) {
+        pages.push('...');
+    }
+    
+    // Add pages around current page
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+        pages.push(i);
+    }
+    
+    // Add ellipsis before last page if needed
+    if (rangeEnd < total - 1) {
+        pages.push('...');
+    }
+    
+    // Always show last page if there's more than one page
+    if (total > 1) {
+        pages.push(total);
+    }
+    
+    return pages;
+});
+
+// Pagination methods
+const goToPage = (page) => {
+    if (typeof page === 'number' && page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+        // Scroll to top of table
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+// Reset to page 1 when search query changes
+const resetPagination = () => {
+    currentPage.value = 1;
+};
+
 // For modal functionality
 const showModal = ref(false);
 const selectedMitra = ref(null);
@@ -76,14 +154,36 @@ const selectedMitra = ref(null);
 const showEditModal = ref(false);
 const editForm = ref({
     id_mitra: null,
+    nama_perusahaan: '',
+    badan_hukum_usaha: '',
+    alamat_perusahaan: '',
+    kota_kabupaten: '',
+    provinsi: '',
+    nama_cp: '',
+    jabatan: '',
+    nik: '',
+    tempat_lahir: '',
+    tanggal_lahir: '',
+    no_telp_perusahaan: '',
+    no_telp_cp: '',
+    bank_korespondensi: '',
+    alamat_bank: '',
+    no_rekening: '',
+    status_perusahaan: '',
+    npwp: '',
+    pkp: '',
+    keterangan_pkp: '',
+    surat_kuasa: '',
+    keterangan_surat_kuasa: '',
     tanggal_seleksi: '',
     tanggal_klasifikasi: '',
     tanggal_penilaian: '',
     tanggal_penetapan: '',
     tanggal_pakta_integritas: '',
     tanggal_surat_permohonan: '',
-    keterangan_pkp: '',
-    keterangan_surat_kuasa: ''
+    email: '',
+    no_vms: '',
+    kode_mitra: ''
 });
 const isUpdating = ref(false);
 const updateError = ref(null);
@@ -122,14 +222,36 @@ const closeModal = () => {
 const openEditModal = (mitra) => {
     editForm.value = {
         id_mitra: mitra.id_mitra,
+        nama_perusahaan: mitra.nama_perusahaan || '',
+        badan_hukum_usaha: mitra.badan_hukum_usaha || '',
+        alamat_perusahaan: mitra.alamat_perusahaan || '',
+        kota_kabupaten: mitra.kota_kabupaten || '',
+        provinsi: mitra.provinsi || '',
+        nama_cp: mitra.nama_cp || '',
+        jabatan: mitra.jabatan || '',
+        nik: mitra.nik || '',
+        tempat_lahir: mitra.tempat_lahir || '',
+        tanggal_lahir: mitra.tanggal_lahir || '',
+        no_telp_perusahaan: mitra.no_telp_perusahaan || '',
+        no_telp_cp: mitra.no_telp_cp || '',
+        bank_korespondensi: mitra.bank_korespondensi || '',
+        alamat_bank: mitra.alamat_bank || '',
+        no_rekening: mitra.no_rekening || '',
+        status_perusahaan: mitra.status_perusahaan || '',
+        npwp: mitra.npwp || '',
+        pkp: mitra.pkp || '',
+        keterangan_pkp: mitra.keterangan_pkp || '',
+        surat_kuasa: mitra.surat_kuasa || '',
+        keterangan_surat_kuasa: mitra.keterangan_surat_kuasa || '',
         tanggal_seleksi: mitra.tanggal_seleksi || '',
         tanggal_klasifikasi: mitra.tanggal_klasifikasi || '',
         tanggal_penilaian: mitra.tanggal_penilaian || '',
         tanggal_penetapan: mitra.tanggal_penetapan || '',
         tanggal_pakta_integritas: mitra.tanggal_pakta_integritas || '',
         tanggal_surat_permohonan: mitra.tanggal_surat_permohonan || '',
-        keterangan_pkp: mitra.keterangan_pkp || '',
-        keterangan_surat_kuasa: mitra.keterangan_surat_kuasa || ''
+        email: mitra.email || '',
+        no_vms: mitra.no_vms || '',
+        kode_mitra: mitra.kode_mitra || ''
     };
     showEditModal.value = true;
     updateError.value = null;
@@ -140,14 +262,36 @@ const closeEditModal = () => {
     showEditModal.value = false;
     editForm.value = {
         id_mitra: null,
+        nama_perusahaan: '',
+        badan_hukum_usaha: '',
+        alamat_perusahaan: '',
+        kota_kabupaten: '',
+        provinsi: '',
+        nama_cp: '',
+        jabatan: '',
+        nik: '',
+        tempat_lahir: '',
+        tanggal_lahir: '',
+        no_telp_perusahaan: '',
+        no_telp_cp: '',
+        bank_korespondensi: '',
+        alamat_bank: '',
+        no_rekening: '',
+        status_perusahaan: '',
+        npwp: '',
+        pkp: '',
+        keterangan_pkp: '',
+        surat_kuasa: '',
+        keterangan_surat_kuasa: '',
         tanggal_seleksi: '',
         tanggal_klasifikasi: '',
         tanggal_penilaian: '',
         tanggal_penetapan: '',
         tanggal_pakta_integritas: '',
         tanggal_surat_permohonan: '',
-        keterangan_pkp: '',
-        keterangan_surat_kuasa: ''
+        email: '',
+        no_vms: '',
+        kode_mitra: ''
     };
     updateError.value = null;
     updateSuccess.value = null;
@@ -320,6 +464,11 @@ const formatDate = (dateString) => {
     
     return `${day}/${month}/${year}`;
 };
+
+// Watch search query to reset pagination
+watch(searchQuery, () => {
+    resetPagination();
+});
 </script>
 
 <template>
@@ -436,7 +585,7 @@ const formatDate = (dateString) => {
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="mitra in filteredMitras" :key="mitra.id_mitra" class="hover:bg-gray-50">
+                            <tr v-for="mitra in paginatedMitras" :key="mitra.id_mitra" class="hover:bg-gray-50">
                                 <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.nama_perusahaan }}</td>
                                 <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.badan_hukum_usaha }}</td>
                                 <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.alamat_perusahaan }}</td>
@@ -472,13 +621,75 @@ const formatDate = (dateString) => {
                                     </div>
                                 </td>
                             </tr>
-                            <tr v-if="filteredMitras.length === 0">
+                            <tr v-if="paginatedMitras.length === 0">
                                 <td colspan="8" class="px-4 py-6 text-center text-gray-500">
                                     {{ searchQuery ? 'Tidak ada mitra yang sesuai dengan pencarian Anda.' : 'Belum ada data mitra. Silakan tambahkan mitra baru.' }}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="totalPages > 1" class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <!-- Info -->
+                        <div class="text-sm text-gray-700">
+                            Menampilkan 
+                            <span class="font-medium">{{ ((currentPage - 1) * itemsPerPage) + 1 }}</span>
+                            sampai 
+                            <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredMitras.length) }}</span>
+                            dari 
+                            <span class="font-medium">{{ filteredMitras.length }}</span>
+                            data
+                        </div>
+
+                        <!-- Pagination Buttons -->
+                        <div class="flex items-center gap-2">
+                            <!-- Previous Button -->
+                            <button
+                                @click="prevPage"
+                                :disabled="currentPage === 1"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+
+                            <!-- Page Numbers -->
+                            <template v-for="(page, index) in visiblePages" :key="index">
+                                <!-- Ellipsis -->
+                                <span v-if="page === '...'" class="px-3 py-2 text-sm text-gray-700">
+                                    ...
+                                </span>
+                                <!-- Page Button -->
+                                <button
+                                    v-else
+                                    @click="goToPage(page)"
+                                    :class="[
+                                        'px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                                        currentPage === page
+                                            ? 'bg-blue-600 text-white'
+                                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                                    ]"
+                                >
+                                    {{ page }}
+                                </button>
+                            </template>
+
+                            <!-- Next Button -->
+                            <button
+                                @click="nextPage"
+                                :disabled="currentPage === totalPages"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -803,8 +1014,300 @@ const formatDate = (dateString) => {
                 <h2 class="text-xl font-bold mb-6 text-blue-700">Edit Data Mitra</h2>
                 
                 <form @submit.prevent="updateMitra" class="space-y-6">
-                    <!-- Tanggal-tanggal -->
+                    <!-- Data Perusahaan -->
                     <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Perusahaan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Nama Perusahaan <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.nama_perusahaan"
+                                    required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Masukkan nama perusahaan"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Badan Hukum/Usaha
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.badan_hukum_usaha"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="PT, CV, UD, dll"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Status Perusahaan
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.status_perusahaan"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Penggilingan Padi, Poktan/Gapoktan, dll"
+                                />
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Alamat Perusahaan
+                                </label>
+                                <textarea
+                                    v-model="editForm.alamat_perusahaan"
+                                    rows="2"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Alamat lengkap perusahaan"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Kota/Kabupaten
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.kota_kabupaten"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Kota/Kabupaten"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Provinsi
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.provinsi"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Provinsi"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Nomor Telepon Perusahaan
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.no_telp_perusahaan"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="021-1234567"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    v-model="editForm.email"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="email@perusahaan.com"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Contact Person -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Contact Person</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Nama Contact Person
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.nama_cp"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Nama lengkap"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Jabatan
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.jabatan"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Direktur, Manager, dll"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    NIK
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.nik"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="16 digit NIK"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Nomor HP Contact Person
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.no_telp_cp"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="081234567890"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Tempat Lahir
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.tempat_lahir"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Kota lahir"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Tanggal Lahir
+                                </label>
+                                <input
+                                    type="date"
+                                    v-model="editForm.tanggal_lahir"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Bank -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Perbankan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Bank Korespondensi
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.bank_korespondensi"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Bank Mandiri, BCA, dll"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Nomor Rekening
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.no_rekening"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Nomor rekening"
+                                />
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Alamat Bank
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.alamat_bank"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Alamat cabang bank"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Pajak & Legalitas -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Pajak & Legalitas</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    NPWP
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.npwp"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="00.000.000.0-000.000"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Status PKP
+                                </label>
+                                <select
+                                    v-model="editForm.pkp"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="">Pilih Status PKP</option>
+                                    <option value="Pkp">PKP</option>
+                                    <option value="Non Pkp">Non PKP</option>
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Keterangan PKP
+                                </label>
+                                <textarea
+                                    v-model="editForm.keterangan_pkp"
+                                    rows="2"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Keterangan tambahan terkait PKP"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Surat Kuasa
+                                </label>
+                                <select
+                                    v-model="editForm.surat_kuasa"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="">Pilih Status</option>
+                                    <option value="Ada">Ada</option>
+                                    <option value="Tidak Ada">Tidak Ada</option>
+                                </select>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Keterangan Surat Kuasa
+                                </label>
+                                <textarea
+                                    v-model="editForm.keterangan_surat_kuasa"
+                                    rows="2"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Keterangan tambahan terkait surat kuasa"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tanggal Proses -->
+                    <div class="border-t border-gray-200 pt-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Tanggal Proses</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -875,32 +1378,32 @@ const formatDate = (dateString) => {
                         </div>
                     </div>
 
-                    <!-- Keterangan -->
+                    <!-- Data VMS & Kode Mitra -->
                     <div class="border-t border-gray-200 pt-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Keterangan Tambahan</h3>
-                        <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Sistem</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Keterangan PKP
+                                    Nomor VMS
                                 </label>
-                                <textarea
-                                    v-model="editForm.keterangan_pkp"
-                                    rows="3"
+                                <input
+                                    type="text"
+                                    v-model="editForm.no_vms"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Masukkan keterangan terkait status PKP"
-                                ></textarea>
+                                    placeholder="VMS001"
+                                />
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Keterangan Surat Kuasa
+                                    Kode Mitra
                                 </label>
-                                <textarea
-                                    v-model="editForm.keterangan_surat_kuasa"
-                                    rows="3"
+                                <input
+                                    type="text"
+                                    v-model="editForm.kode_mitra"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Masukkan keterangan terkait surat kuasa"
-                                ></textarea>
+                                    placeholder="MTR001"
+                                />
                             </div>
                         </div>
                     </div>
