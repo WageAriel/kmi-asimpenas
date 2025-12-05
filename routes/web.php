@@ -64,6 +64,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/daftar-mitra/template', [App\Http\Controllers\DataMitraController::class, 'downloadTemplate'])->name('daftar-mitra.template');
     Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
     Route::put('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'updateByAdmin'])->name('admin.daftar-mitra.update');
+    Route::post('/daftar-mitra/bulk-delete', [App\Http\Controllers\DataMitraController::class, 'bulkDelete'])->name('admin.daftar-mitra.bulk-delete');
     
 
     // 4. Daftar Seleksi Mitra
@@ -306,6 +307,7 @@ Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'role:su
         ]);
     })->name('daftar-mitra.index');
     Route::delete('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'destroy'])->name('daftar-mitra.destroy');
+    Route::post('/daftar-mitra/bulk-delete', [App\Http\Controllers\DataMitraController::class, 'bulkDelete'])->name('daftar-mitra.bulk-delete');
     Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
 
     // 4. Daftar Seleksi Mitra

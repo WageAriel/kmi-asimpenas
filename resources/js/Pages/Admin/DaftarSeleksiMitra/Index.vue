@@ -1,7 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 
 // Accept the data from the controller
@@ -22,6 +22,10 @@ const sortedSeleksiMitras = computed(() => {
 // Add search functionality
 const searchQuery = ref('');
 const selectedYear = ref(''); // Filter tahun
+
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
 
 // Get unique years from seleksi mitras
 const availableYears = computed(() => {
@@ -65,6 +69,184 @@ const filteredSeleksiMitras = computed(() => {
     }
     
     return filtered;
+});
+
+// Pagination computed properties
+const totalPages = computed(() => {
+    return Math.ceil(filteredSeleksiMitras.value.length / itemsPerPage.value);
+});
+
+const paginatedSeleksiMitras = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return filteredSeleksiMitras.value.slice(start, end);
+});
+
+const visiblePages = computed(() => {
+    const pages = [];
+    const total = totalPages.value;
+    const current = currentPage.value;
+    
+    // Always show first page
+    pages.push(1);
+    
+    // Calculate range around current page
+    let rangeStart = Math.max(2, current - 2);
+    let rangeEnd = Math.min(total - 1, current + 2);
+    
+    // Add ellipsis after first page if needed
+    if (rangeStart > 2) {
+        pages.push('...');
+    }
+    
+    // Add pages around current page
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+        pages.push(i);
+    }
+    
+    // Add ellipsis before last page if needed
+    if (rangeEnd < total - 1) {
+        pages.push('...');
+    }
+    
+    // Always show last page if there's more than one page
+    if (total > 1) {
+        pages.push(total);
+    }
+    
+    return pages;
+});
+
+// Pagination methods
+const goToPage = (page) => {
+    if (typeof page === 'number' && page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+// Reset to page 1 when search query or year filter changes
+const resetPagination = () => {
+    currentPage.value = 1;
+};
+
+// Bulk delete functionality
+const selectedIds = ref([]);
+const selectAll = ref(false);
+const showDeleteModal = ref(false);
+const isDeleting = ref(false);
+const deleteError = ref(null);
+const deleteSuccess = ref(null);
+
+// Toggle select all
+const toggleSelectAll = () => {
+    if (selectAll.value) {
+        selectedIds.value = paginatedSeleksiMitras.value.map(m => m.id_seleksi_mitra);
+    } else {
+        selectedIds.value = [];
+    }
+};
+
+// Toggle individual selection
+const toggleSelection = (id) => {
+    const index = selectedIds.value.indexOf(id);
+    if (index > -1) {
+        selectedIds.value.splice(index, 1);
+    } else {
+        selectedIds.value.push(id);
+    }
+    // Update selectAll checkbox
+    selectAll.value = selectedIds.value.length === paginatedSeleksiMitras.value.length;
+};
+
+// Check if item is selected
+const isSelected = (id) => {
+    return selectedIds.value.includes(id);
+};
+
+// Open delete confirmation modal
+const openDeleteModal = () => {
+    if (selectedIds.value.length === 0) {
+        alert('Pilih minimal satu seleksi mitra untuk dihapus');
+        return;
+    }
+    showDeleteModal.value = true;
+    deleteError.value = null;
+    deleteSuccess.value = null;
+};
+
+// Close delete modal
+const closeDeleteModal = () => {
+    showDeleteModal.value = false;
+    deleteError.value = null;
+    deleteSuccess.value = null;
+};
+
+// Bulk delete function
+const bulkDelete = async () => {
+    if (selectedIds.value.length === 0) return;
+    
+    isDeleting.value = true;
+    deleteError.value = null;
+    deleteSuccess.value = null;
+
+    try {
+        await axios.post('/data-seleksi-mitra/bulk-delete', {
+            ids: selectedIds.value
+        });
+        
+        deleteSuccess.value = `${selectedIds.value.length} seleksi mitra berhasil dihapus`;
+        
+        // Clear selection
+        selectedIds.value = [];
+        selectAll.value = false;
+        
+        // Reload page after successful delete
+        setTimeout(() => {
+            window.location.reload();
+            closeDeleteModal();
+        }, 1500);
+
+    } catch (error) {
+        console.error('Delete error:', error);
+        
+        if (error.response) {
+            const data = error.response.data;
+            deleteError.value = data.message || 'Terjadi kesalahan saat menghapus data';
+        } else {
+            deleteError.value = `Terjadi kesalahan: ${error.message}`;
+        }
+    } finally {
+        isDeleting.value = false;
+    }
+};
+
+// Watch pagination and filters to update selectAll
+watch(currentPage, () => {
+    selectAll.value = false;
+    selectedIds.value = [];
+});
+
+watch(searchQuery, () => {
+    resetPagination();
+});
+
+watch(selectedYear, () => {
+    resetPagination();
 });
 
 // Modal state
@@ -612,13 +794,43 @@ const exportData = () => {
                         </option>
                     </select>
                 </div>
+
+                <!-- Bulk Delete Button -->
             </div>
+            <transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="opacity-0 transform scale-95"
+                enter-to-class="opacity-100 transform scale-100"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100 transform scale-100"
+                leave-to-class="opacity-0 transform scale-95"
+            >
+                <div v-if="selectedIds.length > 0" class="flex justify-end">
+                    <button
+                        @click="openDeleteModal"
+                        class="inline-flex items-center justify-center mb-3 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors whitespace-nowrap shadow-sm"
+                    >
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Hapus {{ selectedIds.length }} item terpilih
+                    </button>
+                </div>
+            </transition>
 
             <!-- Tabel Daftar Seleksi Mitra -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 text-xs">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">
+                                <input 
+                                    type="checkbox" 
+                                    v-model="selectAll" 
+                                    @change="toggleSelectAll"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                            </th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Nama Perusahaan</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Surat Permohonan</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">MB Surat Permohonan</th>
@@ -646,7 +858,15 @@ const exportData = () => {
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="item in filteredSeleksiMitras" :key="item.id_seleksi_mitra" class="hover:bg-gray-50">
+                        <tr v-for="item in paginatedSeleksiMitras" :key="item.id_seleksi_mitra" class="hover:bg-gray-50">
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <input 
+                                    type="checkbox" 
+                                    :checked="isSelected(item.id_seleksi_mitra)"
+                                    @change="toggleSelection(item.id_seleksi_mitra)"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                            </td>
                             <td class="px-4 py-3 whitespace-nowrap">{{ item.mitra?.nama_perusahaan || '-' }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.surat_permohonan)]">
@@ -780,13 +1000,67 @@ const exportData = () => {
                                 </button>
                             </td>
                         </tr>
-                        <tr v-if="filteredSeleksiMitras.length === 0">
-                            <td colspan="22" class="px-4 py-6 text-center text-gray-500">
-                                {{ searchQuery ? 'Tidak Ada data seleksi mitra yang sesuai dengan pencarian.' : 'Belum Ada data seleksi mitra.' }}
+                        <tr v-if="paginatedSeleksiMitras.length === 0">
+                            <td colspan="25" class="px-4 py-6 text-center text-gray-500">
+                                {{ searchQuery || selectedYear ? 'Tidak ada data seleksi mitra yang sesuai dengan pencarian.' : 'Belum ada data seleksi mitra.' }}
                             </td>
                         </tr>
                     </tbody>
                 </table>
+
+                <!-- Pagination -->
+                <div v-if="totalPages > 1" class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <!-- Page Info -->
+                        <div class="text-sm text-gray-700">
+                            Menampilkan 
+                            <span class="font-medium">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
+                            sampai 
+                            <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredSeleksiMitras.length) }}</span>
+                            dari 
+                            <span class="font-medium">{{ filteredSeleksiMitras.length }}</span>
+                            hasil
+                        </div>
+
+                        <!-- Pagination Controls -->
+                        <div class="flex items-center gap-2">
+                            <!-- Previous Button -->
+                            <button
+                                @click="prevPage"
+                                :disabled="currentPage === 1"
+                                class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+
+                            <!-- Page Numbers -->
+                            <template v-for="page in visiblePages" :key="page">
+                                <button
+                                    v-if="typeof page === 'number'"
+                                    @click="goToPage(page)"
+                                    :class="[
+                                        'px-3 py-1 text-sm font-medium rounded-md',
+                                        currentPage === page
+                                            ? 'bg-blue-600 text-white'
+                                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                                    ]"
+                                >
+                                    {{ page }}
+                                </button>
+                                <span v-else class="px-2 text-gray-500">{{ page }}</span>
+                            </template>
+
+                            <!-- Next Button -->
+                            <button
+                                @click="nextPage"
+                                :disabled="currentPage === totalPages"
+                                class="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1656,6 +1930,77 @@ const exportData = () => {
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         {{ isGeneratingPdf ? 'Generating...' : 'Generate PDF' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Konfirmasi Bulk Delete -->
+        <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+                <button @click="closeDeleteModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h2 class="ml-4 text-xl font-bold text-gray-900">Konfirmasi Hapus</h2>
+                </div>
+
+                <div class="mb-6">
+                    <p class="text-gray-700 mb-2">
+                        Apakah Anda yakin ingin menghapus <strong>{{ selectedIds.length }}</strong> seleksi mitra yang dipilih?
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Tindakan ini tidak dapat dibatalkan. Data yang dihapus tidak dapat dikembalikan.
+                    </p>
+                </div>
+
+                <!-- Success Message -->
+                <div v-if="deleteSuccess" class="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-sm text-green-700">{{ deleteSuccess }}</p>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div v-if="deleteError" class="mb-4 bg-red-50 border border-red-200 rounded-lg p-3">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-sm text-red-700">{{ deleteError }}</p>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex justify-end gap-3">
+                    <button
+                        @click="closeDeleteModal"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium text-sm"
+                        :disabled="isDeleting"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="bulkDelete"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                        :disabled="isDeleting"
+                    >
+                        <svg v-if="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isDeleting ? 'Menghapus...' : 'Hapus' }}
                     </button>
                 </div>
             </div>

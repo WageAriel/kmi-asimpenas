@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\ActivityAggregatorService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Imports\DataMitraImport;
 use App\Exports\DataMitraExport;
@@ -412,9 +413,49 @@ class DataMitraController extends Controller
 
     public function destroy($id)
     {
-        $mitra = DataMitra::findOrFail($id);
-        $mitra->delete();
-        return response()->json(['message' => 'Data mitra berhasil dihapus']);
+        try {
+            $mitra = DataMitra::findOrFail($id);
+            
+            // Use transaction to ensure data consistency
+            DB::transaction(function () use ($id) {
+                // Delete related records first (to avoid foreign key constraint violation)
+                
+                // 1. Delete from hasil_seleksi_mitras (if exists)
+                DB::table('hasil_seleksi_mitra')
+                    ->where('id_mitra', $id)
+                    ->delete();
+
+                // 2. Delete from klasifikasi_mitra_pangans (if exists)
+                DB::table('data_klasifikasi_mitra')
+                    ->where('id_mitra', $id)
+                    ->delete();
+
+                // 3. Delete from data_seleksi_mitras
+                DB::table('data_seleksi_mitra')
+                    ->where('id_mitra', $id)
+                    ->delete();
+
+                // 4. Finally, delete from data_mitras
+                DataMitra::where('id_mitra', $id)->delete();
+            });
+
+            // Clear activity cache
+            ActivityAggregatorService::clearAllActivitiesCache();
+
+            return response()->json([
+                'message' => 'Data mitra dan data terkait berhasil dihapus'
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Data mitra tidak ditemukan'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Delete mitra error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -522,5 +563,69 @@ class DataMitraController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Bulk delete mitras
+     */
+    public function bulkDelete(Request $request)
+    {
+        try {
+            // Validate request
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'required|exists:data_mitra,id_mitra',
+            ], [
+                'ids.required' => 'Pilih minimal 1 mitra untuk dihapus',
+                'ids.array' => 'Format data tidak valid',
+                'ids.min' => 'Pilih minimal 1 mitra untuk dihapus',
+                'ids.*.exists' => 'Salah satu mitra tidak ditemukan',
+            ]);
+
+            $ids = $validated['ids'];
+            $count = count($ids);
+
+            // Use transaction to ensure data consistency
+            DB::transaction(function () use ($ids) {
+                // Delete related records first (to avoid foreign key constraint violation)
+                
+                // 1. Delete from hasil_seleksi_mitras (if exists)
+                DB::table('hasil_seleksi_mitra')
+                    ->whereIn('id_mitra', $ids)
+                    ->delete();
+
+                // 2. Delete from klasifikasi_mitra_pangans (if exists)
+                DB::table('data_klasifikasi_mitra')
+                    ->whereIn('id_mitra', $ids)
+                    ->delete();
+
+                // 3. Delete from data_seleksi_mitras
+                DB::table('data_seleksi_mitra')
+                    ->whereIn('id_mitra', $ids)
+                    ->delete();
+
+                // 4. Finally, delete from data_mitras
+                DataMitra::whereIn('id_mitra', $ids)->delete();
+            });
+
+            // Clear activity cache
+            ActivityAggregatorService::clearAllActivitiesCache();
+
+            return response()->json([
+                'message' => "Berhasil menghapus {$count} mitra dan data terkait",
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Bulk delete error: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+
 

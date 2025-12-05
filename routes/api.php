@@ -87,6 +87,8 @@ Route::middleware(['auth:sanctum', 'role:admin,super admin'])->group(function ()
     Route::get('/data-seleksi-mitra/export/data', [DataSeleksiMitraController::class, 'export'])->name('data-seleksi-mitra.export');
     Route::get('/data-seleksi-mitra/export/template', [DataSeleksiMitraController::class, 'downloadTemplate'])->name('data-seleksi-mitra.template');
     
+    // Bulk delete for Data Seleksi Mitra
+    Route::post('/data-seleksi-mitra/bulk-delete', [DataSeleksiMitraController::class, 'bulkDelete'])->name('data-seleksi-mitra.bulk-delete');
 
     // Hasil Seleksi Mitra - Admin & Super Admin full CRUD
     Route::get('/hasil-seleksi-mitra', [HasilSeleksiMitraController::class, 'index']);

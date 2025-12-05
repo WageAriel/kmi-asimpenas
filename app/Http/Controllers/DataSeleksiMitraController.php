@@ -241,4 +241,34 @@ public function mySeleksi()
         return Excel::download(new DataSeleksiMitraExport(true), 'template-data-seleksi-mitra.xlsx');
     }
 
+    /**
+     * Bulk delete data seleksi mitra
+     */
+    public function bulkDelete(Request $request)
+    {
+        try {
+            $request->validate([
+                'ids' => 'required|array',
+                'ids.*' => 'exists:data_seleksi_mitra,id_seleksi_mitra'
+            ]);
+
+            $deletedCount = DataSeleksiMitra::whereIn('id_seleksi_mitra', $request->ids)->delete();
+
+            return response()->json([
+                'message' => "Berhasil menghapus {$deletedCount} data seleksi mitra",
+                'deleted_count' => $deletedCount
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
