@@ -198,4 +198,27 @@ class KlasifikasiMitraController extends Controller
     {
         return Excel::download(new KlasifikasiMitraExport(true), 'template-data-klasifikasi-mitra.xlsx');
     }
+
+    /**
+     * Bulk delete klasifikasi mitra
+     */
+    public function bulkDelete(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'ids' => 'required|array',
+                'ids.*' => 'exists:klasifikasi_mitra,id_klasifikasi_mitra'
+            ]);
+
+            $count = KlasifikasiMitra::whereIn('id_klasifikasi_mitra', $validated['ids'])->delete();
+
+            return response()->json([
+                'message' => "Berhasil menghapus {$count} data klasifikasi mitra"
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

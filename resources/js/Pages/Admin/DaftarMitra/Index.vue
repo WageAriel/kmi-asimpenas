@@ -909,6 +909,10 @@ watch(searchQuery, () => {
                         <span class="block text-sm text-gray-500">No Telp CP</span>
                         <span class="font-medium text-gray-900">{{ selectedMitra.no_telp_cp || '-' }}</span>
                     </div>
+                    <div>
+                        <span class="block text-sm text-gray-500">Jabatan</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.jabatan || '-' }}</span>
+                    </div>
                     
                     <div class="col-span-2 border-t border-gray-200 pt-4 mt-2">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Informasi Bank</h3>

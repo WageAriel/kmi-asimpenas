@@ -1,7 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
 // Accept data from the controller as props
@@ -63,6 +63,176 @@ const filteredKlasifikasiMitras = computed(() => {
     }
     
     return filtered;
+});
+
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
+// Bulk delete state
+const selectedIds = ref([]);
+const selectAll = ref(false);
+const showBulkDeleteModal = ref(false);
+const isBulkDeleting = ref(false);
+const bulkDeleteSuccess = ref('');
+const bulkDeleteError = ref('');
+
+// Computed: Total pages
+const totalPages = computed(() => {
+    return Math.ceil(filteredKlasifikasiMitras.value.length / itemsPerPage.value);
+});
+
+// Computed: Paginated data
+const paginatedKlasifikasiMitras = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return filteredKlasifikasiMitras.value.slice(start, end);
+});
+
+// Computed: Visible page numbers
+const visiblePages = computed(() => {
+    const pages = [];
+    const total = totalPages.value;
+    const current = currentPage.value;
+    
+    // Always show first page
+    pages.push(1);
+    
+    // Calculate range around current page
+    let rangeStart = Math.max(2, current - 2);
+    let rangeEnd = Math.min(total - 1, current + 2);
+    
+    // Add ellipsis after first page if needed
+    if (rangeStart > 2) {
+        pages.push('...');
+    }
+    
+    // Add pages around current page
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+        pages.push(i);
+    }
+    
+    // Add ellipsis before last page if needed
+    if (rangeEnd < total - 1) {
+        pages.push('...');
+    }
+    
+    // Always show last page if there's more than one page
+    if (total > 1) {
+        pages.push(total);
+    }
+    
+    return pages;
+});
+
+// Pagination methods
+const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+        selectedIds.value = [];
+        selectAll.value = false;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+        selectedIds.value = [];
+        selectAll.value = false;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+        selectedIds.value = [];
+        selectAll.value = false;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+// Bulk delete methods
+const toggleSelectAll = () => {
+    if (selectAll.value) {
+        selectedIds.value = paginatedKlasifikasiMitras.value.map(item => item.id_klasifikasi_mitra);
+    } else {
+        selectedIds.value = [];
+    }
+};
+
+const toggleSelection = (id) => {
+    const index = selectedIds.value.indexOf(id);
+    if (index > -1) {
+        selectedIds.value.splice(index, 1);
+    } else {
+        selectedIds.value.push(id);
+    }
+    selectAll.value = selectedIds.value.length === paginatedKlasifikasiMitras.value.length;
+};
+
+const openBulkDeleteModal = () => {
+    if (selectedIds.value.length === 0) return;
+    showBulkDeleteModal.value = true;
+    bulkDeleteSuccess.value = '';
+    bulkDeleteError.value = '';
+};
+
+const closeBulkDeleteModal = () => {
+    showBulkDeleteModal.value = false;
+    bulkDeleteSuccess.value = '';
+    bulkDeleteError.value = '';
+};
+
+const bulkDelete = async () => {
+    if (selectedIds.value.length === 0) return;
+
+    isBulkDeleting.value = true;
+    bulkDeleteError.value = '';
+    bulkDeleteSuccess.value = '';
+
+    try {
+        const response = await axios.post('/api/klasifikasi-mitra/bulk-delete', {
+            ids: selectedIds.value
+        });
+
+        bulkDeleteSuccess.value = response.data.message || `Berhasil menghapus ${selectedIds.value.length} data klasifikasi mitra`;
+        
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    } catch (error) {
+        console.error('Error bulk deleting:', error);
+        if (error.response && error.response.data && error.response.data.message) {
+            bulkDeleteError.value = error.response.data.message;
+        } else {
+            bulkDeleteError.value = 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.';
+        }
+        isBulkDeleting.value = false;
+    }
+};
+
+// Watchers
+watch(currentPage, () => {
+    selectedIds.value = [];
+    selectAll.value = false;
+});
+
+watch(searchQuery, () => {
+    currentPage.value = 1;
+    selectedIds.value = [];
+    selectAll.value = false;
+});
+
+watch(selectedYear, () => {
+    currentPage.value = 1;
+    selectedIds.value = [];
+    selectAll.value = false;
+});
+
+watch(selectedIds, () => {
+    selectAll.value = selectedIds.value.length === paginatedKlasifikasiMitras.value.length && paginatedKlasifikasiMitras.value.length > 0;
 });
 
 // Modal functionality
@@ -669,6 +839,28 @@ const generateBaPdf = async () => {
                 </div>
             </div>
 
+            <!-- Bulk Delete Button -->
+            <transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="opacity-0 transform -translate-y-2"
+                enter-to-class="opacity-100 transform translate-y-0"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100 transform translate-y-0"
+                leave-to-class="opacity-0 transform -translate-y-2"
+            >
+                <div v-if="selectedIds.length > 0" class="mb-4">
+                    <button
+                        @click="openBulkDeleteModal"
+                        class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium shadow-sm"
+                    >
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Hapus Terpilih ({{ selectedIds.length }})
+                    </button>
+                </div>
+            </transition>
+
             <!-- Tabel Daftar Klasifikasi Mitra -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div class="px-6 py-4 border-b border-gray-200">
@@ -678,6 +870,14 @@ const generateBaPdf = async () => {
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="px-4 py-3 text-left">
+                                    <input 
+                                        type="checkbox" 
+                                        v-model="selectAll" 
+                                        @change="toggleSelectAll"
+                                        class="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                    />
+                                </th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Perusahaan</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
@@ -687,7 +887,16 @@ const generateBaPdf = async () => {
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="item in filteredKlasifikasiMitras" :key="item.id_klasifikasi_mitra" class="hover:bg-gray-50">
+                            <tr v-for="item in paginatedKlasifikasiMitras" :key="item.id_klasifikasi_mitra" class="hover:bg-gray-50">
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <input 
+                                        type="checkbox" 
+                                        :value="item.id_klasifikasi_mitra"
+                                        v-model="selectedIds"
+                                        @change="toggleSelection(item.id_klasifikasi_mitra)"
+                                        class="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                    />
+                                </td>
                                 <td class="text-xs px-4 py-3 whitespace-nowrap">{{ item.mitra?.nama_perusahaan }}</td>
                                 <td class="text-xs px-4 py-3 whitespace-nowrap">{{ formatDate(item.created_at) }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
@@ -741,13 +950,75 @@ const generateBaPdf = async () => {
                                     </button>
                                 </td>
                             </tr>
-                            <tr v-if="filteredKlasifikasiMitras.length === 0">
-                                <td colspan="6" class="px-4 py-6 text-center text-gray-500">
+                            <tr v-if="paginatedKlasifikasiMitras.length === 0">
+                                <td colspan="7" class="px-4 py-6 text-center text-gray-500">
                                     {{ searchQuery ? 'Tidak ada klasifikasi mitra yang sesuai dengan pencarian Anda.' : 'Belum ada data klasifikasi mitra.' }}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination Controls -->
+                <div v-if="totalPages > 1" class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <!-- Info -->
+                        <div class="text-sm text-gray-700">
+                            Menampilkan 
+                            <span class="font-medium">{{ ((currentPage - 1) * itemsPerPage) + 1 }}</span>
+                            sampai 
+                            <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredKlasifikasiMitras.length) }}</span>
+                            dari 
+                            <span class="font-medium">{{ filteredKlasifikasiMitras.length }}</span>
+                            data
+                        </div>
+
+                        <!-- Pagination Buttons -->
+                        <div class="flex items-center gap-2">
+                            <!-- Previous Button -->
+                            <button
+                                @click="prevPage"
+                                :disabled="currentPage === 1"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+
+                            <!-- Page Numbers -->
+                            <template v-for="(page, index) in visiblePages" :key="index">
+                                <!-- Ellipsis -->
+                                <span v-if="page === '...'" class="px-3 py-2 text-sm text-gray-700">
+                                    ...
+                                </span>
+                                <!-- Page Button -->
+                                <button
+                                    v-else
+                                    @click="goToPage(page)"
+                                    :class="[
+                                        'px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                                        currentPage === page
+                                            ? 'bg-green-600 text-white'
+                                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                                    ]"
+                                >
+                                    {{ page }}
+                                </button>
+                            </template>
+
+                            <!-- Next Button -->
+                            <button
+                                @click="nextPage"
+                                :disabled="currentPage === totalPages"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -101,6 +101,7 @@ Route::middleware(['auth:sanctum', 'role:admin,super admin'])->group(function ()
     Route::post('/klasifikasi-mitra/import', [KlasifikasiMitraController::class, 'import'])->name('klasifikasi-mitra.import');
     Route::get('/klasifikasi-mitra/export/data', [KlasifikasiMitraController::class, 'export'])->name('klasifikasi-mitra.export');
     Route::get('/klasifikasi-mitra/export/template', [KlasifikasiMitraController::class, 'downloadTemplate'])->name('klasifikasi-mitra.template');
+    Route::post('/klasifikasi-mitra/bulk-delete', [KlasifikasiMitraController::class, 'bulkDelete'])->name('klasifikasi-mitra.bulk-delete');
 
     // Karyawan - Admin & Super Admin bisa akses
     Route::get('/karyawan', [KaryawanController::class, 'index'])->name('karyawan.index');

@@ -2,7 +2,7 @@
 import { Head } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
 import SuperAdminLayout from '@/Layouts/SuperAdminLayout.vue';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import axios from 'axios';
 
 const hasilSeleksiMitras = ref([]);
@@ -65,6 +65,83 @@ const filteredData = computed(() => {
     }
     
     return filtered;
+});
+
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
+// Pagination computed properties
+const totalPages = computed(() => {
+    return Math.ceil(filteredData.value.length / itemsPerPage.value);
+});
+
+const paginatedData = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return filteredData.value.slice(start, end);
+});
+
+const visiblePages = computed(() => {
+    const pages = [];
+    const total = totalPages.value;
+    const current = currentPage.value;
+    
+    // Always show first page
+    pages.push(1);
+    
+    // Calculate range around current page
+    let rangeStart = Math.max(2, current - 2);
+    let rangeEnd = Math.min(total - 1, current + 2);
+    
+    // Add ellipsis after first page if needed
+    if (rangeStart > 2) {
+        pages.push('...');
+    }
+    
+    // Add pages around current page
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+        pages.push(i);
+    }
+    
+    // Add ellipsis before last page if needed
+    if (rangeEnd < total - 1) {
+        pages.push('...');
+    }
+    
+    // Always show last page if there's more than one page
+    if (total > 1) {
+        pages.push(total);
+    }
+    
+    return pages;
+});
+
+// Pagination methods
+const goToPage = (page) => {
+    if (typeof page === 'number' && page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+// Watch search query and year to reset pagination
+watch([searchQuery, selectedYear], () => {
+    currentPage.value = 1;
 });
 
 // Format date helper
@@ -267,7 +344,7 @@ onMounted(() => {
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="item in filteredData" :key="item.id_hasil_seleksi_mitra" class="hover:bg-gray-50">
+                        <tr v-for="item in paginatedData" :key="item.id_hasil_seleksi_mitra" class="hover:bg-gray-50">
                             <td class="text-xs px-6 py-4 whitespace-nowrap">{{ item.mitra?.nama_perusahaan || '-' }}</td>
                             <td class="text-xs px-6 py-4 whitespace-nowrap">{{ formatDate(item.created_at) }}</td>
                             <td class="text-xs px-6 py-4 whitespace-nowrap">
@@ -296,10 +373,72 @@ onMounted(() => {
                 </table>
 
                 <!-- Empty State -->
-                <div v-if="filteredData.length === 0" class="text-center py-12">
+                <div v-if="paginatedData.length === 0" class="text-center py-12">
                     <p class="text-gray-500">
                         {{ searchQuery ? 'Tidak ada data yang sesuai dengan pencarian.' : 'Belum ada data hasil seleksi.' }}
                     </p>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="totalPages > 1" class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <!-- Info -->
+                        <div class="text-sm text-gray-700">
+                            Menampilkan 
+                            <span class="font-medium">{{ ((currentPage - 1) * itemsPerPage) + 1 }}</span>
+                            sampai 
+                            <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredData.length) }}</span>
+                            dari 
+                            <span class="font-medium">{{ filteredData.length }}</span>
+                            data
+                        </div>
+
+                        <!-- Pagination Buttons -->
+                        <div class="flex items-center gap-2">
+                            <!-- Previous Button -->
+                            <button
+                                @click="prevPage"
+                                :disabled="currentPage === 1"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+
+                            <!-- Page Numbers -->
+                            <template v-for="(page, index) in visiblePages" :key="index">
+                                <!-- Ellipsis -->
+                                <span v-if="page === '...'" class="px-3 py-2 text-sm text-gray-700">
+                                    ...
+                                </span>
+                                <!-- Page Button -->
+                                <button
+                                    v-else
+                                    @click="goToPage(page)"
+                                    :class="[
+                                        'px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                                        currentPage === page
+                                            ? 'bg-orange-600 text-white'
+                                            : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                                    ]"
+                                >
+                                    {{ page }}
+                                </button>
+                            </template>
+
+                            <!-- Next Button -->
+                            <button
+                                @click="nextPage"
+                                :disabled="currentPage === totalPages"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
