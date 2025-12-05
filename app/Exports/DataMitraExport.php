@@ -57,6 +57,7 @@ class DataMitraExport implements FromCollection, WithMapping, ShouldAutoSize, Wi
             $mitra->alamat_perusahaan, // Alamat Perusahaan
             $mitra->no_telp_perusahaan, // Nomor Telp Perusahaan
             $mitra->nama_cp, // Nama Kontak Person
+            $mitra->jabatan ?? '', // Jabatan
             $mitra->no_telp_cp, // Nomor Telp/HP Contact Person
             $mitra->bank_korespondensi, // Bank Korespondensi
             $mitra->alamat_bank, // Alamat Bank Korespondensi
@@ -96,19 +97,19 @@ class DataMitraExport implements FromCollection, WithMapping, ShouldAutoSize, Wi
                 // HEADER ROW 1 (Main Headers)
                 $sheet->setCellValue('A1', 'No');
                 $sheet->setCellValue('B1', 'DATA CALON & MITRA KERJA ADA GABAH/BERAS DN');
-                $sheet->setCellValue('M1', 'Status Perusahaan');
-                $sheet->setCellValue('N1', 'Tanggal Seleksi');
-                $sheet->setCellValue('O1', 'Tanggal Klasifikasi');
-                $sheet->setCellValue('P1', 'Tanggal Penilaian');
-                $sheet->setCellValue('Q1', 'Tanggal Penetapan');
-                $sheet->setCellValue('R1', 'Tanggal Surat Permohonan');
-                $sheet->setCellValue('S1', 'Tgl Pakta Integritas');
-                $sheet->setCellValue('T1', 'NIK');
-                $sheet->setCellValue('U1', 'NPWP');
-                $sheet->setCellValue('V1', 'PENGUSAHA KENA PAJAK');
-                $sheet->setCellValue('Y1', 'Email');
-                $sheet->setCellValue('Z1', 'NO VMS');
-                $sheet->setCellValue('AA1', 'KODE MITRA');
+                $sheet->setCellValue('N1', 'Status Perusahaan');
+                $sheet->setCellValue('O1', 'Tanggal Seleksi');
+                $sheet->setCellValue('P1', 'Tanggal Klasifikasi');
+                $sheet->setCellValue('Q1', 'Tanggal Penilaian');
+                $sheet->setCellValue('R1', 'Tanggal Penetapan');
+                $sheet->setCellValue('S1', 'Tanggal Surat Permohonan');
+                $sheet->setCellValue('T1', 'Tgl Pakta Integritas');
+                $sheet->setCellValue('U1', 'NIK');
+                $sheet->setCellValue('V1', 'NPWP');
+                $sheet->setCellValue('W1', 'PENGUSAHA KENA PAJAK');
+                $sheet->setCellValue('Z1', 'Email');
+                $sheet->setCellValue('AA1', 'NO VMS');
+                $sheet->setCellValue('AB1', 'KODE MITRA');
                 
                 // HEADER ROW 2 (Sub Headers Level 1)
                 $sheet->setCellValue('A2', 'No');
@@ -117,26 +118,27 @@ class DataMitraExport implements FromCollection, WithMapping, ShouldAutoSize, Wi
                 $sheet->setCellValue('D2', 'ALAMAT PERUSAHAAN');
                 $sheet->setCellValue('E2', 'NOMOR TELP PERUSAHAAN');
                 $sheet->setCellValue('F2', 'NAMA KONTAK PERSON');
-                $sheet->setCellValue('G2', 'NOMOR TELP/HP CONTACT PERSON');
-                $sheet->setCellValue('H2', 'BANK KORESPONDENSI');
-                $sheet->setCellValue('I2', 'ALAMAT BANK KORESPONDENSI');
-                $sheet->setCellValue('J2', 'SURAT KUASA');
-                $sheet->setCellValue('L2', 'NOMOR REKENING');
-                $sheet->setCellValue('M2', 'Status Perusahaan');
-                $sheet->setCellValue('N2', 'Tanggal Seleksi');
-                $sheet->setCellValue('O2', 'Tanggal Klasifikasi');
-                $sheet->setCellValue('P2', 'Tanggal Penilaian');
-                $sheet->setCellValue('Q2', 'Tanggal Penetapan');
-                $sheet->setCellValue('R2', 'Tanggal Surat Permohonan');
-                $sheet->setCellValue('S2', 'Tgl Pakta Integritas');
-                $sheet->setCellValue('T2', 'NIK');
-                $sheet->setCellValue('U2', 'NPWP');
-                $sheet->setCellValue('V2', 'PKP');
-                $sheet->setCellValue('W2', 'NON PKP');
-                $sheet->setCellValue('X2', 'Keterangan PKP');
-                $sheet->setCellValue('Y2', 'Email');
-                $sheet->setCellValue('Z2', 'NO VMS');
-                $sheet->setCellValue('AA2', 'KODE MITRA');
+                $sheet->setCellValue('G2', 'JABATAN');
+                $sheet->setCellValue('H2', 'NOMOR TELP/HP CONTACT PERSON');
+                $sheet->setCellValue('I2', 'BANK KORESPONDENSI');
+                $sheet->setCellValue('J2', 'ALAMAT BANK KORESPONDENSI');
+                $sheet->setCellValue('K2', 'SURAT KUASA');
+                $sheet->setCellValue('M2', 'NOMOR REKENING');
+                $sheet->setCellValue('N2', 'Status Perusahaan');
+                $sheet->setCellValue('O2', 'Tanggal Seleksi');
+                $sheet->setCellValue('P2', 'Tanggal Klasifikasi');
+                $sheet->setCellValue('Q2', 'Tanggal Penilaian');
+                $sheet->setCellValue('R2', 'Tanggal Penetapan');
+                $sheet->setCellValue('S2', 'Tanggal Surat Permohonan');
+                $sheet->setCellValue('T2', 'Tgl Pakta Integritas');
+                $sheet->setCellValue('U2', 'NIK');
+                $sheet->setCellValue('V2', 'NPWP');
+                $sheet->setCellValue('W2', 'PKP');
+                $sheet->setCellValue('X2', 'NON PKP');
+                $sheet->setCellValue('Y2', 'Keterangan PKP');
+                $sheet->setCellValue('Z2', 'Email');
+                $sheet->setCellValue('AA2', 'NO VMS');
+                $sheet->setCellValue('AB2', 'KODE MITRA');
                 
                 // HEADER ROW 3 (Sub Headers Level 2 - hanya untuk Surat Kuasa)
                 $sheet->setCellValue('A3', 'No');
@@ -145,44 +147,45 @@ class DataMitraExport implements FromCollection, WithMapping, ShouldAutoSize, Wi
                 $sheet->setCellValue('D3', 'ALAMAT PERUSAHAAN');
                 $sheet->setCellValue('E3', 'NOMOR TELP PERUSAHAAN');
                 $sheet->setCellValue('F3', 'NAMA KONTAK PERSON');
-                $sheet->setCellValue('G3', 'NOMOR TELP/HP CONTACT PERSON');
-                $sheet->setCellValue('H3', 'BANK KORESPONDENSI');
-                $sheet->setCellValue('I3', 'ALAMAT BANK KORESPONDENSI');
-                $sheet->setCellValue('J3', 'Ada/Tidak Ada');
-                $sheet->setCellValue('K3', 'Keterangan');
-                $sheet->setCellValue('L3', 'NOMOR REKENING');
-                $sheet->setCellValue('M3', 'Status Perusahaan');
-                $sheet->setCellValue('N3', 'Tanggal Seleksi');
-                $sheet->setCellValue('O3', 'Tanggal Klasifikasi');
-                $sheet->setCellValue('P3', 'Tanggal Penilaian');
-                $sheet->setCellValue('Q3', 'Tanggal Penetapan');
-                $sheet->setCellValue('R3', 'Tanggal Surat Permohonan');
-                $sheet->setCellValue('S3', 'Tgl Pakta Integritas');
-                $sheet->setCellValue('T3', 'NIK');
-                $sheet->setCellValue('U3', 'NPWP');
-                $sheet->setCellValue('V3', 'PKP');
-                $sheet->setCellValue('W3', 'NON PKP');
-                $sheet->setCellValue('X3', 'Keterangan PKP');
-                $sheet->setCellValue('Y3', 'Email');
-                $sheet->setCellValue('Z3', 'NO VMS');
-                $sheet->setCellValue('AA3', 'KODE MITRA');
+                $sheet->setCellValue('G3', 'JABATAN');
+                $sheet->setCellValue('H3', 'NOMOR TELP/HP CONTACT PERSON');
+                $sheet->setCellValue('I3', 'BANK KORESPONDENSI');
+                $sheet->setCellValue('J3', 'ALAMAT BANK KORESPONDENSI');
+                $sheet->setCellValue('K3', 'Ada/Tidak Ada');
+                $sheet->setCellValue('L3', 'Keterangan');
+                $sheet->setCellValue('M3', 'NOMOR REKENING');
+                $sheet->setCellValue('N3', 'Status Perusahaan');
+                $sheet->setCellValue('O3', 'Tanggal Seleksi');
+                $sheet->setCellValue('P3', 'Tanggal Klasifikasi');
+                $sheet->setCellValue('Q3', 'Tanggal Penilaian');
+                $sheet->setCellValue('R3', 'Tanggal Penetapan');
+                $sheet->setCellValue('S3', 'Tanggal Surat Permohonan');
+                $sheet->setCellValue('T3', 'Tgl Pakta Integritas');
+                $sheet->setCellValue('U3', 'NIK');
+                $sheet->setCellValue('V3', 'NPWP');
+                $sheet->setCellValue('W3', 'PKP');
+                $sheet->setCellValue('X3', 'NON PKP');
+                $sheet->setCellValue('Y3', 'Keterangan PKP');
+                $sheet->setCellValue('Z3', 'Email');
+                $sheet->setCellValue('AA3', 'NO VMS');
+                $sheet->setCellValue('AB3', 'KODE MITRA');
                 
                 // Merge cells for main headers
                 $sheet->mergeCells('A1:A3'); // No
-                $sheet->mergeCells('B1:L1'); // DATA CALON & MITRA KERJA (span semua kolom data calon)
-                $sheet->mergeCells('M1:M3'); // Status Perusahaan
-                $sheet->mergeCells('N1:N3'); // Tanggal Seleksi
-                $sheet->mergeCells('O1:O3'); // Tanggal Klasifikasi
-                $sheet->mergeCells('P1:P3'); // Tanggal Penilaian
-                $sheet->mergeCells('Q1:Q3'); // Tanggal Penetapan
-                $sheet->mergeCells('R1:R3'); // Tanggal Surat Permohonan
-                $sheet->mergeCells('S1:S3'); // Tgl Pakta Integritas
-                $sheet->mergeCells('T1:T3'); // NIK
-                $sheet->mergeCells('U1:U3'); // NPWP
-                $sheet->mergeCells('V1:X1'); // PENGUSAHA KENA PAJAK
-                $sheet->mergeCells('Y1:Y3'); // Email
-                $sheet->mergeCells('Z1:Z3'); // NO VMS
-                $sheet->mergeCells('AA1:AA3'); // KODE MITRA
+                $sheet->mergeCells('B1:M1'); // DATA CALON & MITRA KERJA (span semua kolom data calon)
+                $sheet->mergeCells('N1:N3'); // Status Perusahaan
+                $sheet->mergeCells('O1:O3'); // Tanggal Seleksi
+                $sheet->mergeCells('P1:P3'); // Tanggal Klasifikasi
+                $sheet->mergeCells('Q1:Q3'); // Tanggal Penilaian
+                $sheet->mergeCells('R1:R3'); // Tanggal Penetapan
+                $sheet->mergeCells('S1:S3'); // Tanggal Surat Permohonan
+                $sheet->mergeCells('T1:T3'); // Tgl Pakta Integritas
+                $sheet->mergeCells('U1:U3'); // NIK
+                $sheet->mergeCells('V1:V3'); // NPWP
+                $sheet->mergeCells('W1:Y1'); // PENGUSAHA KENA PAJAK
+                $sheet->mergeCells('Z1:Z3'); // Email
+                $sheet->mergeCells('AA1:AA3'); // NO VMS
+                $sheet->mergeCells('AB1:AB3'); // KODE MITRA
                 
                 // Merge cells for sub headers level 1 (Row 2)
                 $sheet->mergeCells('B2:B3'); // NAMA PERUSAHAAN
@@ -190,16 +193,17 @@ class DataMitraExport implements FromCollection, WithMapping, ShouldAutoSize, Wi
                 $sheet->mergeCells('D2:D3'); // ALAMAT PERUSAHAAN
                 $sheet->mergeCells('E2:E3'); // NOMOR TELP PERUSAHAAN
                 $sheet->mergeCells('F2:F3'); // NAMA KONTAK PERSON
-                $sheet->mergeCells('G2:G3'); // NOMOR TELP/HP CONTACT PERSON
-                $sheet->mergeCells('H2:H3'); // BANK KORESPONDENSI
-                $sheet->mergeCells('I2:I3'); // ALAMAT BANK KORESPONDENSI
-                $sheet->mergeCells('J2:K2'); // SURAT KUASA (span 2 kolom: Ada/Tidak Ada & Keterangan)
-                $sheet->mergeCells('L2:L3'); // NOMOR REKENING
+                $sheet->mergeCells('G2:G3'); // JABATAN
+                $sheet->mergeCells('H2:H3'); // NOMOR TELP/HP CONTACT PERSON
+                $sheet->mergeCells('I2:I3'); // BANK KORESPONDENSI
+                $sheet->mergeCells('J2:J3'); // ALAMAT BANK KORESPONDENSI
+                $sheet->mergeCells('K2:L2'); // SURAT KUASA (span 2 kolom: Ada/Tidak Ada & Keterangan)
+                $sheet->mergeCells('M2:M3'); // NOMOR REKENING
                 
                 // Merge cells for PENGUSAHA KENA PAJAK sub headers
-                $sheet->mergeCells('V2:V3'); // PKP
-                $sheet->mergeCells('W2:W3'); // NON PKP
-                $sheet->mergeCells('X2:X3'); // Keterangan PKP
+                $sheet->mergeCells('W2:W3'); // PKP
+                $sheet->mergeCells('X2:X3'); // NON PKP
+                $sheet->mergeCells('Y2:Y3'); // Keterangan PKP
                 
                 // Style headers
                 $headerStyle = [
@@ -224,7 +228,7 @@ class DataMitraExport implements FromCollection, WithMapping, ShouldAutoSize, Wi
                     ],
                 ];
                 
-                $sheet->getStyle('A1:AA3')->applyFromArray($headerStyle);
+                $sheet->getStyle('A1:AB3')->applyFromArray($headerStyle);
                 
                 // Set row height for headers
                 $sheet->getRowDimension(1)->setRowHeight(30);
@@ -235,7 +239,7 @@ class DataMitraExport implements FromCollection, WithMapping, ShouldAutoSize, Wi
                 $highestRow = $sheet->getHighestRow();
                 
                 // Apply borders to all data
-                $sheet->getStyle('A1:AA' . $highestRow)->applyFromArray([
+                $sheet->getStyle('A1:AB' . $highestRow)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
@@ -246,13 +250,13 @@ class DataMitraExport implements FromCollection, WithMapping, ShouldAutoSize, Wi
                 
                 // Center align untuk kolom tertentu (data mulai dari row 4)
                 $sheet->getStyle('A4:A' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('J4:K' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('M4:M' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('N4:S' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('V4:W' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('K4:L' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('N4:N' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('O4:T' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('W4:X' . $highestRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 
                 // Format kolom sebagai TEXT untuk mencegah scientific notation
-                $textColumns = ['E', 'G', 'L', 'T', 'U']; // No Telp Perusahaan, No Telp CP, No Rekening, NIK, NPWP
+                $textColumns = ['E', 'H', 'M', 'U', 'V']; // No Telp Perusahaan, No Telp CP, No Rekening, NIK, NPWP
                 
                 foreach ($textColumns as $col) {
                     $sheet->getStyle($col . '4:' . $col . $highestRow)

@@ -34,6 +34,16 @@ class DataMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsE
             }
         }
         
+        // Transform PKP values from "Ada/Tidak Ada" to "Pkp/Non Pkp"
+        if (isset($data['pkp'])) {
+            $pkpValue = trim($data['pkp']);
+            if (strcasecmp($pkpValue, 'Ada') === 0) {
+                $data['pkp'] = 'Pkp';
+            } elseif (strcasecmp($pkpValue, 'Tidak Ada') === 0) {
+                $data['pkp'] = 'Non Pkp';
+            }
+        }
+
         return $data;
     }
 
@@ -81,6 +91,7 @@ class DataMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsE
             'kota_kabupaten' => $row['kota_kabupaten'] ?? null,
             'provinsi' => $row['provinsi'] ?? null,
             'nama_cp' => $row['nama_cp'] ?? null,
+            'jabatan' => $row['jabatan'] ?? null,
             'nik' => $this->formatNumericString($row['nik'] ?? null),
             'tempat_lahir' => $row['tempat_lahir'] ?? null,
             'tanggal_lahir' => $tanggalLahir,
