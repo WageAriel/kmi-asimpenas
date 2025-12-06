@@ -432,32 +432,50 @@ const isUpdating = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
 
+// Verification modal state
+const showVerificationModal = ref(false);
+const selectedClassificationResult = ref('');
+
+// Open verification modal
+const openVerificationModal = (result) => {
+    selectedClassificationResult.value = result;
+    showVerificationModal.value = true;
+    showDropdown.value = false;
+};
+
+// Close verification modal
+const closeVerificationModal = () => {
+    showVerificationModal.value = false;
+    selectedClassificationResult.value = '';
+};
+
 // Update classification result
-const updateKlasifikasi = async (id, result) => {
-    if (isUpdating.value) return;
+const updateKlasifikasi = async () => {
+    if (isUpdating.value || !selectedKlasifikasi.value || !selectedClassificationResult.value) return;
     
     isUpdating.value = true;
     errorMessage.value = '';
     successMessage.value = '';
     
     try {
-        await axios.put(`/klasifikasi-mitra/${id}`, {
-            hasil_klasifikasi: result
+        await axios.put(`/klasifikasi-mitra/${selectedKlasifikasi.value.id_klasifikasi_mitra}`, {
+            hasil_klasifikasi: selectedClassificationResult.value
         });
         
         // Update local data
-        const index = props.klasifikasiMitras.findIndex(item => item.id_klasifikasi_mitra === id);
+        const index = props.klasifikasiMitras.findIndex(item => item.id_klasifikasi_mitra === selectedKlasifikasi.value.id_klasifikasi_mitra);
         if (index !== -1) {
-            props.klasifikasiMitras[index].hasil_klasifikasi = result;
+            props.klasifikasiMitras[index].hasil_klasifikasi = selectedClassificationResult.value;
         }
         
         // Update selected klasifikasi if it's the one being viewed in modal
-        if (selectedKlasifikasi.value && selectedKlasifikasi.value.id_klasifikasi_mitra === id) {
-            selectedKlasifikasi.value.hasil_klasifikasi = result;
+        if (selectedKlasifikasi.value) {
+            selectedKlasifikasi.value.hasil_klasifikasi = selectedClassificationResult.value;
         }
         
-        successMessage.value = `Berhasil memverifikasi mitra ke Kelas ${result}`;
-        showDropdown.value = false;
+        successMessage.value = `Berhasil memverifikasi mitra ke Kelas ${selectedClassificationResult.value}`;
+        showVerificationModal.value = false;
+        selectedClassificationResult.value = '';
         
         // Auto close success message after 3 seconds
         setTimeout(() => {
@@ -466,6 +484,7 @@ const updateKlasifikasi = async (id, result) => {
     } catch (error) {
         console.error('Error updating klasifikasi:', error);
         errorMessage.value = 'Gagal memperbarui hasil klasifikasi. Silakan coba lagi.';
+        showVerificationModal.value = false;
     } finally {
         isUpdating.value = false;
     }
@@ -605,6 +624,47 @@ const downloadTemplate = () => {
 // Export function
 const exportData = () => {
     window.location.href = '/klasifikasi-mitra/export/data';
+};
+
+// Delete functionality
+const showDeleteModal = ref(false);
+const selectedItemToDelete = ref(null);
+const isDeleting = ref(false);
+const deleteError = ref(null);
+
+const openDeleteModal = (item) => {
+    selectedItemToDelete.value = item;
+    showDeleteModal.value = true;
+    deleteError.value = null;
+};
+
+const closeDeleteModal = () => {
+    showDeleteModal.value = false;
+    selectedItemToDelete.value = null;
+    deleteError.value = null;
+    isDeleting.value = false;
+};
+
+const confirmDelete = async () => {
+    if (!selectedItemToDelete.value) return;
+
+    isDeleting.value = true;
+    deleteError.value = null;
+
+    try {
+        await axios.delete(`/klasifikasi-mitra/${selectedItemToDelete.value.id_klasifikasi_mitra}`);
+        
+        // Reload page after successful deletion
+        window.location.reload();
+    } catch (error) {
+        console.error('Error deleting klasifikasi:', error);
+        if (error.response && error.response.data && error.response.data.message) {
+            deleteError.value = error.response.data.message;
+        } else {
+            deleteError.value = 'Terjadi kesalahan saat menghapus data. Silakan coba lagi.';
+        }
+        isDeleting.value = false;
+    }
 };
 
 // Add new refs
@@ -862,10 +922,10 @@ const generateBaPdf = async () => {
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Perusahaan</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Klasifikasi Mitra</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Form Klasifikasi</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hasil Klasifikasi</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Surat Penetapan</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -886,24 +946,11 @@ const generateBaPdf = async () => {
                                         {{ item.hasil_klasifikasi ? `Kelas ${item.hasil_klasifikasi}` : 'Belum Dinilai' }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 whitespace-nowrap">
-                                    <div class="flex items-center gap-2">
-                                        <button
-                                            @click="viewDetails(item)"
-                                            class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
-                                        >
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                            Lihat
-                                        </button>
-                                    </div>
-                                </td>
+                                
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <button
                                         @click="downloadKlasifikasiMitra(item.id_klasifikasi_mitra)"
-                                        class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
+                                        class="inline-flex items-center px-2 py-1 text-green-800 hover:text-white hover:bg-green-800 border border-green-800 rounded transition-colors duration-200 text-xs"
                                 >
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -932,6 +979,29 @@ const generateBaPdf = async () => {
                                         </svg>
                                         Download
                                     </button>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            @click="viewDetails(item)"
+                                            class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
+                                        >
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                            Lihat
+                                        </button>
+                                        <button
+                                            @click="openDeleteModal(item)"
+                                            class="inline-flex items-center px-2 py-1 text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded transition-colors duration-200 text-xs"
+                                        >
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                            Hapus
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr v-if="paginatedKlasifikasiMitras.length === 0">
@@ -1204,7 +1274,7 @@ const generateBaPdf = async () => {
                                 class="absolute left-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10"
                             >
                                 <button
-                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'A')"
+                                    @click="openVerificationModal('A')"
                                     class="w-full text-left px-4 py-2 text-sm hover:bg-green-50 flex items-center transition-colors"
                                     :disabled="isUpdating"
                                 >
@@ -1214,7 +1284,7 @@ const generateBaPdf = async () => {
                                     <span class="text-gray-700">Kelas A (Terbaik)</span>
                                 </button>
                                 <button
-                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'B')"
+                                    @click="openVerificationModal('B')"
                                     class="w-full text-left px-4 py-2 text-sm hover:bg-blue-50 flex items-center transition-colors"
                                     :disabled="isUpdating"
                                 >
@@ -1224,7 +1294,7 @@ const generateBaPdf = async () => {
                                     <span class="text-gray-700">Kelas B (Menengah)</span>
                                 </button>
                                 <button
-                                    @click="updateKlasifikasi(selectedKlasifikasi.id_klasifikasi_mitra, 'C')"
+                                    @click="openVerificationModal('C')"
                                     class="w-full text-left px-4 py-2 text-sm hover:bg-yellow-50 flex items-center transition-colors"
                                     :disabled="isUpdating"
                                 >
@@ -1244,6 +1314,96 @@ const generateBaPdf = async () => {
                             Tutup
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Modal -->
+        <div v-if="showVerificationModal" @click="closeVerificationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+                <button @click="closeVerificationModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <div class="mb-4">
+                    <div class="flex items-center justify-center w-12 h-12 mx-auto rounded-full mb-4"
+                         :class="{
+                             'bg-green-100': selectedClassificationResult === 'A',
+                             'bg-blue-100': selectedClassificationResult === 'B',
+                             'bg-yellow-100': selectedClassificationResult === 'C'
+                         }">
+                        <svg class="w-6 h-6" 
+                             :class="{
+                                 'text-green-600': selectedClassificationResult === 'A',
+                                 'text-blue-600': selectedClassificationResult === 'B',
+                                 'text-yellow-600': selectedClassificationResult === 'C'
+                             }"
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 text-center">Konfirmasi Verifikasi</h3>
+                    <p class="mt-2 text-sm text-gray-600 text-center">
+                        Apakah Anda yakin ingin memverifikasi klasifikasi mitra 
+                        <strong>{{ selectedKlasifikasi?.mitra?.nama_perusahaan }}</strong> 
+                        ke <strong>Kelas {{ selectedClassificationResult }}</strong>?
+                    </p>
+                    <div class="mt-4 p-3 rounded-lg"
+                         :class="{
+                             'bg-green-50 border border-green-200': selectedClassificationResult === 'A',
+                             'bg-blue-50 border border-blue-200': selectedClassificationResult === 'B',
+                             'bg-yellow-50 border border-yellow-200': selectedClassificationResult === 'C'
+                         }">
+                        <p class="text-xs font-medium"
+                           :class="{
+                               'text-green-800': selectedClassificationResult === 'A',
+                               'text-blue-800': selectedClassificationResult === 'B',
+                               'text-yellow-800': selectedClassificationResult === 'C'
+                           }">
+                            <span v-if="selectedClassificationResult === 'A'">
+                                ✓ Kelas A (Terbaik)
+                            </span>
+                            <span v-else-if="selectedClassificationResult === 'B'">
+                                ✓ Kelas B (Menengah)
+                            </span>
+                            <span v-else-if="selectedClassificationResult === 'C'">
+                                ✓ Kelas C (Standar)
+                            </span>
+                        </p>
+                    </div>
+                    <p class="mt-3 text-xs text-gray-500 text-center">
+                        <strong>Perhatian:</strong> Setelah diverifikasi, hasil klasifikasi tidak dapat diubah kembali.
+                    </p>
+                </div>
+
+                <!-- Error Message -->
+                <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-sm text-red-800">{{ errorMessage }}</p>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button
+                        @click="closeVerificationModal"
+                        :disabled="isUpdating"
+                        class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="updateKlasifikasi"
+                        :disabled="isUpdating"
+                        class="flex-1 px-4 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50"
+                        :class="{
+                            'bg-green-600 hover:bg-green-700': selectedClassificationResult === 'A',
+                            'bg-blue-600 hover:bg-blue-700': selectedClassificationResult === 'B',
+                            'bg-yellow-600 hover:bg-yellow-700': selectedClassificationResult === 'C'
+                        }"
+                    >
+                        <span v-if="!isUpdating">Verifikasi</span>
+                        <span v-else>Memproses...</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1516,6 +1676,52 @@ const generateBaPdf = async () => {
         </div>
 
         <!-- Delete Confirmation Modal -->
+        <div v-if="showDeleteModal" @click="closeDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative">
+                <button @click="closeDeleteModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <div class="mb-4">
+                    <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </div>
+                    <h3 class="mt-4 text-lg font-semibold text-gray-900 text-center">Konfirmasi Hapus</h3>
+                    <p class="mt-2 text-sm text-gray-600 text-center">
+                        Apakah Anda yakin ingin menghapus data klasifikasi mitra untuk 
+                        <strong>{{ selectedItemToDelete?.mitra?.nama_perusahaan }}</strong>? 
+                        Tindakan ini tidak dapat dibatalkan.
+                    </p>
+                </div>
+
+                <!-- Error Message -->
+                <div v-if="deleteError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-sm text-red-800">{{ deleteError }}</p>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button
+                        @click="closeDeleteModal"
+                        :disabled="isDeleting"
+                        class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="confirmDelete"
+                        :disabled="isDeleting"
+                        class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+                    >
+                        <span v-if="!isDeleting">Hapus</span>
+                        <span v-else>Menghapus...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
         
     </AdminLayout>
 </template>

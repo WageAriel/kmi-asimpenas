@@ -1,6 +1,6 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 
 // Accept data from the controller as props
@@ -65,6 +65,89 @@ const filteredUsers = computed(() => {
 // Add sorting state
 const sortBy = ref('created_at');
 const sortOrder = ref('desc');
+
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
+// Computed property for total pages
+const totalPages = computed(() => {
+    return Math.ceil(filteredUsers.value.length / itemsPerPage.value);
+});
+
+// Computed property for paginated users
+const paginatedUsers = computed(() => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    const endIndex = startIndex + itemsPerPage.value;
+    return filteredUsers.value.slice(startIndex, endIndex);
+});
+
+// Computed property for visible page numbers
+const visiblePages = computed(() => {
+    const pages = [];
+    const total = totalPages.value;
+    const current = currentPage.value;
+    
+    // Always show first page
+    pages.push(1);
+    
+    // Calculate range around current page
+    let rangeStart = Math.max(2, current - 2);
+    let rangeEnd = Math.min(total - 1, current + 2);
+    
+    // Add ellipsis after first page if needed
+    if (rangeStart > 2) {
+        pages.push('...');
+    }
+    
+    // Add pages around current page
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+        pages.push(i);
+    }
+    
+    // Add ellipsis before last page if needed
+    if (rangeEnd < total - 1) {
+        pages.push('...');
+    }
+    
+    // Always show last page if there's more than one page
+    if (total > 1) {
+        pages.push(total);
+    }
+    
+    return pages;
+});
+
+// Methods for pagination
+const goToPage = (page) => {
+    if (typeof page === 'number' && page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+const resetPagination = () => {
+    currentPage.value = 1;
+};
+
+// Watch search query to reset pagination
+watch(searchQuery, () => {
+    resetPagination();
+});
 
 // Format date
 const formatDate = (dateString) => {
@@ -151,7 +234,7 @@ const getRoleBadgeClass = (role) => {
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="user in filteredUsers" :key="user.id" class="hover:bg-gray-50">
+                            <tr v-for="user in paginatedUsers" :key="user.id" class="hover:bg-gray-50">
                                 <td class="px-4 py-3 text-sm whitespace-nowrap">{{ user.name }}</td>
                                 <td class="px-4 py-3 text-sm whitespace-nowrap">{{ user.email }}</td>
                                 <td class="px-4 py-3 text-sm whitespace-nowrap">
@@ -161,13 +244,73 @@ const getRoleBadgeClass = (role) => {
                                 </td>
                                 <td class="px-4 py-3 text-sm whitespace-nowrap">{{ formatDate(user.created_at) }}</td>
                             </tr>
-                            <tr v-if="filteredUsers.length === 0">
+                            <tr v-if="paginatedUsers.length === 0">
                                 <td colspan="4" class="px-4 py-6 text-center text-gray-500">
                                     {{ searchQuery ? 'Tidak ada user yang sesuai dengan pencarian.' : 'Belum ada data user.' }}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination Controls -->
+                <div v-if="totalPages > 1" class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <!-- Info Text -->
+                        <div class="text-sm text-gray-700">
+                            Menampilkan 
+                            <span class="font-medium">{{ ((currentPage - 1) * itemsPerPage) + 1 }}</span>
+                            sampai 
+                            <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, filteredUsers.length) }}</span>
+                            dari 
+                            <span class="font-medium">{{ filteredUsers.length }}</span>
+                            user
+                        </div>
+
+                        <!-- Pagination Buttons -->
+                        <div class="flex items-center gap-2">
+                            <!-- Previous Button -->
+                            <button
+                                @click="prevPage"
+                                :disabled="currentPage === 1"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Previous
+                            </button>
+
+                            <!-- Page Numbers -->
+                            <template v-for="(page, index) in visiblePages" :key="index">
+                                <button
+                                    v-if="page === '...'"
+                                    disabled
+                                    class="min-w-[40px] px-3 py-2 text-sm font-medium text-gray-400 bg-white cursor-default"
+                                >
+                                    {{ page }}
+                                </button>
+                                <button
+                                    v-else
+                                    @click="goToPage(page)"
+                                    :class="[
+                                        'min-w-[40px] px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                                        page === currentPage
+                                            ? 'bg-purple-600 text-white'
+                                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                                    ]"
+                                >
+                                    {{ page }}
+                                </button>
+                            </template>
+
+                            <!-- Next Button -->
+                            <button
+                                @click="nextPage"
+                                :disabled="currentPage === totalPages"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

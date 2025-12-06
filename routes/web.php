@@ -64,6 +64,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/daftar-mitra/template', [App\Http\Controllers\DataMitraController::class, 'downloadTemplate'])->name('daftar-mitra.template');
     Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
     Route::put('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'updateByAdmin'])->name('admin.daftar-mitra.update');
+    Route::delete('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'destroy'])->name('admin.daftar-mitra.destroy');
     Route::post('/daftar-mitra/bulk-delete', [App\Http\Controllers\DataMitraController::class, 'bulkDelete'])->name('admin.daftar-mitra.bulk-delete');
     
 
@@ -306,9 +307,12 @@ Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'role:su
             'mitras' => $mitras
         ]);
     })->name('daftar-mitra.index');
+    Route::post('/daftar-mitra/import', [App\Http\Controllers\DataMitraController::class, 'import'])->name('daftar-mitra.import');
+    Route::get('/daftar-mitra/template', [App\Http\Controllers\DataMitraController::class, 'downloadTemplate'])->name('daftar-mitra.template');
+    Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
+    Route::put('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'updateByAdmin'])->name('daftar-mitra.update');
     Route::delete('/daftar-mitra/{id}', [App\Http\Controllers\DataMitraController::class, 'destroy'])->name('daftar-mitra.destroy');
     Route::post('/daftar-mitra/bulk-delete', [App\Http\Controllers\DataMitraController::class, 'bulkDelete'])->name('daftar-mitra.bulk-delete');
-    Route::get('/daftar-mitra/export', [App\Http\Controllers\DataMitraController::class, 'export'])->name('daftar-mitra.export');
 
     // 4. Daftar Seleksi Mitra
     Route::get('/seleksi-mitra', function () {
@@ -320,6 +324,10 @@ Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'role:su
             'seleksiMitras' => $seleksiMitras
         ]);
     })->name('seleksi-mitra.index');
+
+    // Download form pengajuan seleksi mitra (Super Admin)
+    Route::get('/seleksi-mitra/{id}/download-form', [PdfGeneratorController::class, 'downloadSeleksiMitraPdf'])
+        ->name('seleksi-mitra.download-form');
 
     // Generate PDF Surat Penetapan Seleksi (Super Admin)
     Route::get('/seleksi-mitra/{id}/surat-penetapan', [PdfGeneratorController::class, 'generateSuratPenetapan'])
@@ -335,6 +343,10 @@ Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'role:su
             'klasifikasiMitras' => $klasifikasiMitras
         ]);
     })->name('klasifikasi-mitra.index');
+
+    // Download Klasifikasi Mitra Form (Super Admin)
+    Route::get('/klasifikasi-mitra/{id}/download-form', [PdfGeneratorController::class, 'downloadKlasifikasiMitraPdf'])
+        ->name('klasifikasi-mitra.download-form');
 
     // Generate PDF Surat Penetapan Klasifikasi (Super Admin)
     Route::get('/klasifikasi-mitra/{id}/surat-penetapan', [PdfGeneratorController::class, 'generateSuratPenetapanKlasifikasi'])
@@ -397,6 +409,20 @@ Route::prefix('super-admin')->name('super-admin.')->middleware(['auth', 'role:su
     // Helper Route for Dynamic Options
     Route::get('/kualitas-options', [PurchaseOrderController::class, 'getKualitasOptions'])
         ->name('purchase-orders.kualitas-options');
+
+    // 8. HPP Management Routes (Super Admin)
+    Route::get('/hpp', [App\Http\Controllers\HppController::class, 'indexSuperAdmin'])
+        ->name('hpp.index');
+    Route::post('/hpp', [App\Http\Controllers\HppController::class, 'store'])
+        ->name('hpp.store');
+    Route::get('/hpp/{id}', [App\Http\Controllers\HppController::class, 'show'])
+        ->name('hpp.show');
+    Route::put('/hpp/{id}', [App\Http\Controllers\HppController::class, 'update'])
+        ->name('hpp.update');
+    Route::delete('/hpp/{id}', [App\Http\Controllers\HppController::class, 'destroy'])
+        ->name('hpp.destroy');
+    Route::patch('/hpp/{id}/toggle-active', [App\Http\Controllers\HppController::class, 'toggleActive'])
+        ->name('hpp.toggle-active');
 });
 
 Route::middleware('auth')->group(function () {

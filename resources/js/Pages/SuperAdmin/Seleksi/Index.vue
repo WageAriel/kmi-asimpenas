@@ -685,6 +685,18 @@ const exportData = () => {
     window.location.href = '/data-seleksi-mitra/export/data';
 };
 
+// Download pengajuan mitra function
+const downloadFormMitra = (submissionId) => {
+    if (!submissionId) {
+        console.error('Submission ID is undefined');
+        return;
+    }
+    
+    const downloadUrl = `/super-admin/seleksi-mitra/${submissionId}/download-form`;
+    console.log('Attempting to download form mitra from:', downloadUrl);
+    window.open(downloadUrl, '_blank');
+};
+
 // Delete functionality
 const showDeleteModal = ref(false);
 const selectedItemToDelete = ref(null);
@@ -744,6 +756,15 @@ const confirmDelete = async () => {
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
+                        <button
+                            @click="openImportModal"
+                            class="inline-flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors duration-200 font-medium shadow-sm"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                            </svg>
+                            Import Excel
+                        </button>
                         <button
                             @click="exportData"
                             class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium shadow-sm"
@@ -823,9 +844,10 @@ const confirmDelete = async () => {
             </transition>
 
             <!-- Tabel Daftar Seleksi Mitra -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 text-xs">
-                    <thead class="bg-gray-50">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 text-xs">
+                        <thead class="bg-gray-50">
                         <tr>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">
                                 <input 
@@ -857,6 +879,7 @@ const confirmDelete = async () => {
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Alat Pemisah Beras</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Status Seleksi</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Surat Penetapan</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Form Pengajuan</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Aksi</th>
                         </tr>
                     </thead>
@@ -980,6 +1003,32 @@ const confirmDelete = async () => {
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="flex gap-2">
                                     <button
+                                        @click="downloadFormMitra(item.id_seleksi_mitra)"
+                                        class="inline-flex items-center px-2 py-1 text-green-600 hover:text-white hover:bg-green-600 border border-green-600 rounded transition-colors duration-200 text-xs"
+                                        title="Download form mitra"
+                                    >
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        Download
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="flex gap-2">
+                                    <button
+                                        @click="lihatSeleksi(item)"
+                                        class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
+                                        title="Lihat detail seleksi"
+                                    >
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        Lihat
+                                    </button>
+                                    
+                                    <button
                                         @click="openDeleteModal(item)"
                                         class="inline-flex items-center px-2 py-1 text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded transition-colors duration-200 text-xs"
                                         title="Hapus data seleksi"
@@ -999,8 +1048,9 @@ const confirmDelete = async () => {
                         </tr>
                     </tbody>
                 </table>
+                </div>
 
-                <!-- Pagination -->
+                <!-- Pagination - Di luar overflow container -->
                 <div v-if="totalPages > 1" class="px-6 py-4 border-t border-gray-200">
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <!-- Page Info -->
@@ -1089,12 +1139,12 @@ const confirmDelete = async () => {
                         </div>
                     </div>
                     
-                    <!-- Kesimpulan Kriteria - Hanya tampil jika belum ada hasil validasi -->
-                    <div v-if="!hasilSeleksi && !loadingHasilSeleksi && selectedItem.status_seleksi === 'pending'" class="border-t border-gray-200 pt-5 mt-5">
-                        <h3 class="text-lg font-semibold mb-4 text-blue-700">📊 Kesimpulan Setiap Kriteria</h3>
-                        <p class="text-sm text-gray-600 mb-4">Tentukan kesimpulan untuk setiap kategori berdasarkan validasi yang sudah dilakukan:</p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <!-- Form Seleksi - Hanya tampil jika belum Ada hasil validasi -->
+                    <template v-if="!hasilSeleksi && !loadingHasilSeleksi">
+                    <!-- Dokumen Perizinan -->
+                    <div class="border-b border-gray-200 pb-5">
+                        <h3 class="text-lg font-semibold mb-3">Dokumen Perizinan</h3>
+                        <div class="grid grid-cols-1 gap-4">
                             <!-- Surat Permohonan -->
                             <div class="grid grid-cols-1 md:grid-cols-3 items-center p-2 rounded-lg hover:bg-gray-50">
                                 <div>
@@ -1439,7 +1489,7 @@ const confirmDelete = async () => {
                     
                     <!-- Kesimpulan Kriteria - Hanya tampil jika belum ada hasil validasi -->
                     <div v-if="!hasilSeleksi && !loadingHasilSeleksi && selectedItem.status_seleksi === 'pending'" class="border-t border-gray-200 pt-5 mt-5">
-                        <h3 class="text-lg font-semibold mb-4 text-blue-700">ðŸ“Š Kesimpulan Setiap Kriteria</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-blue-700">📊 Kesimpulan Setiap Kriteria</h3>
                         <p class="text-sm text-gray-600 mb-4">Tentukan kesimpulan untuk setiap kategori berdasarkan validasi yang sudah dilakukan:</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -1452,8 +1502,8 @@ const confirmDelete = async () => {
                                     v-model="kesimpulanDokumen"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                 >
-                                    <option value="Lolos">âœ“ Lolos</option>
-                                    <option value="Tidak Lolos">âœ— Tidak Lolos</option>
+                                    <option value="Lolos">✓ Lolos</option>
+                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
                                 </select>
                                 <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanDokumen }}</p>
                             </div>
@@ -1468,8 +1518,8 @@ const confirmDelete = async () => {
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                     @change="console.log('Pengeringan changed to:', kesimpulanSaranaPengeringan)"
                                 >
-                                    <option value="Lolos">âœ“ Lolos</option>
-                                    <option value="Tidak Lolos">âœ— Tidak Lolos</option>
+                                    <option value="Lolos">✓ Lolos</option>
+                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
                                 </select>
                                 <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanSaranaPengeringan }}</p>
                             </div>
@@ -1483,8 +1533,8 @@ const confirmDelete = async () => {
                                     v-model="kesimpulanSaranaPenggilingan"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                                 >
-                                    <option value="Lolos">âœ“ Lolos</option>
-                                    <option value="Tidak Lolos">âœ— Tidak Lolos</option>
+                                    <option value="Lolos">✓ Lolos</option>
+                                    <option value="Tidak Lolos">✗ Tidak Lolos</option>
                                 </select>
                                 <p class="text-xs text-gray-500 mt-1">Terpilih: {{ kesimpulanSaranaPenggilingan }}</p>
                             </div>
@@ -1493,15 +1543,15 @@ const confirmDelete = async () => {
                         <!-- Kesimpulan Akhir -->
                         <div class="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-5 mb-4">
                             <label class="block text-base font-bold text-purple-900 mb-3">
-                                ðŸ† Kesimpulan Akhir Validasi
+                                🏆 Kesimpulan Akhir Validasi
                             </label>
                             <select 
                                 v-model="kesimpulanAkhir"
                                 class="w-full px-4 py-3 text-lg font-semibold border-2 border-purple-300 rounded-lg shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
                                 :class="kesimpulanAkhir === 'Lolos' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'"
                             >
-                                <option value="Lolos">âœ“ LOLOS</option>
-                                <option value="Tidak Lolos">âœ— TIDAK LOLOS</option>
+                                <option value="Lolos">✓ LOLOS</option>
+                                <option value="Tidak Lolos">✗ TIDAK LOLOS</option>
                             </select>
                             <p class="text-xs font-semibold text-purple-700 mt-2">Terpilih: {{ kesimpulanAkhir }}</p>
                             <p class="text-xs text-gray-600 mt-1">
@@ -1509,7 +1559,7 @@ const confirmDelete = async () => {
                             </p>
                         </div>
                     </div>
-                   
+                    </template>
                     <!-- End Form Seleksi -->
                     
                     <!-- Status messages -->
@@ -1533,7 +1583,7 @@ const confirmDelete = async () => {
                     </div>
                     
                     <div v-if="!loadingHasilSeleksi && hasilSeleksi" class="border-t border-gray-200 pt-5">
-                        <h3 class="text-lg font-semibold mb-4 text-green-700">ðŸ“‹ Hasil Validasi Seleksi</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-green-700">📋 Hasil Validasi Seleksi</h3>
                         
                         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg mb-4">
                             <div class="flex items-center justify-between">
@@ -1541,7 +1591,7 @@ const confirmDelete = async () => {
                                     <p class="text-sm text-gray-600">Kesimpulan Akhir</p>
                                     <span :class="['inline-flex items-center px-3 py-1 rounded-full text-sm font-bold mt-1', 
                                         hasilSeleksi.kesimpulan_akhir === 'Lolos' ? 'bg-green-500 text-white' : 'bg-red-500 text-white']">
-                                        {{ hasilSeleksi.kesimpulan_akhir === 'Lolos' ? 'âœ“ LOLOS' : 'âœ— TIDAK LOLOS' }}
+                                        {{ hasilSeleksi.kesimpulan_akhir === 'Lolos' ? '✓ LOLOS' : '✗ TIDAK LOLOS' }}
                                     </span>
                                 </div>
                                 <div class="text-right">
@@ -1581,7 +1631,7 @@ const confirmDelete = async () => {
                             <!-- Dokumen Ada & Valid (Lolos) -->
                             <div v-if="hasilSeleksi.dokumen_Ada_valid && hasilSeleksi.dokumen_Ada_valid.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">âœ“ Dokumen Lolos</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Dokumen Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_Ada_valid" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1596,7 +1646,7 @@ const confirmDelete = async () => {
                             <!-- Dokumen Ada Tidak Valid (Ada tapi Tidak Lolos) -->
                             <div v-if="hasilSeleksi.dokumen_ada_tidak_valid && hasilSeleksi.dokumen_ada_tidak_valid.length > 0" 
                                  class="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-orange-800 mb-2">âš  Dokumen Ada Tidak Valid</p>
+                                <p class="text-sm font-semibold text-orange-800 mb-2">⚠ Dokumen Ada Tidak Valid</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_ada_tidak_valid" :key="'ada-tidak-valid-' + index" 
                                         class="text-xs text-orange-700 flex items-center">
@@ -1611,7 +1661,7 @@ const confirmDelete = async () => {
                             <!-- Dokumen Tidak Ada -->
                             <div v-if="hasilSeleksi.dokumen_tidak_ada && hasilSeleksi.dokumen_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">âœ— Dokumen Tidak Ada</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Dokumen Tidak Ada</p>
                                 <ul class="space-y-1">
                                     <li v-for="(dok, index) in hasilSeleksi.dokumen_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1626,7 +1676,7 @@ const confirmDelete = async () => {
                             <!-- Sarana Pengeringan Lolos -->
                             <div v-if="hasilSeleksi.sarana_pengeringan_Ada && hasilSeleksi.sarana_pengeringan_Ada.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">âœ“ Sarana Pengeringan Lolos</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Pengeringan Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_Ada" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1641,7 +1691,7 @@ const confirmDelete = async () => {
                             <!-- Sarana Pengeringan Tidak Lolos -->
                             <div v-if="hasilSeleksi.sarana_pengeringan_tidak_ada && hasilSeleksi.sarana_pengeringan_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">âœ— Sarana Pengeringan Tidak Lolos</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Pengeringan Tidak Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_pengeringan_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1656,7 +1706,7 @@ const confirmDelete = async () => {
                             <!-- Sarana Penggilingan Lolos -->
                             <div v-if="hasilSeleksi.sarana_penggilingan_Ada && hasilSeleksi.sarana_penggilingan_Ada.length > 0" 
                                  class="bg-green-50 border border-green-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-green-800 mb-2">âœ“ Sarana Penggilingan Lolos</p>
+                                <p class="text-sm font-semibold text-green-800 mb-2">✓ Sarana Penggilingan Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_Ada" :key="index" 
                                         class="text-xs text-green-700 flex items-center">
@@ -1671,7 +1721,7 @@ const confirmDelete = async () => {
                             <!-- Sarana Penggilingan Tidak Lolos -->
                             <div v-if="hasilSeleksi.sarana_penggilingan_tidak_ada && hasilSeleksi.sarana_penggilingan_tidak_ada.length > 0" 
                                  class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <p class="text-sm font-semibold text-red-800 mb-2">âœ— Sarana Penggilingan Tidak Lolos</p>
+                                <p class="text-sm font-semibold text-red-800 mb-2">✗ Sarana Penggilingan Tidak Lolos</p>
                                 <ul class="space-y-1">
                                     <li v-for="(sarana, index) in hasilSeleksi.sarana_penggilingan_tidak_ada" :key="index" 
                                         class="text-xs text-red-700 flex items-center">
@@ -1765,7 +1815,7 @@ const confirmDelete = async () => {
                                 </svg>
                                 Menyimpan...
                             </span>
-                            <span v-else>ðŸ’¾ Simpan Hasil Validasi</span>
+                            <span v-else>💾 Simpan Hasil Validasi</span>
                         </button>
                         
                         <!-- Info jika sudah divalidasi -->
@@ -1956,6 +2006,121 @@ const confirmDelete = async () => {
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         {{ isBulkDeleting ? 'Menghapus...' : 'Hapus' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Import Excel -->
+        <div v-if="showImportModal" @click="closeImportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 relative">
+                <button @click="closeImportModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                
+                <h2 class="text-xl font-bold mb-6 text-blue-700">Import Data Seleksi Mitra dari Excel</h2>
+                
+                <div class="space-y-4">
+                    <!-- Info Box -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-medium text-blue-900 mb-1">Panduan Import</h4>
+                                <ul class="text-sm text-blue-700 space-y-1">
+                                    <li>• Download template terlebih dahulu</li>
+                                    <li>• Isi data sesuai format yang tersedia</li>
+                                    <li>• Format file: Excel (.xlsx, .xls) atau CSV</li>
+                                    <li>• Ukuran maksimal: 5MB</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Template Button -->
+                    <div class="flex justify-center">
+                        <button
+                            @click="downloadTemplate"
+                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            Download Template Excel
+                        </button>
+                    </div>
+
+                    <!-- File Upload Area -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                        <input
+                            type="file"
+                            @change="handleFileChange"
+                            accept=".xlsx,.xls,.csv"
+                            class="hidden"
+                            id="fileInputSuperAdmin"
+                        />
+                        <label
+                            for="fileInputSuperAdmin"
+                            class="flex flex-col items-center cursor-pointer"
+                        >
+                            <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                            </svg>
+                            <span class="text-sm font-medium text-gray-700 mb-1">
+                                {{ selectedFile ? selectedFile.name : 'Klik untuk pilih file atau drag & drop' }}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                Excel (.xlsx, .xls) atau CSV (maksimal 5MB)
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div v-if="uploadSuccess" class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span class="text-sm text-green-800">{{ uploadSuccess }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div v-if="uploadError" class="bg-red-50 border border-red-200 rounded-lg p-4 max-h-48 overflow-y-auto">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            <div class="text-sm text-red-800 whitespace-pre-wrap">{{ uploadError }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6">
+                    <button
+                        @click="closeImportModal"
+                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                        :disabled="isUploading"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="uploadFile"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+                        :disabled="!selectedFile || isUploading"
+                    >
+                        <span v-if="isUploading" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Mengupload...
+                        </span>
+                        <span v-else>Upload File</span>
                     </button>
                 </div>
             </div>

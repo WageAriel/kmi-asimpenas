@@ -531,17 +531,54 @@ class DataMitraController extends Controller
             $mitra = DataMitra::findOrFail($id);
 
             $validated = $request->validate([
+                // Data Perusahaan
+                'nama_perusahaan' => 'nullable|string|max:255',
+                'badan_hukum_usaha' => 'nullable|string|max:100',
+                'alamat_perusahaan' => 'nullable|string',
+                'kota_kabupaten' => 'nullable|string|max:100',
+                'provinsi' => 'nullable|string|max:100',
+                'status_perusahaan' => 'nullable|string|max:50',
+                'email' => 'nullable|email|max:255',
+                'no_telp_perusahaan' => 'nullable|string|max:20',
+                
+                // Data Contact Person
+                'nama_cp' => 'nullable|string|max:255',
+                'jabatan' => 'nullable|string|max:100',
+                'nik' => 'nullable|string|max:20',
+                'tempat_lahir' => 'nullable|string|max:100',
+                'tanggal_lahir' => 'nullable|date',
+                'no_telp_cp' => 'nullable|string|max:20',
+                
+                // Data Bank
+                'bank_korespondensi' => 'nullable|string|max:100',
+                'alamat_bank' => 'nullable|string',
+                'no_rekening' => 'nullable|string|max:50',
+                
+                // Data Pajak & Legalitas
+                'npwp' => 'nullable|string|max:20',
+                'pkp' => 'nullable|string|max:50',
+                'keterangan_pkp' => 'nullable|string',
+                'surat_kuasa' => 'nullable|string|max:50',
+                'keterangan_surat_kuasa' => 'nullable|string',
+                
+                // Tanggal Proses
                 'tanggal_seleksi' => 'nullable|date',
                 'tanggal_klasifikasi' => 'nullable|date',
                 'tanggal_penilaian' => 'nullable|date',
                 'tanggal_penetapan' => 'nullable|date',
                 'tanggal_pakta_integritas' => 'nullable|date',
                 'tanggal_surat_permohonan' => 'nullable|date',
-                'keterangan_pkp' => 'nullable|string',
-                'keterangan_surat_kuasa' => 'nullable|string',
+                
+                // Data VMS & Kode Mitra
+                'no_vms' => 'nullable|string|max:50',
+                'kode_mitra' => 'nullable|string|max:50',
             ]);
 
+            // Update mitra with validated data
             $mitra->update($validated);
+
+            // Clear activity cache after update
+            ActivityAggregatorService::clearAllActivitiesCache();
 
             return response()->json([
                 'message' => 'Data mitra berhasil diperbarui',
@@ -558,6 +595,7 @@ class DataMitraController extends Controller
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
+            Log::error('Update mitra error: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage()
             ], 500);

@@ -87,7 +87,8 @@ Route::middleware(['auth:sanctum', 'role:admin,super admin'])->group(function ()
     Route::get('/data-seleksi-mitra/export/data', [DataSeleksiMitraController::class, 'export'])->name('data-seleksi-mitra.export');
     Route::get('/data-seleksi-mitra/export/template', [DataSeleksiMitraController::class, 'downloadTemplate'])->name('data-seleksi-mitra.template');
     
-    // Bulk delete for Data Seleksi Mitra
+    // Delete operations for Data Seleksi Mitra - Admin & Super Admin
+    Route::delete('/data-seleksi-mitra/{id}', [DataSeleksiMitraController::class, 'destroy'])->name('data-seleksi-mitra.destroy');
     Route::post('/data-seleksi-mitra/bulk-delete', [DataSeleksiMitraController::class, 'bulkDelete'])->name('data-seleksi-mitra.bulk-delete');
 
     // Hasil Seleksi Mitra - Admin & Super Admin full CRUD
@@ -102,6 +103,7 @@ Route::middleware(['auth:sanctum', 'role:admin,super admin'])->group(function ()
     Route::get('/klasifikasi-mitra/export/data', [KlasifikasiMitraController::class, 'export'])->name('klasifikasi-mitra.export');
     Route::get('/klasifikasi-mitra/export/template', [KlasifikasiMitraController::class, 'downloadTemplate'])->name('klasifikasi-mitra.template');
     Route::post('/klasifikasi-mitra/bulk-delete', [KlasifikasiMitraController::class, 'bulkDelete'])->name('klasifikasi-mitra.bulk-delete');
+    Route::delete('/klasifikasi-mitra/{id}', [KlasifikasiMitraController::class, 'destroy'])->name('klasifikasi-mitra.destroy');
 
     // Karyawan - Admin & Super Admin bisa akses
     Route::get('/karyawan', [KaryawanController::class, 'index'])->name('karyawan.index');
@@ -113,9 +115,7 @@ Route::middleware(['auth:sanctum', 'role:admin,super admin'])->group(function ()
 Route::middleware(['auth:sanctum', 'role:super admin'])->group(function () {
     // DELETE operations - Hanya Super Admin
     Route::delete('/data-mitra/{id}', [DataMitraController::class, 'destroy'])->name('data-mitra.destroy');
-    Route::delete('/data-seleksi-mitra/{id}', [DataSeleksiMitraController::class, 'destroy'])->name('data-seleksi-mitra.destroy');
     Route::delete('/hasil-seleksi-mitra/{id}', [HasilSeleksiMitraController::class, 'destroy']);
-    Route::delete('/klasifikasi-mitra/{id}', [KlasifikasiMitraController::class, 'destroy'])->name('klasifikasi-mitra.destroy');
     
     // User Management - Hanya Super Admin
     Route::post('/users', [UserController::class, 'store'])->name('users.store');

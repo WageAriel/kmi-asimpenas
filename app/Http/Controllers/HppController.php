@@ -27,6 +27,21 @@ class HppController extends Controller
     }
 
     /**
+     * Display listing for super admin dashboard
+     */
+    public function indexSuperAdmin()
+    {
+        $documents = HppDocument::with('komoditas')
+            ->orderBy('tahun', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('SuperAdmin/HPP/Index', [
+            'documents' => $documents
+        ]);
+    }
+
+    /**
      * Get all HPP documents (API for landing page)
      */
     public function getAllDocuments()

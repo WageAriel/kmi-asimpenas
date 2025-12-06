@@ -1,7 +1,7 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { HomeIcon, UsersIcon, DocumentIcon, ClipboardDocumentCheckIcon, DocumentChartBarIcon, DocumentCheckIcon, ShoppingCartIcon } from '@heroicons/vue/24/outline';
+import { HomeIcon, UsersIcon, DocumentIcon, ClipboardDocumentCheckIcon, DocumentChartBarIcon, DocumentCheckIcon, ShoppingCartIcon, CurrencyDollarIcon } from '@heroicons/vue/24/outline';
 import logoImg from '@/../../resources/assets/Images/bulog.png'; 
 
 const page = usePage();
@@ -71,6 +71,11 @@ const menuItems = [
         name: 'Purchase Orders',
         route: 'super-admin.purchase-orders.index',
         icon: ShoppingCartIcon
+    },
+    {
+        name: 'Manajemen HPP',
+        route: 'super-admin.hpp.index',
+        icon: CurrencyDollarIcon
     }
 ];
 </script>

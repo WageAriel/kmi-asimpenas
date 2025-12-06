@@ -339,6 +339,8 @@ onMounted(() => {
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Mitra</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Evaluasi</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dokumen</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sarana Pengeringan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sarana Penggilingan</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hasil Akhir</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hasil Seleksi</th>
                         </tr>
@@ -350,6 +352,16 @@ onMounted(() => {
                             <td class="text-xs px-6 py-4 whitespace-nowrap">
                                 <span :class="['px-2 py-1 text-xs rounded-full font-medium', getStatusBadge(item.kesimpulan_dokumen)]">
                                     {{ item.kesimpulan_dokumen || 'Belum Ada' }}
+                                </span>
+                            </td>
+                            <td class="text-xs px-6 py-4 whitespace-nowrap">
+                                <span :class="['px-2 py-1 text-xs rounded-full font-medium', getStatusBadge(item.kesimpulan_sarana_pengeringan)]">
+                                    {{ item.kesimpulan_sarana_pengeringan || 'Belum Ada' }}
+                                </span>
+                            </td>
+                            <td class="text-xs px-6 py-4 whitespace-nowrap">
+                                <span :class="['px-2 py-1 text-xs rounded-full font-medium', getStatusBadge(item.kesimpulan_sarana_penggilingan)]">
+                                    {{ item.kesimpulan_sarana_penggilingan || 'Belum Ada' }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
