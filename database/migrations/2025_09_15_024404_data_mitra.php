@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('bank_korespondensi')->nullable();
             $table->string('alamat_bank')->nullable();
             $table->string('no_rekening', 30)->nullable();
+            $table->string('nama_pemilik_rekening')->nullable(); //baru kutambahkan
             $table->string('status_perusahaan')->nullable();
             $table->string('npwp', 30)->nullable();
             $table->enum('pkp', ['Pkp', 'Non Pkp'])->nullable();

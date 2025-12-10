@@ -266,6 +266,7 @@ const editForm = ref({
     bank_korespondensi: '',
     alamat_bank: '',
     no_rekening: '',
+    nama_pemilik_rekening: '',
     status_perusahaan: '',
     npwp: '',
     pkp: '',
@@ -338,6 +339,7 @@ const openEditModal = (mitra) => {
         bank_korespondensi: mitra.bank_korespondensi || '',
         alamat_bank: mitra.alamat_bank || '',
         no_rekening: mitra.no_rekening || '',
+        nama_pemilik_rekening: mitra.nama_pemilik_rekening || '',
         status_perusahaan: mitra.status_perusahaan || '',
         npwp: mitra.npwp || '',
         pkp: mitra.pkp || '',
@@ -378,6 +380,7 @@ const closeEditModal = () => {
         bank_korespondensi: '',
         alamat_bank: '',
         no_rekening: '',
+        nama_pemilik_rekening: '',
         status_perusahaan: '',
         npwp: '',
         pkp: '',
@@ -993,6 +996,11 @@ watch(searchQuery, () => {
                         <span class="font-medium text-gray-900">{{ selectedMitra.no_rekening || '-' }}</span>
                     </div>
                     
+                    <div>
+                        <span class="block text-sm text-gray-500">Nama Pemilik Rekening</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.nama_pemilik_rekening || '-' }}</span>
+                    </div>
+                    
                     <div class="col-span-2 border-t border-gray-200 pt-4 mt-2">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Informasi Pajak</h3>
                     </div>
@@ -1412,6 +1420,18 @@ watch(searchQuery, () => {
                                     v-model="editForm.no_rekening"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Nomor rekening"
+                                />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Nama Pemilik Rekening
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="editForm.nama_pemilik_rekening"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Nama pemilik rekening"
                                 />
                             </div>
 

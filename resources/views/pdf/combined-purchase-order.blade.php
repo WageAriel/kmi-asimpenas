@@ -406,7 +406,7 @@
                 <div class="fp-info-value">{{ $mitra->nik ?? '' }}</div>
                 <div class="fp-info-label" style="padding-left: 50px;">Nama Pemilik</div>
                 <div class="fp-info-separator" style="padding-left: 25px;">:</div>
-                <div class="fp-info-value" style="padding-left: 15px;">{{ $mitra->nama_cp ?? '' }}</div>
+                <div class="fp-info-value" style="padding-left: 15px;">{{ $mitra->nama_pemilik_rekening ?? '' }}</div>
             </div>
             <div class="fp-info-row">
                 <div class="fp-info-label">Nomor Telepon/HP</div>

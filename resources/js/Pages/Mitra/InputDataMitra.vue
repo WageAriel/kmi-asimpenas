@@ -21,6 +21,7 @@ const form = ref({
   bank_korespondensi: "",
   alamat_bank: "",
   no_rekening: "",
+  nama_pemilik_rekening: "",
   status_perusahaan: "",
   npwp:"",
   pkp:"",
@@ -131,6 +132,7 @@ const getEmptyFields = () => {
     { key: 'bank_korespondensi', label: 'Bank Korespondensi' },
     { key: 'alamat_bank', label: 'Alamat Bank' },
     { key: 'no_rekening', label: 'No Rekening' },
+    { key: 'nama_pemilik_rekening', label: 'Nama Pemilik Rekening' },
     { key: 'status_perusahaan', label: 'Status Perusahaan' },
     { key: 'npwp', label: 'NPWP' },
     { key: 'pkp', label: 'PKP' },
@@ -723,6 +725,23 @@ const generatePaktaIntegritasPdf = async () => {
                   form.no_rekening.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
                 ]"
                 placeholder="Masukkan nomor rekening"
+              />
+            </div>
+
+            <!-- Nama Pemilik Rekening -->
+            <div class="space-y-2">
+              <label for="nama_pemilik_rekening" class="block text-sm font-medium">
+                Nama Pemilik Rekening <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="nama_pemilik_rekening"
+                v-model="form.nama_pemilik_rekening"
+                :class="[
+                  'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
+                  form.nama_pemilik_rekening.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                ]"
+                placeholder="Masukkan nama pemilik rekening"
               />
             </div>
 

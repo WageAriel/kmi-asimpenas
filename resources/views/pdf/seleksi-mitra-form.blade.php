@@ -142,7 +142,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">1 Nama Perusahaan</td>
+                <td width="200">1. Nama Perusahaan</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->nama_perusahaan }}</td>
             </tr>
@@ -151,7 +151,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">2 Badan Hukum/Usaha</td>
+                <td width="200">2. Badan Hukum/Usaha</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->badan_hukum_usaha }}</td>
             </tr>
@@ -160,7 +160,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">3 Alamat Perusahaan</td>
+                <td width="200">3. Alamat Perusahaan</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->alamat_perusahaan }}</td>
             </tr>
@@ -169,7 +169,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">4 Nomor Telp Perusahaan</td>
+                <td width="200">4. Nomor Telp Perusahaan</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->no_telp_perusahaan }}</td>
             </tr>
@@ -178,7 +178,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">5 Nama Contact Person</td>
+                <td width="200">5. Nama Contact Person</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->nama_cp }}</td>
             </tr>
@@ -187,7 +187,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">6 Nomor Telp/HP Contact Person</td>
+                <td width="200">6. Nomor Telp/HP Contact Person</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->no_telp_cp }}</td>
             </tr>
@@ -196,7 +196,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">7 Nama Bank Koresponden</td>
+                <td width="200">7. Nama Bank Koresponden</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->bank_korespondensi }}</td>
             </tr>
@@ -205,7 +205,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">8 Alamat Bank Koresponden</td>
+                <td width="200">8. Alamat Bank Koresponden</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->alamat_bank }}</td>
             </tr>
@@ -214,7 +214,7 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">9 Nomor Rekening</td>
+                <td width="200">9. Nomor Rekening</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->no_rekening }}</td>
             </tr>
@@ -223,7 +223,16 @@
     <div class="data-item">
         <table>
             <tr>
-                <td width="200">10 Status</td>
+                <td width="200">10. Nama Pemilik Rekening</td>
+                <td width="10">:</td>
+                <td>{{ $mitra->nama_pemilik_rekening }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="data-item">
+        <table>
+            <tr>
+                <td width="200">11. Status</td>
                 <td width="10">:</td>
                 <td>{{ $mitra->status_perusahaan }}</td>
             </tr>

@@ -100,6 +100,7 @@ class DataMitraImport implements ToModel, WithHeadingRow, WithValidation, SkipsE
             'bank_korespondensi' => $row['bank_korespondensi'] ?? null,
             'alamat_bank' => $row['alamat_bank'] ?? null,
             'no_rekening' => $this->formatNumericString($row['no_rekening'] ?? null),
+            'nama_pemilik_rekening' => $row['nama_pemilik_rekening'] ?? null,
             'status_perusahaan' => $row['status_perusahaan'] ?? null,
             'npwp' => $this->formatNumericString($row['npwp'] ?? null),
             'pkp' => $row['pkp'] ?? null,

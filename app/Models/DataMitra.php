@@ -41,6 +41,7 @@ class DataMitra extends Model
         'no_vms',
         'kode_mitra',
         'jabatan',
+        'nama_pemilik_rekening',
     ];
 
     protected $dates = [

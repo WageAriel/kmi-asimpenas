@@ -178,7 +178,7 @@
                 <div class="info-value">{{ $mitra->nik ?? '' }}</div>
                 <div class="info-label" style="padding-left: 50px;">Nama Pemilik</div>
                 <div class="info-separator" style="padding-left: 25px;">:</div>
-                <div class="info-value" style="padding-left: 15px;">{{ $mitra->nama_cp ?? '' }}</div>
+                <div class="info-value" style="padding-left: 15px;">{{ $mitra->nama_pemilik_rekening ?? '' }}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">Nomor Telepon/HP</div>
