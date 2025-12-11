@@ -411,7 +411,15 @@
             <div class="signature-content">
                 <p>Calon Mitra Pangan,</p>
                 <div class="signature-space"></div>
-                <p><strong><u>{{ $mitra->nama_cp }}</u></strong><br>{{ $mitra->nama_perusahaan }}</p>
+                <p>
+                    <strong><u>
+                        @if($seleksi->surat_kuasa === 'Ada' && !empty($mitra->nama_yang_dikuasakan))
+                            {{ $mitra->nama_yang_dikuasakan }}
+                        @else
+                            {{ $mitra->nama_cp }}
+                        @endif
+                    </u></strong><br>{{ $mitra->nama_perusahaan }}
+                </p>
             </div>
             <div class="clear"></div>
         </div>

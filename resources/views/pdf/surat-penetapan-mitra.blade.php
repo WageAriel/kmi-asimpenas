@@ -116,7 +116,13 @@
         <div class="signature-left">
             <p>Mitra Pangan,</p>
             <div class="signature-space"></div>
-            <p style="margin: 0; font-weight: bold;"><u>{{ $mitra->nama_cp }}</u></p>
+            <p style="margin: 0; font-weight: bold;"><u>
+                        @if($seleksi->surat_kuasa === 'Ada' && !empty($mitra->nama_yang_dikuasakan))
+                            {{ $mitra->nama_yang_dikuasakan }}
+                        @else
+                            {{ $mitra->nama_cp }}
+                        @endif
+                    </u></p>
             <p style="margin: 0;">{{ $mitra->nama_perusahaan }}</p>
         </div>
         <div class="signature-right">

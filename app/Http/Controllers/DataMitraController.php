@@ -407,6 +407,13 @@ class DataMitraController extends Controller
             'kode_mitra' => 'nullable|string|unique:data_mitra,kode_mitra,' . $id . ',id_mitra|max:50',
         ]);
 
+        // If surat_kuasa is changed to "Tidak Ada", clear the kuasa fields
+        if (isset($validated['surat_kuasa']) && $validated['surat_kuasa'] === 'Tidak Ada') {
+            $validated['nama_yang_dikuasakan'] = null;
+            $validated['nik_yang_dikuasakan'] = null;
+            $validated['alamat_yang_dikuasakan'] = null;
+        }
+
         $mitra->update($validated);
         if ($mitra->user) {
             $userUpdateData = [];
@@ -593,6 +600,13 @@ class DataMitraController extends Controller
                 'no_vms' => 'nullable|string|max:50',
                 'kode_mitra' => 'nullable|string|max:50',
             ]);
+
+            // If surat_kuasa is changed to "Tidak Ada", clear the kuasa fields
+            if (isset($validated['surat_kuasa']) && $validated['surat_kuasa'] === 'Tidak Ada') {
+                $validated['nama_yang_dikuasakan'] = null;
+                $validated['nik_yang_dikuasakan'] = null;
+                $validated['alamat_yang_dikuasakan'] = null;
+            }
 
             // Update mitra with validated data
             $mitra->update($validated);

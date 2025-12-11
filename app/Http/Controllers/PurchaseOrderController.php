@@ -370,11 +370,20 @@ class PurchaseOrderController extends Controller
             ? $purchaseOrder->tanggal_pembuatan->locale('id')->translatedFormat('d F Y')
             : Carbon::now()->locale('id')->translatedFormat('d F Y');
 
+        // Tentukan nama penandatangan berdasarkan surat kuasa
+        $namaPenandatangan = $purchaseOrder->mitra->nama_cp ?? $purchaseOrder->created_by ?? '';
+        if ($purchaseOrder->mitra && 
+            $purchaseOrder->mitra->surat_kuasa === 'Ada' && 
+            !empty($purchaseOrder->mitra->nama_yang_dikuasakan)) {
+            $namaPenandatangan = $purchaseOrder->mitra->nama_yang_dikuasakan;
+        }
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'mitra' => $purchaseOrder->mitra,
             'tanggal' => $tanggal,
             'no_surat' => $purchaseOrder->no_surat ?? 'NO Test',
+            'nama_penandatangan' => $namaPenandatangan,
         ];
 
         $pdf = Pdf::loadView('pdf.surat-permohonan', $data);
@@ -396,10 +405,19 @@ class PurchaseOrderController extends Controller
             ? $purchaseOrder->tanggal_pembuatan->locale('id')->translatedFormat('d F Y')
             : Carbon::now()->locale('id')->translatedFormat('d F Y');
 
+        // Tentukan nama penandatangan berdasarkan surat kuasa
+        $namaPenandatangan = $purchaseOrder->mitra->nama_cp ?? $purchaseOrder->created_by ?? '';
+        if ($purchaseOrder->mitra && 
+            $purchaseOrder->mitra->surat_kuasa === 'Ada' && 
+            !empty($purchaseOrder->mitra->nama_yang_dikuasakan)) {
+            $namaPenandatangan = $purchaseOrder->mitra->nama_yang_dikuasakan;
+        }
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'mitra' => $purchaseOrder->mitra,
             'tanggal' => $tanggal,
+            'nama_penandatangan' => $namaPenandatangan,
         ];
 
         $pdf = Pdf::loadView('pdf.form-penawaran', $data);
@@ -424,10 +442,19 @@ class PurchaseOrderController extends Controller
             ? $purchaseOrder->tanggal_pembuatan->locale('id')->translatedFormat('d F Y')
             : Carbon::now()->locale('id')->translatedFormat('d F Y');
 
+        // Tentukan nama penandatangan berdasarkan surat kuasa
+        $namaPenandatangan = $mitra->nama_cp ?? $purchaseOrder->created_by ?? '';
+        if ($mitra && 
+            $mitra->surat_kuasa === 'Ada' && 
+            !empty($mitra->nama_yang_dikuasakan)) {
+            $namaPenandatangan = $mitra->nama_yang_dikuasakan;
+        }
+
         $data = [
             'purchaseOrder' => $purchaseOrder,
             'mitra' => $mitra,
             'tanggal' => $tanggal,
+            'nama_penandatangan' => $namaPenandatangan,
         ];
 
         // Generate PDF 1: Surat Permohonan

@@ -167,7 +167,7 @@
                 <tr>
                     <td>4. Status</td>
                     <td>:</td>
-                    <td><strong>{{ $klasifikasi->mitra->status ?? 'Penggilingan' }}</strong></td>
+                    <td><strong>{{ $klasifikasi->mitra->status_perusahaan ?? 'Penggilingan' }}</strong></td>
                 </tr>
             </table>
         </div>
@@ -386,10 +386,17 @@
         <div class="signature-section">
                 <p>Dengan ini, kami menyatakan bahwa data dan/atau informasi yang kami berikan adalah benar.</p>
                 
+                @php
+                    $namaPenandatangan = $klasifikasi->mitra->nama_cp;
+                    if ($klasifikasi->mitra->surat_kuasa === 'Ada' && !empty($klasifikasi->mitra->nama_yang_dikuasakan)) {
+                        $namaPenandatangan = $klasifikasi->mitra->nama_yang_dikuasakan;
+                    }
+                @endphp
+                
                 <div class="signature-box">
                     <p>Mitra Pangan,</p>
                     <div class="signature-space"></div>
-                    <p><u style="font-weight: bold;">{{ $klasifikasi->mitra->nama_cp }}</u><br>
+                    <p><u style="font-weight: bold;">{{ $namaPenandatangan }}</u><br>
                     {{ $klasifikasi->mitra->nama_perusahaan }}</p>
                 </div>
             </div>

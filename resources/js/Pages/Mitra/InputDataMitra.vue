@@ -43,6 +43,13 @@ const isSubmitting = ref(false);
 const mitraId = ref(null);
 const samaDenganCP = ref(false);
 
+// Surat Kuasa modal states
+const showSuratKuasaModal = ref(false);
+const suratKuasaForm = ref({
+  tempat: '',
+  tanggal: new Date().toISOString().split('T')[0] // Default to today
+});
+
 // Notification states
 const notification = ref({
   show: false,
@@ -292,15 +299,52 @@ const generateSuratPernyataanNonPkpPdf = async () => {
     }
 };
 
-const downloadTemplateSuratKuasa = () => {
-    const link = document.createElement('a');
-    link.href = '/storage/templates/SURAT KUASA.docx';
-    link.setAttribute('download', 'Template-Surat-Kuasa.docx');
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+const openSuratKuasaModal = () => {
+    if (!mitraId.value) {
+        errorMessage.value = "Silakan simpan data mitra terlebih dahulu sebelum generate PDF";
+        return;
+    }
     
-    showNotification('success', 'Berhasil!', 'Template Surat Kuasa berhasil diunduh');
+    // Reset form with today's date
+    suratKuasaForm.value = {
+        tempat: '',
+        tanggal: new Date().toISOString().split('T')[0]
+    };
+    
+    showSuratKuasaModal.value = true;
+};
+
+const generateSuratKuasaPdf = async () => {
+    if (!suratKuasaForm.value.tempat || !suratKuasaForm.value.tanggal) {
+        showNotification('error', 'Gagal!', 'Mohon lengkapi tempat dan tanggal');
+        return;
+    }
+
+    isSubmitting.value = true;
+    try {
+        const response = await axios.post(
+            `/mitra/data-mitra/${mitraId.value}/surat-kuasa`,
+            suratKuasaForm.value,
+            { responseType: 'blob' }
+        );
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Surat-Kuasa-${form.value.nama_perusahaan}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        showSuratKuasaModal.value = false;
+        showNotification('success', 'Berhasil!', 'PDF Surat Kuasa berhasil diunduh');
+    } catch (error) {
+        console.error('Error generating Surat Kuasa PDF:', error);
+        showNotification('error', 'Gagal!', 'Terjadi kesalahan saat generate PDF');
+    } finally {
+        isSubmitting.value = false;
+    }
 };
 
 const generatePaktaIntegritasPdf = async () => {
@@ -1037,14 +1081,14 @@ const generatePaktaIntegritasPdf = async () => {
             <button 
                 v-if="form.surat_kuasa === 'Ada'"
                 type="button" 
-                @click="downloadTemplateSuratKuasa"
+                @click="openSuratKuasaModal"
                 class="w-full px-4 py-3 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors bg-orange-600 text-white hover:bg-orange-700 cursor-pointer"
             >
                 <span class="flex items-center justify-center">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                   </svg>
-                  Template Surat Kuasa
+                  Generate Surat Kuasa
                 </span>
             </button>
           </div>
@@ -1093,6 +1137,90 @@ const generatePaktaIntegritasPdf = async () => {
         </div>
       </div>
     </div>
+
+    <!-- Modal Generate Surat Kuasa -->
+    <div v-if="showSuratKuasaModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" @click="showSuratKuasaModal = false"></div>
+
+        <!-- Modal panel -->
+        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-orange-100 rounded-full sm:mx-0 sm:h-10 sm:w-10">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">
+                  Generate Surat Kuasa
+                </h3>
+                <div class="mt-4 space-y-4">
+                  <!-- Tempat Input -->
+                  <div>
+                    <label for="tempat" class="block text-sm font-medium text-gray-700">
+                      Tempat <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="tempat"
+                      v-model="suratKuasaForm.tempat"
+                      type="text"
+                      placeholder="Contoh: Surakarta"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm px-3 py-2 border"
+                      required
+                    />
+                  </div>
+
+                  <!-- Tanggal Input -->
+                  <div>
+                    <label for="tanggal" class="block text-sm font-medium text-gray-700">
+                      Tanggal <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="tanggal"
+                      v-model="suratKuasaForm.tanggal"
+                      type="date"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm px-3 py-2 border"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Modal footer -->
+          <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              @click="generateSuratKuasaPdf"
+              :disabled="isSubmitting"
+              class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-orange-600 border border-transparent rounded-md shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span v-if="isSubmitting" class="flex items-center">
+                <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+              </span>
+              <span v-else>Generate PDF</span>
+            </button>
+            <button
+              type="button"
+              @click="showSuratKuasaModal = false"
+              :disabled="isSubmitting"
+              class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Batal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </MitraLayout>
 </template>
 

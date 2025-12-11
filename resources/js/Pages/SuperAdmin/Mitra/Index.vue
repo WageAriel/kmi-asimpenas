@@ -420,11 +420,15 @@ const updateMitra = async () => {
         
         updateSuccess.value = 'Data mitra berhasil diperbarui';
         
-        // Reload page after successful update
+        // Close modal and reload page after successful update
+        closeEditModal();
+        
         setTimeout(() => {
-            router.reload();
-            closeEditModal();
-        }, 1500);
+            router.visit(route('super-admin.daftar-mitra.index'), {
+                preserveScroll: false,
+                preserveState: false
+            });
+        }, 500);
 
     } catch (error) {
         console.error('Update error:', error);

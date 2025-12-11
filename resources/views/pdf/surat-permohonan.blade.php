@@ -330,7 +330,7 @@
         <div>Surakarta, {{ $tanggal }}</div>
         <div style="margin-top: 3px;">Pemohon</div>
         <div class="signature-space"></div>
-        <div style="margin-top: 5px;"><strong>{{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? '') }}</strong></div>
+        <div style="margin-top: 5px;"><strong>{{ strtoupper($nama_penandatangan ?? '') }}</strong></div>
         <div style="margin-top: 3px;">{{ $purchaseOrder->nama_perusahaan }}</div>
     </div>
 

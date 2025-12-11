@@ -232,6 +232,10 @@ Route::prefix('mitra')->name('mitra.')->middleware(['auth', 'role:mitra'])->grou
     Route::get('/data-mitra/{id}/pakta-integritas', [PdfGeneratorController::class, 'generatePaktaIntegritas'])
         ->name('data-mitra.pakta-integritas');
 
+    // Generate PDF Surat Kuasa
+    Route::post('/data-mitra/{id}/surat-kuasa', [PdfGeneratorController::class, 'generateSuratKuasa'])
+        ->name('data-mitra.surat-kuasa');
+
     //untuk mengakses form pengajuan seleksi
     Route::get('/pengajuan-seleksi/form', function () {
         return Inertia::render('Mitra/PengajuanSeleksi/Form');

@@ -323,11 +323,17 @@
     <div class="signatures">
         <div class="signature-row">
             <!-- Left signature -->
+             @php
+                    $namaPenandatangan = $klasifikasi->mitra->nama_cp;
+                    if ($klasifikasi->mitra->surat_kuasa === 'Ada' && !empty($klasifikasi->mitra->nama_yang_dikuasakan)) {
+                        $namaPenandatangan = $klasifikasi->mitra->nama_yang_dikuasakan;
+                    }
+                @endphp
             <div class="signature-box">
                 <br>
                 <p class="signature-text">Mitra Pangan,</p>
                 <div class="signature-space"></div>
-                <p class="signature-text" style="font-weight: bold;"><u>{{ $nama_cp }}</u></p>
+                <p class="signature-text" style="font-weight: bold;"><u>{{ $namaPenandatangan }}</u></p>
                 <p class="signature-text">{{ $nama_perusahaan }}</p>
             </div>
 

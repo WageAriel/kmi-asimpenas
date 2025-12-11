@@ -274,7 +274,7 @@
             <div style="position: absolute; top: 36px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
             <div style="flex-grow: 1;"></div>
             <div style="position: absolute; bottom: 30px; left: 0; right: 0; border-bottom: 1px solid #000; margin: 0 -1px;"></div>
-            <div style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; font-size: 7pt;"><strong>{{ strtoupper($mitra->nama_cp ?? $purchaseOrder->created_by ?? '') }}</strong></div>
+            <div style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; font-size: 7pt;"><strong>{{ strtoupper($nama_penandatangan ?? '') }}</strong></div>
             <div style="position: absolute; bottom: 1px; left: 0; right: 0; text-align: center; font-size: 7pt;">{{ $purchaseOrder->nama_perusahaan }}</div>
         </div>
         <div style="display: table-cell; width: 4%;"></div>

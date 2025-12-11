@@ -384,6 +384,12 @@ class PdfGeneratorController extends Controller
                 $keteranganPenggilingan .= "Sarana Tidak Memenuhi : " . implode(', ', $penggilinganTidakAda);
             }
             
+            // Determine nama penandatangan berdasarkan surat kuasa
+            $namaPjMitra = $hasilSeleksi->mitra->nama_cp;
+            if ($hasilSeleksi->seleksiMitra->surat_kuasa === 'Ada' && !empty($hasilSeleksi->mitra->nama_yang_dikuasakan)) {
+                $namaPjMitra = $hasilSeleksi->mitra->nama_yang_dikuasakan;
+            }
+
             $data = [
                 'nomor_surat' => $nomorSurat,
                 'tahun' => $tahunPengajuan,
@@ -405,7 +411,7 @@ class PdfGeneratorController extends Controller
                 'status_mitra' => $hasilSeleksi->mitra->status_perusahaan ?? 'Penggilingan',
                 'hasil_seleksi' => $hasilSeleksi,
                 'hasil_akhir' => strtoupper($hasilSeleksi->kesimpulan_akhir),
-                'nama_pj_mitra' => $hasilSeleksi->mitra->nama_cp,
+                'nama_pj_mitra' => $namaPjMitra,
                 'nama_pj_bulog' => $pengetahui->nama_karyawan,
                 'pelaksana' => $pelaksana,
                 'pengetahui' => $pengetahui,
@@ -644,7 +650,9 @@ class PdfGeneratorController extends Controller
                 'nomor_urut_klasifikasi' => sprintf("%02d", $urutanDataKlasifikasi),
                 'hasil_klasifikasi' => $klasifikasi->hasil_klasifikasi,
                 'kantor_cabang' => 'Surakarta',
-                'nama_mitra' => $klasifikasi->mitra->nama_cp,
+                'nama_mitra' => ($klasifikasi->mitra->surat_kuasa === 'Ada' && !empty($klasifikasi->mitra->nama_yang_dikuasakan)) 
+                    ? $klasifikasi->mitra->nama_yang_dikuasakan 
+                    : $klasifikasi->mitra->nama_cp,
                 'nama_pejabat' => $karyawan->nama_karyawan,
                 'jabatan_pejabat' => $karyawan->jabatan
             ];
@@ -773,6 +781,52 @@ class PdfGeneratorController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Pakta Integritas PDF Generation Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function generateSuratKuasa(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'tempat' => 'required|string|max:255',
+                'tanggal' => 'required|date'
+            ]);
+
+            $mitra = DataMitra::where('id_mitra', $id)
+                            ->where('user_id', auth()->id())
+                            ->firstOrFail();
+            
+            // Format tanggal ke bahasa Indonesia
+            Carbon::setLocale('id');
+            $tanggal = Carbon::parse($validated['tanggal'])->isoFormat('D MMMM Y');
+            
+            $data = [
+                'tempat' => $validated['tempat'],
+                'tanggal' => $tanggal,
+                // Yang memberi kuasa (CP)
+                'nama_pemberi' => $mitra->nama_cp,
+                'nik_pemberi' => $mitra->nik,
+                'alamat_pemberi' => $mitra->alamat_perusahaan,
+                'jabatan_pemberi' => $mitra->jabatan ?? 'Direktur',
+                // Yang diberi kuasa
+                'nama_penerima' => $mitra->nama_yang_dikuasakan,
+                'nik_penerima' => $mitra->nik_yang_dikuasakan,
+                'alamat_penerima' => $mitra->alamat_yang_dikuasakan,
+                // Data rekening
+                'no_rekening' => $mitra->no_rekening,
+                'nama_pemilik_rekening' => $mitra->nama_pemilik_rekening,
+                'bank' => $mitra->bank_korespondensi,
+                'nama_perusahaan' => $mitra->nama_perusahaan
+            ];
+
+            $pdf = PDF::loadView('pdf.surat-kuasa', $data);
+            $pdf->setPaper('A4', 'portrait');
+            
+            return $pdf->download('Surat-Kuasa-' . str_replace(' ', '-', $mitra->nama_perusahaan) . '.pdf');
+            
+        } catch (\Exception $e) {
+            Log::error('Surat Kuasa PDF Generation Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
