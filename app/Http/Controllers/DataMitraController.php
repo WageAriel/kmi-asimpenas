@@ -171,6 +171,9 @@ class DataMitraController extends Controller
             'npwp',
             'pkp',
             'surat_kuasa',
+            'nama_yang_dikuasakan',
+            'nik_yang_dikuasakan',
+            'alamat_yang_dikuasakan',
             'tanggal_seleksi',
             'tanggal_klasifikasi',
             'tanggal_penilaian',
@@ -203,6 +206,9 @@ class DataMitraController extends Controller
             '01.234.567.8-901.000',
             'Pkp',
             'Ada',
+            'Budi Santoso',
+            '3174013456789012',
+            'Jl. Kuasa No. 456, Jakarta Pusat',
             '2025-01-01',
             '2025-01-15',
             '2025-02-01',
@@ -241,7 +247,7 @@ class DataMitraController extends Controller
             
             // For text columns, explicitly set as string with text format
             $currentHeader = $headers[ord($column) - ord('A')];
-            $textColumns = ['nik', 'npwp', 'no_rekening', 'no_telp_perusahaan', 'no_telp_cp'];
+            $textColumns = ['nik', 'npwp', 'no_rekening', 'no_telp_perusahaan', 'no_telp_cp', 'nik_yang_dikuasakan'];
             
             if (in_array($currentHeader, $textColumns)) {
                 // Set value explicitly as string
@@ -332,6 +338,9 @@ class DataMitraController extends Controller
             'npwp' => 'nullable|string|max:30',
             'pkp' => 'nullable|in:Pkp,Non Pkp',
             'surat_kuasa' => 'nullable|in:Ada,Tidak Ada',
+            'nama_yang_dikuasakan' => 'nullable|string|max:255',
+            'nik_yang_dikuasakan' => 'nullable|string|max:30',
+            'alamat_yang_dikuasakan' => 'nullable|string',
             'tanggal_seleksi' => 'nullable|date',
             'tanggal_klasifikasi' => 'nullable|date',
             'tanggal_penilaian' => 'nullable|date',
@@ -380,6 +389,9 @@ class DataMitraController extends Controller
             'alamat_bank' => 'nullable|string|max:255',
             'no_rekening' => 'nullable|string|max:30',
             'nama_pemilik_rekening' => 'nullable|string|max:255',
+            'nama_yang_dikuasakan' => 'nullable|string|max:255',
+            'nik_yang_dikuasakan' => 'nullable|string|max:30',
+            'alamat_yang_dikuasakan' => 'nullable|string',
             'status_perusahaan' => 'nullable|string|max:255',
             'npwp' => 'nullable|string|max:30',
             'pkp' => 'nullable|in:Pkp,Non Pkp',
@@ -565,6 +577,9 @@ class DataMitraController extends Controller
                 'keterangan_pkp' => 'nullable|string',
                 'surat_kuasa' => 'nullable|string|max:50',
                 'keterangan_surat_kuasa' => 'nullable|string',
+                'nama_yang_dikuasakan' => 'nullable|string|max:255',
+                'nik_yang_dikuasakan' => 'nullable|string|max:20',
+                'alamat_yang_dikuasakan' => 'nullable|string',
                 
                 // Tanggal Proses
                 'tanggal_seleksi' => 'nullable|date',

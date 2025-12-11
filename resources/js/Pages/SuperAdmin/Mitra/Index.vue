@@ -270,6 +270,9 @@ const editForm = ref({
     keterangan_pkp: '',
     surat_kuasa: '',
     keterangan_surat_kuasa: '',
+    nama_yang_dikuasakan: '',
+    nik_yang_dikuasakan: '',
+    alamat_yang_dikuasakan: '',
     tanggal_seleksi: '',
     tanggal_klasifikasi: '',
     tanggal_penilaian: '',
@@ -283,6 +286,7 @@ const editForm = ref({
 const isUpdating = ref(false);
 const updateError = ref(null);
 const updateSuccess = ref(null);
+const samaDenganCPSuperAdmin = ref(false);
 
 // Import functionality
 const showImportModal = ref(false);
@@ -343,6 +347,9 @@ const openEditModal = (mitra) => {
         keterangan_pkp: mitra.keterangan_pkp || '',
         surat_kuasa: mitra.surat_kuasa || '',
         keterangan_surat_kuasa: mitra.keterangan_surat_kuasa || '',
+        nama_yang_dikuasakan: mitra.nama_yang_dikuasakan || '',
+        nik_yang_dikuasakan: mitra.nik_yang_dikuasakan || '',
+        alamat_yang_dikuasakan: mitra.alamat_yang_dikuasakan || '',
         tanggal_seleksi: mitra.tanggal_seleksi || '',
         tanggal_klasifikasi: mitra.tanggal_klasifikasi || '',
         tanggal_penilaian: mitra.tanggal_penilaian || '',
@@ -353,6 +360,7 @@ const openEditModal = (mitra) => {
         no_vms: mitra.no_vms || '',
         kode_mitra: mitra.kode_mitra || ''
     };
+    samaDenganCPSuperAdmin.value = false;
     showEditModal.value = true;
     updateError.value = null;
     updateSuccess.value = null;
@@ -360,6 +368,7 @@ const openEditModal = (mitra) => {
 
 const closeEditModal = () => {
     showEditModal.value = false;
+    samaDenganCPSuperAdmin.value = false;
     editForm.value = {
         id_mitra: null,
         nama_perusahaan: '',
@@ -384,6 +393,9 @@ const closeEditModal = () => {
         keterangan_pkp: '',
         surat_kuasa: '',
         keterangan_surat_kuasa: '',
+        nama_yang_dikuasakan: '',
+        nik_yang_dikuasakan: '',
+        alamat_yang_dikuasakan: '',
         tanggal_seleksi: '',
         tanggal_klasifikasi: '',
         tanggal_penilaian: '',
@@ -1020,6 +1032,11 @@ watch(searchQuery, () => {
                         <span class="font-medium text-gray-900">{{ selectedMitra.keterangan_pkp }}</span>
                     </div>
                     
+
+                    <div class="col-span-2 border-t border-gray-200 pt-4 mt-2">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Data Kuasa?</h3>
+                    </div>
+
                     <div>
                         <span class="block text-sm text-gray-500">Surat Kuasa</span>
                         <span class="font-medium text-gray-900">{{ selectedMitra.surat_kuasa === 'Ada' ? 'Ada' : 'Tidak Ada' }}</span>
@@ -1029,6 +1046,24 @@ watch(searchQuery, () => {
                         <span class="block text-sm text-gray-500">Keterangan Surat Kuasa</span>
                         <span class="font-medium text-gray-900">{{ selectedMitra.keterangan_surat_kuasa }}</span>
                     </div>
+
+                    <!-- Data Kuasa - Only show if surat_kuasa is 'Ada' -->
+                    <template v-if="selectedMitra.surat_kuasa === 'Ada'">
+                        <div>
+                            <span class="block text-sm text-gray-500">Nama Yang Dikuasakan</span>
+                            <span class="font-medium text-gray-900">{{ selectedMitra.nama_yang_dikuasakan || '-' }}</span>
+                        </div>
+
+                        <div>
+                            <span class="block text-sm text-gray-500">NIK Yang Dikuasakan</span>
+                            <span class="font-medium text-gray-900">{{ selectedMitra.nik_yang_dikuasakan || '-' }}</span>
+                        </div>
+
+                        <div class="col-span-2">
+                            <span class="block text-sm text-gray-500">Alamat Yang Dikuasakan</span>
+                            <span class="font-medium text-gray-900">{{ selectedMitra.alamat_yang_dikuasakan || '-' }}</span>
+                        </div>
+                    </template>
 
                     <div class="col-span-2 border-t border-gray-200 pt-4 mt-2">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Tanggal Proses</h3>
@@ -1572,12 +1607,30 @@ watch(searchQuery, () => {
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Nama Pemilik Rekening
                                 </label>
-                                <input
-                                    type="text"
-                                    v-model="editForm.nama_pemilik_rekening"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Nama pemilik rekening"
-                                />
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="edit_sama_dengan_cp_superadmin"
+                                            v-model="samaDenganCPSuperAdmin"
+                                            @change="(e) => { if (e.target.checked) editForm.nama_pemilik_rekening = editForm.nama_cp; else editForm.nama_pemilik_rekening = ''; }"
+                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        />
+                                        <label for="edit_sama_dengan_cp_superadmin" class="ml-2 text-sm text-gray-600">
+                                            Sama dengan nama Contact Person
+                                        </label>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        v-model="editForm.nama_pemilik_rekening"
+                                        :readonly="samaDenganCPSuperAdmin"
+                                        :class="[
+                                            'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                                            samaDenganCPSuperAdmin ? 'bg-gray-100 cursor-not-allowed' : ''
+                                        ]"
+                                        placeholder="Nama pemilik rekening"
+                                    />
+                                </div>
                             </div>
 
                             <div class="md:col-span-2">
@@ -1636,6 +1689,13 @@ watch(searchQuery, () => {
                                 ></textarea>
                             </div>
 
+                            
+                        </div>
+                    </div>
+
+                     <div class="border-t border-gray-200 pt-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Kuasa</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Surat Kuasa
@@ -1661,9 +1721,48 @@ watch(searchQuery, () => {
                                     placeholder="Masukkan keterangan terkait surat kuasa"
                                 ></textarea>
                             </div>
-                        </div>
-                    </div>
 
+                            <!-- Data Kuasa - Only show if surat_kuasa is 'Ada' -->
+                            <template v-if="editForm.surat_kuasa === 'Ada'">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Nama Yang Dikuasakan
+                                    </label>
+                                    <input
+                                        type="text"
+                                        v-model="editForm.nama_yang_dikuasakan"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Nama lengkap yang dikuasakan"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        NIK Yang Dikuasakan
+                                    </label>
+                                    <input
+                                        type="text"
+                                        v-model="editForm.nik_yang_dikuasakan"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="16 digit NIK"
+                                        maxlength="16"
+                                    />
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Alamat Yang Dikuasakan
+                                    </label>
+                                    <textarea
+                                        v-model="editForm.alamat_yang_dikuasakan"
+                                        rows="2"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Alamat lengkap yang dikuasakan"
+                                    ></textarea>
+                                </div>
+                            </template>
+                        </div>  
+                    </div>
                     <!-- Tanggal Proses -->
                     <div class="border-t border-gray-200 pt-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Tanggal Proses</h3>

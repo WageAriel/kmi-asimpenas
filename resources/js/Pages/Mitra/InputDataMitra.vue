@@ -26,6 +26,9 @@ const form = ref({
   npwp:"",
   pkp:"",
   surat_kuasa:"",
+  nama_yang_dikuasakan:"",
+  nik_yang_dikuasakan:"",
+  alamat_yang_dikuasakan:"",
   email: "",
   no_vms:"",
   kode_mitra: "",
@@ -38,6 +41,7 @@ const successMessage = ref("");
 const errorMessage = ref("");
 const isSubmitting = ref(false);
 const mitraId = ref(null);
+const samaDenganCP = ref(false);
 
 // Notification states
 const notification = ref({
@@ -101,7 +105,6 @@ const isFormValid = computed(() => {
     'status_perusahaan',
     'npwp',
     'pkp',
-    'surat_kuasa',
     'email',
     'no_vms',
     'kode_mitra'
@@ -136,7 +139,6 @@ const getEmptyFields = () => {
     { key: 'status_perusahaan', label: 'Status Perusahaan' },
     { key: 'npwp', label: 'NPWP' },
     { key: 'pkp', label: 'PKP' },
-    { key: 'surat_kuasa', label: 'Surat Kuasa' },
     { key: 'email', label: 'Email' },
     { key: 'no_vms', label: 'No VMS' },
     { key: 'kode_mitra', label: 'Kode Mitra' }
@@ -733,16 +735,32 @@ const generatePaktaIntegritasPdf = async () => {
               <label for="nama_pemilik_rekening" class="block text-sm font-medium">
                 Nama Pemilik Rekening <span class="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="nama_pemilik_rekening"
-                v-model="form.nama_pemilik_rekening"
-                :class="[
-                  'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
-                  form.nama_pemilik_rekening.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                ]"
-                placeholder="Masukkan nama pemilik rekening"
-              />
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="sama_dengan_cp"
+                    v-model="samaDenganCP"
+                    @change="(e) => { if (e.target.checked) form.nama_pemilik_rekening = form.nama_cp; else form.nama_pemilik_rekening = ''; }"
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label for="sama_dengan_cp" class="ml-2 text-sm text-gray-600">
+                    Sama dengan nama Contact Person
+                  </label>
+                </div>
+                <input
+                  type="text"
+                  id="nama_pemilik_rekening"
+                  v-model="form.nama_pemilik_rekening"
+                  :readonly="samaDenganCP"
+                  :class="[
+                    'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none text-sm transition-colors',
+                    samaDenganCP ? 'bg-gray-100 cursor-not-allowed' : 'focus:ring-blue-500 focus:border-blue-500',
+                    form.nama_pemilik_rekening.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  ]"
+                  placeholder="Masukkan nama pemilik rekening"
+                />
+              </div>
             </div>
 
             <!-- Alamat Bank -->
@@ -813,14 +831,17 @@ const generatePaktaIntegritasPdf = async () => {
               </div>
               <div v-if="form.pkp === ''" class="text-xs text-red-500">Pilih salah satu opsi</div>
             </div>
+          </div>
+        </div>
 
-            <!-- Keterangan PKP -->
-            
-
+        <!-- Section 5: Data Kuasa -->
+        <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-md font-medium text-gray-900 mb-4">Data Kuasa</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Surat Kuasa -->
-            <div class="space-y-2">
+            <div class="space-y-2 md:col-span-2">
               <label class="block text-sm font-medium">
-                Surat Kuasa <span class="text-red-500">*</span>
+                Apakah Ada Surat Kuasa?
               </label>
               <div class="flex space-x-4">
                 <label class="flex items-center">
@@ -842,15 +863,57 @@ const generatePaktaIntegritasPdf = async () => {
                   <span class="ml-2 text-sm text-gray-700">Tidak Ada</span>
                 </label>
               </div>
-              <div v-if="form.surat_kuasa === ''" class="text-xs text-red-500">Pilih salah satu opsi</div>
             </div>
 
-            <!-- Keterangan Surat Kuasa -->
-            
+            <!-- Fields yang muncul jika surat kuasa Ada -->
+            <template v-if="form.surat_kuasa === 'Ada'">
+              <!-- Nama Yang Dikuasakan -->
+              <div class="space-y-2">
+                <label for="nama_yang_dikuasakan" class="block text-sm font-medium">
+                  Nama Yang Dikuasakan
+                </label>
+                <input
+                  type="text"
+                  id="nama_yang_dikuasakan"
+                  v-model="form.nama_yang_dikuasakan"
+                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors"
+                  placeholder="Masukkan nama yang dikuasakan"
+                />
+              </div>
+
+              <!-- NIK Yang Dikuasakan -->
+              <div class="space-y-2">
+                <label for="nik_yang_dikuasakan" class="block text-sm font-medium">
+                  NIK Yang Dikuasakan
+                </label>
+                <input
+                  type="text"
+                  id="nik_yang_dikuasakan"
+                  v-model="form.nik_yang_dikuasakan"
+                  maxlength="16"
+                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors"
+                  placeholder="Masukkan NIK (16 digit)"
+                />
+              </div>
+
+              <!-- Alamat Yang Dikuasakan -->
+              <div class="space-y-2 md:col-span-2">
+                <label for="alamat_yang_dikuasakan" class="block text-sm font-medium">
+                  Alamat Yang Dikuasakan
+                </label>
+                <textarea
+                  id="alamat_yang_dikuasakan"
+                  v-model="form.alamat_yang_dikuasakan"
+                  rows="3"
+                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors resize-none"
+                  placeholder="Masukkan alamat lengkap yang dikuasakan"
+                ></textarea>
+              </div>
+            </template>
           </div>
         </div>
 
-        <!-- Section 5: Tracking & Timeline -->
+        <!-- Section 6: Tracking & Timeline -->
         <div class="pb-6">
           <h3 class="text-md font-medium text-gray-900 mb-4">Informasi Tambahan</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
