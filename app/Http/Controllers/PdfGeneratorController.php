@@ -762,7 +762,8 @@ class PdfGeneratorController extends Controller
                 'tahun' => Carbon::now()->year,
                 'nama_cp' => $mitra->nama_cp,
                 'nama_perusahaan' => $mitra->nama_perusahaan,
-                'alamat_perusahaan' => $mitra->alamat_perusahaan
+                'alamat_perusahaan' => $mitra->alamat_perusahaan,
+                'jabatan' => $mitra->jabatan ?? 'Direktur'
             ];
 
             $pdf = PDF::loadView('pdf.pakta-integritas', $data);

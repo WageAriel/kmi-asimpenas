@@ -112,6 +112,11 @@
             <td class="colon">:</td>
             <td class="value">{{ $alamat_perusahaan }}</td>
         </tr>
+        <tr>
+            <td class="label">Jabatan</td>
+            <td class="colon">:</td>
+            <td class="value">{{ $jabatan }}</td>
+        </tr>
     </table>
 
     <!-- Content -->
