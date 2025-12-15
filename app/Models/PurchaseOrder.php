@@ -53,7 +53,7 @@ class PurchaseOrder extends Model
         if (!$this->relationLoaded('items')) {
             $this->load('items');
         }
-        return (int) $this->items->sum('harga') ?? 0;
+        return (int) ($this->items->sum('harga') ?? 0);
     }
 
     // Accessor untuk total kuantum
@@ -62,7 +62,7 @@ class PurchaseOrder extends Model
         if (!$this->relationLoaded('items')) {
             $this->load('items');
         }
-        return (int) $this->items->sum('kuantum') ?? 0;
+        return (int) ($this->items->sum('kuantum') ?? 0);
     }
 
     // Accessor untuk total nilai
@@ -71,7 +71,7 @@ class PurchaseOrder extends Model
         if (!$this->relationLoaded('items')) {
             $this->load('items');
         }
-        return (int) $this->items->sum('nilai') ?? 0;
+        return (int) ($this->items->sum('nilai') ?? 0);
     }
 
     // Accessor untuk mendapatkan jenis komoditas yang tepat
