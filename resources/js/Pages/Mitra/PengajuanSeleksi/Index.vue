@@ -89,7 +89,7 @@ const hasNewerSubmissionAfterRejection = (submission) => {
 
 // Boleh membuat registrasi ulang jika:
 // - Ada pengajuan "lolos" di tahun-tahun sebelumnya
-// - Selisih minimal 1 tahun dari tahun "lolos" terakhir
+// - Tahun sekarang lebih besar dari tahun "lolos" terakhir (reset di awal tahun)
 // - Belum Ada pengajuan untuk tahun berjalan yang lolos/pending
 const canRenew = computed(() => {
   const approved = submissions.value
@@ -99,7 +99,8 @@ const canRenew = computed(() => {
   const lastApproved = approved[0];
   if (!lastApproved) return false;
 
-  const eligibleByYear = (currentYear - (lastApproved.year || 0)) >= 1;
+  // Reset pengajuan di awal tahun: boleh renewal jika tahun sekarang > tahun terakhir lolos
+  const eligibleByYear = currentYear > (lastApproved.year || 0);
   return eligibleByYear && !hasCurrentYearApprovedOrPending.value;
 });
 
@@ -240,7 +241,7 @@ const editSubmission = (submission) => {
           <div class="mb-4 md:mb-0">
             <h3 class="text-xl font-bold text-white mb-2">Pengajuan Seleksi</h3>
             <p class="text-blue-100">
-              <span v-if="canRenew">Anda dapat melakukan registrasi ulang untuk tahun {{ currentYear }}</span>
+              <span v-if="canRenew">Anda dapat melakukan registrasi ulang untuk tahun {{ currentYear }} (periode baru)</span>
               <span v-else-if="hasCurrentYearApprovedOrPending">Anda sudah memiliki pengajuan untuk tahun ini</span>
               <span v-else-if="hasCurrentYearRejected">Pengajuan tahun ini tidak lolos, Anda dapat mengajukan ulang</span>
               <span v-else>Belum Ada pengajuan untuk tahun ini</span>

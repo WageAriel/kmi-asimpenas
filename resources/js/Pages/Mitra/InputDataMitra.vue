@@ -113,8 +113,8 @@ const isFormValid = computed(() => {
     'npwp',
     'pkp',
     'email',
-    'no_vms',
-    'kode_mitra'
+    // 'no_vms',
+    // 'kode_mitra'
   ];
 
   // Cek apakah semua field wajib sudah terisi
@@ -147,8 +147,8 @@ const getEmptyFields = () => {
     { key: 'npwp', label: 'NPWP' },
     { key: 'pkp', label: 'PKP' },
     { key: 'email', label: 'Email' },
-    { key: 'no_vms', label: 'No VMS' },
-    { key: 'kode_mitra', label: 'Kode Mitra' }
+    // { key: 'no_vms', label: 'No VMS' },
+    // { key: 'kode_mitra', label: 'Kode Mitra' }
   ];
 
   return requiredFields.filter(field => {
@@ -990,34 +990,36 @@ const generatePaktaIntegritasPdf = async () => {
             <!-- No VMS -->
             <div class="space-y-2">
               <label for="no_vms" class="block text-sm font-medium">
-                No VMS <span class="text-red-500">*</span>
+                No VMS 
               </label>
               <input
                 type="text"
                 id="no_vms"
+                readonly
                 v-model="form.no_vms"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
-                  form.no_vms.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  // form.no_vms.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
                 ]"
-                placeholder="Masukkan nomor VMS"
+                placeholder="Diinputkan Oleh Admin"
               />
             </div>
 
             <!-- Kode Mitra -->
             <div class="space-y-2">
               <label for="kode_mitra" class="block text-sm font-medium">
-                Kode Mitra <span class="text-red-500">*</span>
+                Kode Mitra
               </label>
               <input
                 type="text"
                 id="kode_mitra"
                 v-model="form.kode_mitra"
+                readonly
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
-                  form.kode_mitra.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  // form.kode_mitra.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300' 
                 ]"
-                placeholder="Masukkan kode mitra"
+                placeholder="Diinput Oleh Admin"
               />
             </div>
           </div>

@@ -71,7 +71,8 @@ class PurchaseOrder extends Model
         if (!$this->relationLoaded('items')) {
             $this->load('items');
         }
-        return (int) ($this->items->sum('nilai') ?? 0);
+        // Jangan cast ke int untuk menghindari overflow pada angka besar
+        return $this->items->sum('nilai') ?? 0;
     }
 
     // Accessor untuk mendapatkan jenis komoditas yang tepat

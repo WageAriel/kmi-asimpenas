@@ -21,9 +21,9 @@ class PurchaseOrderItem extends Model
     ];
 
     protected $casts = [
-        'harga' => 'integer',      // Harga per kg dalam rupiah
+        'harga' => 'decimal:2',    // Harga per kg dalam rupiah
         'kuantum' => 'decimal:2',  // Kuantum dalam kg (bisa desimal) 
-        'nilai' => 'integer'       // Nilai total dalam rupiah
+        'nilai' => 'decimal:2'     // Nilai total dalam rupiah (gunakan decimal untuk angka besar)
     ];
 
     // Relationship dengan PurchaseOrder

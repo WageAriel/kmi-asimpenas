@@ -120,7 +120,10 @@ class PurchaseOrderController extends Controller
 
         // Create the quality items
         foreach ($validated['kualitas_items'] as $item) {
-            $item['nilai'] = $item['harga'] * $item['kuantum'];
+            // Gunakan float untuk menghindari overflow pada angka besar
+            $harga = floatval($item['harga']);
+            $kuantum = floatval($item['kuantum']);
+            $item['nilai'] = $harga * $kuantum;
             $item['purchase_order_id'] = $purchaseOrder->id;
             \App\Models\PurchaseOrderItem::create($item);
         }
@@ -155,9 +158,9 @@ class PurchaseOrderController extends Controller
                 'nama_perusahaan' => $purchaseOrder->nama_perusahaan,
                 'jenis_komoditas' => $purchaseOrder->jenis_komoditas_lengkap,
                 'jenis_pengadaan' => $purchaseOrder->jenis_pengadaan,
-                'total_harga' => (int) $purchaseOrder->total_harga,
-                'total_kuantum' => (int) $purchaseOrder->total_kuantum,
-                'total_nilai' => (int) $purchaseOrder->total_nilai,
+                'total_harga' => $purchaseOrder->total_harga,
+                'total_kuantum' => $purchaseOrder->total_kuantum,
+                'total_nilai' => $purchaseOrder->total_nilai, // Jangan cast ke int untuk angka besar
                 'agenda_no' => $purchaseOrder->agenda_no,
                 'tanggal_terima' => $purchaseOrder->tanggal_terima?->format('Y-m-d'),
                 'tanggal_pembuatan' => $purchaseOrder->tanggal_pembuatan?->format('Y-m-d'),
@@ -168,9 +171,9 @@ class PurchaseOrderController extends Controller
                 'items' => $purchaseOrder->items->map(function ($item) {
                     return [
                         'id' => $item->id,
-                        'harga' => (int) $item->harga,
-                        'kuantum' => (float) $item->kuantum,
-                        'nilai' => (int) $item->nilai,
+                        'harga' => $item->harga,
+                        'kuantum' => $item->kuantum,
+                        'nilai' => $item->nilai, // Jangan cast ke int untuk angka besar
                         'komplek_pergudangan' => $item->komplek_pergudangan_lengkap,
                         'kualitas' => $item->kualitas_lengkap,
                     ];
@@ -208,9 +211,9 @@ class PurchaseOrderController extends Controller
                 'items' => $purchaseOrder->items->map(function ($item) {
                     return [
                         'id' => $item->id,
-                        'harga' => (int) $item->harga,
-                        'kuantum' => (float) $item->kuantum,
-                        'nilai' => (int) $item->nilai,
+                        'harga' => $item->harga,
+                        'kuantum' => $item->kuantum,
+                        'nilai' => $item->nilai, // Jangan cast ke int untuk angka besar
                         'komplek_pergudangan' => $item->komplek_pergudangan,
                         'komplek_pergudangan_custom' => $item->komplek_pergudangan_custom,
                         'kualitas' => $item->kualitas,
@@ -293,7 +296,7 @@ class PurchaseOrderController extends Controller
         ]);
 
         // Regenerate no_surat jika diperlukan
-        if ($shouldRegenerateNoSurat) {
+        if ($shouldRegenerateNoSurat) { 
             $purchaseOrder->no_surat = $purchaseOrder->generateNoSurat();
             $purchaseOrder->save();
         }
@@ -304,7 +307,10 @@ class PurchaseOrderController extends Controller
 
         // Update or create items
         foreach ($validated['kualitas_items'] as $itemData) {
-            $itemData['nilai'] = $itemData['harga'] * $itemData['kuantum'];
+            // Gunakan float untuk menghindari overflow pada angka besar
+            $harga = floatval($itemData['harga']);
+            $kuantum = floatval($itemData['kuantum']);
+            $itemData['nilai'] = $harga * $kuantum;
             
             if (isset($itemData['id']) && $itemData['id']) {
                 // Update existing item
