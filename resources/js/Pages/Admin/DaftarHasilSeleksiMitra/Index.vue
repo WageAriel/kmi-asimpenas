@@ -70,6 +70,7 @@ const filteredData = computed(() => {
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const itemsPerPageOptions = [10, 20, 50, 100];
 
 // Pagination computed properties
 const totalPages = computed(() => {
@@ -143,6 +144,12 @@ const prevPage = () => {
 watch([searchQuery, selectedYear], () => {
     currentPage.value = 1;
 });
+
+// Method to change items per page
+const changeItemsPerPage = (value) => {
+    itemsPerPage.value = value;
+    currentPage.value = 1;
+};
 
 // Format date helper
 const formatDate = (date) => {
@@ -280,12 +287,12 @@ onMounted(() => {
             </div>
 
             <!-- Search Bar and Year Filter -->
-            <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div class="mb-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                 <!-- Search Input -->
-                <div class="relative md:col-span-3">
+                <div class="relative w-full sm:flex-1">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                         </svg>
                     </div>
                     <input
@@ -306,8 +313,25 @@ onMounted(() => {
                     </button>
                 </div>
 
+                <!-- Items Per Page Selector -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <label for="itemsPerPageHasil" class="text-sm text-gray-700 whitespace-nowrap">
+                        Tampilkan:
+                    </label>
+                    <select
+                        id="itemsPerPageHasil"
+                        v-model="itemsPerPage"
+                        @change="changeItemsPerPage(itemsPerPage)"
+                        class="block w-full sm:w-auto py-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
+                            {{ option }}
+                        </option>
+                    </select>
+                </div>
+
                 <!-- Year Filter -->
-                <div class="relative">
+                <div class="relative w-full sm:w-auto">
                     <select 
                         v-model="selectedYear"
                         class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-orange-500"

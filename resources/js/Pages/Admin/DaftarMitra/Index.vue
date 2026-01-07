@@ -21,6 +21,7 @@ const sortOrder = ref('desc');
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const itemsPerPageOptions = [10, 20, 50, 100];
 
 // Sort function
 const toggleSort = (column) => {
@@ -144,6 +145,12 @@ const prevPage = () => {
 // Reset to page 1 when search query changes
 const resetPagination = () => {
     currentPage.value = 1;
+};
+
+// Method to change items per page
+const changeItemsPerPage = (value) => {
+    itemsPerPage.value = value;
+    resetPagination();
 };
 
 // Bulk delete functionality
@@ -707,6 +714,23 @@ watch(searchQuery, () => {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
+                    </div>
+
+                    <!-- Items Per Page Selector -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label for="itemsPerPageMitra" class="text-sm text-gray-700 whitespace-nowrap">
+                            Tampilkan:
+                        </label>
+                        <select
+                            id="itemsPerPageMitra"
+                            v-model="itemsPerPage"
+                            @change="changeItemsPerPage(itemsPerPage)"
+                            class="block w-full sm:w-auto py-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
+                                {{ option }}
+                            </option>
+                        </select>
                     </div>
 
                     <!-- Bulk Delete Button -->
