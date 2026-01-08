@@ -201,6 +201,42 @@ class PdfGeneratorController extends Controller
         return $arrBulan[$bulan];
     }
 
+    private function tahunTerbilang($tahun) {
+        $tahun = (int) $tahun;
+        $ribu = floor($tahun / 1000);
+        $ratus = floor(($tahun % 1000) / 100);
+        $puluh = floor(($tahun % 100) / 10);
+        $satuan = $tahun % 10;
+        
+        $hasil = '';
+        
+        // Ribuan
+        if ($ribu == 1) {
+            $hasil .= 'Seribu';
+        } elseif ($ribu > 1) {
+            $hasil .= $this->terbilang($ribu) . ' Ribu';
+        }
+        
+        // Ratusan
+        if ($ratus > 0) {
+            if ($hasil != '') $hasil .= ' ';
+            if ($ratus == 1) {
+                $hasil .= 'Seratus';
+            } else {
+                $hasil .= $this->terbilang($ratus) . ' Ratus';
+            }
+        }
+        
+        // Puluhan dan satuan
+        $sisaPuluhan = ($puluh * 10) + $satuan;
+        if ($sisaPuluhan > 0) {
+            if ($hasil != '') $hasil .= ' ';
+            $hasil .= $this->terbilang($sisaPuluhan);
+        }
+        
+        return $hasil;
+    }
+
     public function generateSuratPenetapan($id, Request $request) {
         try {
             $seleksi = DataSeleksiMitra::with('mitra')->findOrFail($id);
@@ -236,7 +272,7 @@ class PdfGeneratorController extends Controller
                     "%s bulan %s tahun %s (%s)",
                     $this->terbilang($today->day),
                     $this->bulanIndo($today->month),
-                    'Dua Ribu Dua Puluh Lima',
+                    $this->tahunTerbilang($today->year),
                     $today->format('d-m-Y')
                 ),
                 'nomor_surat' => sprintf(
@@ -398,11 +434,11 @@ class PdfGeneratorController extends Controller
                     "%s bulan %s tahun %s (%s)",
                     $this->terbilang($today->day),
                     $this->bulanIndo($today->month),
-                    'Dua Ribu Dua Puluh Lima',
+                    $this->tahunTerbilang($today->year),
                     $today->format('d-m-Y')
                 ),
                 'nomor_urut_seleksi' => sprintf("%02d", $urutanDataSeleksi),
-                'tanggal_seleksi' => $hasilSeleksi->created_at->isoFormat('D MMMM Y'),
+                'tanggal_seleksi' => $hasilSeleksi->created_at->locale('id')->isoFormat('D MMMM Y'),
                 'nomor_entitas_bulog' => '11030',
                 'unit_pelaksana' => 'SURAKARTA',
                 'nama_perusahaan' => $hasilSeleksi->mitra->nama_perusahaan,
@@ -509,11 +545,11 @@ class PdfGeneratorController extends Controller
                     "%s bulan %s tahun %s (%s)",
                     $this->terbilang($today->day),
                     $this->bulanIndo($today->month),
-                    'Dua Ribu Dua Puluh Lima',
+                    $this->tahunTerbilang($today->year),
                     $today->format('d-m-Y')
                 ),
                 'nomor_urut' => sprintf("%d", $urutanKlasifikasi),
-                'tanggal_klasifikasi' => $klasifikasi->created_at->isoFormat('D MMMM Y'),
+                'tanggal_klasifikasi' => $klasifikasi->created_at->locale('id')->isoFormat('D MMMM Y'),
                 'nomor_entitas' => '11030',
                 'unit_pelaksana' => 'SURAKARTA',
                 'nama_perusahaan' => $klasifikasi->mitra->nama_perusahaan,
@@ -634,7 +670,7 @@ class PdfGeneratorController extends Controller
                     "%s bulan %s tahun %s (%s)",
                     $this->terbilang($today->day),
                     $this->bulanIndo($today->month),
-                    'Dua Ribu Dua Puluh Lima',
+                    $this->tahunTerbilang($today->year),
                     $today->format('d-m-Y')
                 ),
                 'nomor_BA' => sprintf(
