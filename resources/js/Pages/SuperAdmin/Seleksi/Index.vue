@@ -751,23 +751,36 @@ const editSuccess = ref(null);
 
 const openEditModal = (item) => {
     itemToEdit.value = item;
+    
+    // Helper function to safely format date
+    const formatDateForInput = (dateValue) => {
+        if (!dateValue) return '';
+        try {
+            const date = new Date(dateValue);
+            if (isNaN(date.getTime())) return '';
+            return date.toISOString().split('T')[0];
+        } catch (e) {
+            return '';
+        }
+    };
+    
     // Copy data untuk form edit
     editFormData.value = {
         id_mitra: item.id_mitra,
         surat_permohonan: item.surat_permohonan || 'Tidak Ada',
-        mb_surat_permohonan: item.mb_surat_permohonan ? new Date(item.mb_surat_permohonan).toISOString().split('T')[0] : '',
+        mb_surat_permohonan: formatDateForInput(item.mb_surat_permohonan),
         akta_notaris: item.akta_notaris || 'Tidak Ada',
-        mb_akta_notaris: item.mb_akta_notaris ? new Date(item.mb_akta_notaris).toISOString().split('T')[0] : '',
+        mb_akta_notaris: formatDateForInput(item.mb_akta_notaris),
         nib: item.nib || 'Tidak Ada',
-        mb_nib: item.mb_nib ? new Date(item.mb_nib).toISOString().split('T')[0] : '',
+        mb_nib: formatDateForInput(item.mb_nib),
         ktp: item.ktp || 'Tidak Ada',
-        mb_ktp: item.mb_ktp ? new Date(item.mb_ktp).toISOString().split('T')[0] : '',
+        mb_ktp: formatDateForInput(item.mb_ktp),
         no_rekening: item.no_rekening || 'Tidak Ada',
-        mb_no_rekening: item.mb_no_rekening ? new Date(item.mb_no_rekening).toISOString().split('T')[0] : '',
+        mb_no_rekening: formatDateForInput(item.mb_no_rekening),
         npwp: item.npwp || 'Tidak Ada',
-        mb_npwp: item.mb_npwp ? new Date(item.mb_npwp).toISOString().split('T')[0] : '',
+        mb_npwp: formatDateForInput(item.mb_npwp),
         surat_kuasa: item.surat_kuasa || 'Tidak Ada',
-        mb_surat_kuasa: item.mb_surat_kuasa ? new Date(item.mb_surat_kuasa).toISOString().split('T')[0] : '',
+        mb_surat_kuasa: formatDateForInput(item.mb_surat_kuasa),
         lantai_jemur: item.lantai_jemur || 'Tidak Ada',
         sarana_lainnya: item.sarana_lainnya || 'Tidak Ada',
         mesin_memecah_kulit: item.mesin_memecah_kulit || 'Tidak Ada',
