@@ -733,6 +733,88 @@ const openSingleDeleteModal = (item) => {
     singleDeleteSuccess.value = null;
 };
 
+// Edit functionality
+const showEditModal = ref(false);
+const itemToEdit = ref(null);
+const editFormData = ref({});
+const isEditing = ref(false);
+const editError = ref(null);
+const editSuccess = ref(null);
+
+const openEditModal = (item) => {
+    itemToEdit.value = item;
+    // Copy data untuk form edit
+    editFormData.value = {
+        id_mitra: item.id_mitra,
+        surat_permohonan: item.surat_permohonan || 'Tidak Ada',
+        mb_surat_permohonan: item.mb_surat_permohonan ? new Date(item.mb_surat_permohonan).toISOString().split('T')[0] : '',
+        akta_notaris: item.akta_notaris || 'Tidak Ada',
+        mb_akta_notaris: item.mb_akta_notaris ? new Date(item.mb_akta_notaris).toISOString().split('T')[0] : '',
+        nib: item.nib || 'Tidak Ada',
+        mb_nib: item.mb_nib ? new Date(item.mb_nib).toISOString().split('T')[0] : '',
+        ktp: item.ktp || 'Tidak Ada',
+        mb_ktp: item.mb_ktp ? new Date(item.mb_ktp).toISOString().split('T')[0] : '',
+        no_rekening: item.no_rekening || 'Tidak Ada',
+        mb_no_rekening: item.mb_no_rekening ? new Date(item.mb_no_rekening).toISOString().split('T')[0] : '',
+        npwp: item.npwp || 'Tidak Ada',
+        mb_npwp: item.mb_npwp ? new Date(item.mb_npwp).toISOString().split('T')[0] : '',
+        surat_kuasa: item.surat_kuasa || 'Tidak Ada',
+        mb_surat_kuasa: item.mb_surat_kuasa ? new Date(item.mb_surat_kuasa).toISOString().split('T')[0] : '',
+        lantai_jemur: item.lantai_jemur || 'Tidak Ada',
+        sarana_lainnya: item.sarana_lainnya || 'Tidak Ada',
+        mesin_memecah_kulit: item.mesin_memecah_kulit || 'Tidak Ada',
+        mesin_pemisah_gabah: item.mesin_pemisah_gabah || 'Tidak Ada',
+        mesin_penyosoh: item.mesin_penyosoh || 'Tidak Ada',
+        alat_pemisah_beras: item.alat_pemisah_beras || 'Tidak Ada'
+    };
+    showEditModal.value = true;
+    editError.value = null;
+    editSuccess.value = null;
+};
+
+const closeEditModal = () => {
+    showEditModal.value = false;
+    itemToEdit.value = null;
+    editFormData.value = {};
+    editError.value = null;
+    editSuccess.value = null;
+};
+
+const updateSeleksiMitra = async () => {
+    if (!itemToEdit.value || isEditing.value) return;
+    
+    isEditing.value = true;
+    editError.value = null;
+    editSuccess.value = null;
+
+    try {
+        const response = await axios.put(
+            `/data-seleksi-mitra/${itemToEdit.value.id_seleksi_mitra}`,
+            editFormData.value
+        );
+        
+        editSuccess.value = 'Data seleksi mitra berhasil diperbarui';
+        
+        // Reload page after successful update
+        setTimeout(() => {
+            window.location.reload();
+            closeEditModal();
+        }, 1500);
+
+    } catch (error) {
+        console.error('Update error:', error);
+        
+        if (error.response) {
+            const data = error.response.data;
+            editError.value = data.message || 'Terjadi kesalahan saat memperbarui data';
+        } else {
+            editError.value = 'Tidak dapat terhubung ke server';
+        }
+    } finally {
+        isEditing.value = false;
+    }
+};
+
 const closeSingleDeleteModal = () => {
     showSingleDeleteModal.value = false;
     itemToDelete.value = null;
@@ -1089,7 +1171,18 @@ const deleteSingleItem = async () => {
                                     </button>
                                     
                                     <button
-                                        @click="openDeleteModal(item)"
+                                        @click="openEditModal(item)"
+                                        class="inline-flex items-center px-2 py-1 border text-amber-600 hover:text-white hover:bg-amber-600  border-amber-600 rounded transition-colors duration-200 text-xs"
+                                        title="Edit data seleksi"
+                                    >
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                    
+                                    <button
+                                        @click="openSingleDeleteModal(item)"
                                         class="inline-flex items-center px-2 py-1 text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded transition-colors duration-200 text-xs"
                                         title="Hapus data seleksi"
                                     >
@@ -2174,6 +2267,226 @@ const deleteSingleItem = async () => {
                             <span v-else>Ya, Hapus</span>
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Seleksi Mitra -->
+        <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40" @click="closeEditModal">
+            <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative" @click.stop>
+                <!-- Header -->
+                <div class="sticky top-0 bg-gradient-to-r from-amber-500 to-amber-700 text-white px-6 py-4 rounded-t-xl z-10">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-bold">Edit Data Seleksi Mitra</h2>
+                        <button @click="closeEditModal" class="text-white hover:text-gray-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-sm text-amber-100 mt-1">{{ itemToEdit?.mitra?.nama_perusahaan }}</p>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <!-- Success Message -->
+                    <div v-if="editSuccess" class="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="text-sm text-green-700 font-medium">{{ editSuccess }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div v-if="editError" class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="text-sm text-red-700">{{ editError }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <form @submit.prevent="updateSeleksiMitra" class="space-y-6">
+                        <!-- Dokumen Section -->
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-blue-900 mb-4">Dokumen Persyaratan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Surat Permohonan -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Surat Permohonan</label>
+                                    <select v-model="editFormData.surat_permohonan" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Masa Berlaku Surat Permohonan</label>
+                                    <input type="date" v-model="editFormData.mb_surat_permohonan" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                </div>
+
+                                <!-- Akta Notaris -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Akta Notaris</label>
+                                    <select v-model="editFormData.akta_notaris" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Masa Berlaku Akta Notaris</label>
+                                    <input type="date" v-model="editFormData.mb_akta_notaris" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                </div>
+
+                                <!-- NIB -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">NIB</label>
+                                    <select v-model="editFormData.nib" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Masa Berlaku NIB</label>
+                                    <input type="date" v-model="editFormData.mb_nib" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                </div>
+
+                                <!-- KTP -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">KTP</label>
+                                    <select v-model="editFormData.ktp" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Masa Berlaku KTP</label>
+                                    <input type="date" v-model="editFormData.mb_ktp" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                </div>
+
+                                <!-- No Rekening -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">No Rekening</label>
+                                    <select v-model="editFormData.no_rekening" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Masa Berlaku No Rekening</label>
+                                    <input type="date" v-model="editFormData.mb_no_rekening" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                </div>
+
+                                <!-- NPWP -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">NPWP</label>
+                                    <select v-model="editFormData.npwp" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Masa Berlaku NPWP</label>
+                                    <input type="date" v-model="editFormData.mb_npwp" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                </div>
+
+                                <!-- Surat Kuasa -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Surat Kuasa</label>
+                                    <select v-model="editFormData.surat_kuasa" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Masa Berlaku Surat Kuasa</label>
+                                    <input type="date" v-model="editFormData.mb_surat_kuasa" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sarana Pengeringan Section -->
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-green-900 mb-4">Sarana Pengeringan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Lantai Jemur</label>
+                                    <select v-model="editFormData.lantai_jemur" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Sarana Lainnya</label>
+                                    <select v-model="editFormData.sarana_lainnya" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sarana Penggilingan Section -->
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold text-purple-900 mb-4">Sarana Penggilingan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Mesin Memecah Kulit</label>
+                                    <select v-model="editFormData.mesin_memecah_kulit" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Mesin Pemisah Gabah</label>
+                                    <select v-model="editFormData.mesin_pemisah_gabah" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Mesin Penyosoh</label>
+                                    <select v-model="editFormData.mesin_penyosoh" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Alat Pemisah Beras</label>
+                                    <select v-model="editFormData.alat_pemisah_beras" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                                        <option value="Ada">Ada</option>
+                                        <option value="Tidak Ada">Tidak Ada</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                            <button
+                                type="button"
+                                @click="closeEditModal"
+                                class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                                :disabled="isEditing"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                type="submit"
+                                class="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:bg-amber-300 disabled:cursor-not-allowed transition-colors font-medium flex items-center"
+                                :disabled="isEditing"
+                            >
+                                <svg v-if="isEditing" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ isEditing ? 'Menyimpan...' : 'Simpan Perubahan' }}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -212,6 +212,16 @@ const getRoleBadgeClass = (role) => {
             return 'bg-blue-100 text-blue-800';
     }
 };
+
+// Get status badge color
+const getStatusBadgeColor = (isActive) => {
+    return isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+};
+
+// Get status display text
+const getStatusDisplayText = (isActive) => {
+    return isActive ? 'Aktif' : 'Nonaktif';
+};
 </script>
 
 <template>
@@ -313,6 +323,7 @@ const getRoleBadgeClass = (role) => {
                                     Role
                                     <span v-if="sortBy === 'role'" class="ml-1">▼</span>
                                 </th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Daftar</th>
                             </tr>
                         </thead>
@@ -325,10 +336,15 @@ const getRoleBadgeClass = (role) => {
                                         {{ user.role }}
                                     </span>
                                 </td>
+                                <td class="px-4 py-3 text-sm whitespace-nowrap">
+                                    <span :class="['px-2 py-1 text-xs rounded-full font-medium', getStatusBadgeColor(user.is_active)]">
+                                        {{ getStatusDisplayText(user.is_active) }}
+                                    </span>
+                                </td>
                                 <td class="px-4 py-3 text-sm whitespace-nowrap">{{ formatDate(user.created_at) }}</td>
                             </tr>
                             <tr v-if="paginatedUsers.length === 0">
-                                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
                                     {{ searchQuery ? 'Tidak ada user yang sesuai dengan pencarian.' : 'Belum ada data user.' }}
                                 </td>
                             </tr>

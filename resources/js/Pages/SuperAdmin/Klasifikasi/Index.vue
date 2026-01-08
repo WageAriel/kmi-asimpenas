@@ -68,6 +68,7 @@ const filteredKlasifikasiMitras = computed(() => {
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const itemsPerPageOptions = [10, 20, 50, 100];
 
 // Bulk delete state
 const selectedIds = ref([]);
@@ -234,6 +235,12 @@ watch(selectedYear, () => {
 watch(selectedIds, () => {
     selectAll.value = selectedIds.value.length === paginatedKlasifikasiMitras.value.length && paginatedKlasifikasiMitras.value.length > 0;
 });
+
+// Method to change items per page
+const changeItemsPerPage = (value) => {
+    itemsPerPage.value = value;
+    currentPage.value = 1;
+};
 
 // Modal functionality
 const showModal = ref(false);
@@ -794,6 +801,83 @@ const generateBaPdf = async () => {
     }
 };
 
+// Edit functionality
+const showEditModal = ref(false);
+const itemToEdit = ref(null);
+const editFormData = ref({});
+const isEditing = ref(false);
+const editError = ref('');
+const editSuccess = ref('');
+
+const openEditModal = (item) => {
+    itemToEdit.value = item;
+    editFormData.value = {
+        mesin_pembersih_gabah: item.mesin_pembersih_gabah || '',
+        lantai_jemur: item.lantai_jemur || '',
+        mesin_pengering: item.mesin_pengering || '',
+        alat_pengering_lainnya: item.alat_pengering_lainnya || '',
+        mesin_pembersih_awal: item.mesin_pembersih_awal || '',
+        mesin_pemecah_kulit: item.mesin_pemecah_kulit || '',
+        mesin_pembersih_sekam: item.mesin_pembersih_sekam || '',
+        mesin_pemisah_gabah_pecah_kulit: item.mesin_pemisah_gabah_pecah_kulit || '',
+        mesin_pemisah_batu: item.mesin_pemisah_batu || '',
+        mesin_penyosoh: item.mesin_penyosoh || '',
+        mesin_pengkabut: item.mesin_pengkabut || '',
+        mesin_pemesah_menir: item.mesin_pemesah_menir || '',
+        mesin_pemisah_katul: item.mesin_pemisah_katul || '',
+        mesin_pemisah_berdasarkan_ukuran: item.mesin_pemisah_berdasarkan_ukuran || '',
+        mesin_pemisah_berdasarkan_warna: item.mesin_pemisah_berdasarkan_warna || '',
+        tangki_penyimpanan: item.tangki_penyimpanan || '',
+        mesin_pengemas: item.mesin_pengemas || '',
+        mesin_jahit: item.mesin_jahit || '',
+        gudang_konvensional: item.gudang_konvensional || '',
+        silo_gkg_hopper: item.silo_gkg_hopper || '',
+        truk: item.truk || '',
+        mini_lab: item.mini_lab || '',
+        moisture_tester: item.moisture_tester || '',
+        pembanding_derajat_sosoh: item.pembanding_derajat_sosoh || '',
+        bagian_quality_control: item.bagian_quality_control || '',
+    };
+    showEditModal.value = true;
+    editError.value = '';
+    editSuccess.value = '';
+};
+
+const closeEditModal = () => {
+    showEditModal.value = false;
+    itemToEdit.value = null;
+    editFormData.value = {};
+    isEditing.value = false;
+    editError.value = '';
+    editSuccess.value = '';
+};
+
+const updateKlasifikasiMitra = async () => {
+    if (isEditing.value || !itemToEdit.value) return;
+
+    isEditing.value = true;
+    editError.value = '';
+    editSuccess.value = '';
+
+    try {
+        await axios.put(`/klasifikasi-mitra/${itemToEdit.value.id_klasifikasi_mitra}`, editFormData.value);
+        
+        editSuccess.value = 'Data klasifikasi mitra berhasil diperbarui';
+        
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    } catch (error) {
+        console.error('Error updating klasifikasi mitra:', error);
+        if (error.response && error.response.data && error.response.data.message) {
+            editError.value = error.response.data.message;
+        } else {
+            editError.value = 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi.';
+        }
+        isEditing.value = false;
+    }
+};
+
 </script>
 
 <template>
@@ -840,7 +924,7 @@ const generateBaPdf = async () => {
             </div>
 
             <!-- Search Bar and Year Filter -->
-            <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div class="mb-4 grid grid-cols-1 md:grid-cols-5 gap-3">
                 <!-- Search Input -->
                 <div class="relative md:col-span-3">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -864,6 +948,20 @@ const generateBaPdf = async () => {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
+                </div>
+
+                <!-- Items Per Page Selector -->
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-700 whitespace-nowrap">Tampilkan:</label>
+                    <select 
+                        v-model="itemsPerPage"
+                        @change="changeItemsPerPage(itemsPerPage)"
+                        class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-green-500"
+                    >
+                        <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
+                            {{ option }}
+                        </option>
+                    </select>
                 </div>
 
                 <!-- Year Filter -->
@@ -991,6 +1089,15 @@ const generateBaPdf = async () => {
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                             </svg>
                                             Lihat
+                                        </button>
+                                        <button
+                                            @click="openEditModal(item)"
+                                            class="inline-flex items-center px-2 py-1 text-amber-600 hover:text-white hover:bg-amber-600 border border-amber-600 rounded transition-colors duration-200 text-xs"
+                                        >
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            Edit
                                         </button>
                                         <button
                                             @click="openDeleteModal(item)"
@@ -1666,6 +1773,303 @@ const generateBaPdf = async () => {
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         {{ isDeleting ? 'Menghapus...' : 'Ya, Hapus' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div v-if="showEditModal" @click="closeEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div @click.stop class="bg-white rounded-xl shadow-lg max-w-6xl w-full p-6 relative max-h-[90vh] overflow-y-auto">
+                <button @click="closeEditModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <!-- Header -->
+                <div class="mb-6">
+                    <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-4 rounded-lg -mx-6 -mt-6 mb-6">
+                        <h2 class="text-xl font-bold">Edit Data Klasifikasi Mitra</h2>
+                        <p class="text-sm text-amber-50 mt-1">{{ itemToEdit?.mitra?.nama_perusahaan }}</p>
+                    </div>
+                </div>
+
+                <!-- Success Message -->
+                <div v-if="editSuccess" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="text-sm text-green-800">{{ editSuccess }}</p>
+                </div>
+
+                <!-- Error Message -->
+                <div v-if="editError" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-sm text-red-800">{{ editError }}</p>
+                </div>
+
+                <!-- Form -->
+                <div v-if="itemToEdit" class="space-y-6">
+                    <!-- Sarana Pengeringan Section -->
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-green-800 mb-4">Sarana Pengeringan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pembersih Gabah (ton/hari)</label>
+                                <select v-model="editFormData.mesin_pembersih_gabah" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 20">A. Ada | > 20</option>
+                                    <option value="2. Ada | ≤ 20">B. Ada | ≤ 20</option>
+                                    <option value="1. Tidak Ada">C. Tidak Ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Lantai Jemur (ton/hari)</label>
+                                <select v-model="editFormData.lantai_jemur" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 10">A. Ada | > 10</option>
+                                    <option value="2. Ada | 1 s/d 10">B. Ada | 1 s/d 10</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pengering (ton/hari)</label>
+                                <select v-model="editFormData.mesin_pengering" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 20">A. Ada | > 20</option>
+                                    <option value="2. Ada | ≤ 20">B. Ada | ≤ 20</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Alat Pengering Lainnya</label>
+                                <select v-model="editFormData.alat_pengering_lainnya" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Tidak Disyaratkan">A. Tidak Disyaratkan</option>
+                                    <option value="2. Tidak Disyaratkan">B. Tidak Disyaratkan</option>
+                                    <option value="1. Ada | ≤ 1">C. Ada | ≤ 1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sarana Penggilingan Section -->
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-purple-800 mb-4">Sarana Penggilingan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pembersih Awal</label>
+                                <select v-model="editFormData.mesin_pembersih_awal" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pemecah Kulit</label>
+                                <select v-model="editFormData.mesin_pemecah_kulit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pembersih Sekam</label>
+                                <select v-model="editFormData.mesin_pembersih_sekam" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pemisah Gabah Pecah Kulit</label>
+                                <select v-model="editFormData.mesin_pemisah_gabah_pecah_kulit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pemisah Batu</label>
+                                <select v-model="editFormData.mesin_pemisah_batu" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Penyosoh</label>
+                                <select v-model="editFormData.mesin_penyosoh" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3 | 2">A. Ada | > 3 | 2</option>
+                                    <option value="2. Ada | 1 s/d 3 | 1">B. Ada | 1 s/d 3 | 1</option>
+                                    <option value="1. Ada | ≤ 1 | 1">C. Ada | ≤ 1 | 1</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pengkabut</label>
+                                <select v-model="editFormData.mesin_pengkabut" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3 | 2">A. Ada | > 3 | 2</option>
+                                    <option value="2. Ada | 1 s/d 3 | 1">B. Ada | 1 s/d 3 | 1</option>
+                                    <option value="1. Ada | ≤ 1 | 1">C. Ada | ≤ 1 | 1</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pemisah Menir</label>
+                                <select v-model="editFormData.mesin_pemesah_menir" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pemisah Katul</label>
+                                <select v-model="editFormData.mesin_pemisah_katul" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pemisah Berdasarkan Ukuran</label>
+                                <select v-model="editFormData.mesin_pemisah_berdasarkan_ukuran" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Ada | ≤ 1">C. Ada | ≤ 1</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pemisah Berdasarkan Warna</label>
+                                <select v-model="editFormData.mesin_pemisah_berdasarkan_warna" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3">A. Ada | > 3</option>
+                                    <option value="2. Ada | 1 s/d 3">B. Ada | 1 s/d 3</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sarana Lainnya Section -->
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-blue-800 mb-4">Sarana Lainnya</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tangki Penyimpanan</label>
+                                <select v-model="editFormData.tangki_penyimpanan" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 10">A. Ada | > 10</option>
+                                    <option value="2. Ada | ≤ 10">B. Ada | ≤ 10</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Pengemas</label>
+                                <select v-model="editFormData.mesin_pengemas" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | Full Otomatis">A. Ada | Full Otomatis</option>
+                                    <option value="2. Ada | Semi Otomatis">B. Ada | Semi Otomatis</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mesin Jahit</label>
+                                <select v-model="editFormData.mesin_jahit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | Full Otomatis">A. Ada | Full Otomatis</option>
+                                    <option value="2. Ada | Semi Otomatis">B. Ada | Semi Otomatis</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Gudang Konvensional</label>
+                                <select v-model="editFormData.gudang_konvensional" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 3000">A. Ada | > 3000</option>
+                                    <option value="2. Ada | < 3000">B. Ada | < 3000</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Silo GKG Hopper</label>
+                                <select v-model="editFormData.silo_gkg_hopper" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 2000">A. Ada | > 2000</option>
+                                    <option value="2. Tidak Ada">B. Tidak Ada</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Truk</label>
+                                <select v-model="editFormData.truk" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | > 5">A. Ada | > 5</option>
+                                    <option value="2. Ada | 1 s/d 5">B. Ada | 1 s/d 5</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mini Lab</label>
+                                <select v-model="editFormData.mini_lab" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | Ruang Khusus">A. Ada | Ruang Khusus</option>
+                                    <option value="2. Ada | Tidak Khusus">B. Ada | Tidak Khusus</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Moisture Tester</label>
+                                <select v-model="editFormData.moisture_tester" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | Lengkap | Berfungsi">A. Ada | Lengkap | Berfungsi</option>
+                                    <option value="2. Ada | Berfungsi">B. Ada | Berfungsi</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pembanding Derajat Sosoh</label>
+                                <select v-model="editFormData.pembanding_derajat_sosoh" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | Sesuai Standar">A. Ada | Sesuai Standar</option>
+                                    <option value="2. Ada | Tidak Sesuai">B. Ada | Tidak Sesuai</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Bagian Quality Control</label>
+                                <select v-model="editFormData.bagian_quality_control" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="">Pilih opsi</option>
+                                    <option value="3. Ada | Tidak Merangkap">A. Ada | Tidak Merangkap</option>
+                                    <option value="2. Ada | Merangkap">B. Ada | Merangkap</option>
+                                    <option value="1. Tidak ada">C. Tidak ada</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex gap-3 mt-6 pt-4 border-t">
+                    <button
+                        @click="closeEditModal"
+                        :disabled="isEditing"
+                        class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="updateKlasifikasiMitra"
+                        :disabled="isEditing"
+                        class="flex-1 px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 disabled:opacity-50"
+                    >
+                        <span v-if="!isEditing">Simpan Perubahan</span>
+                        <span v-else>Menyimpan...</span>
                     </button>
                 </div>
             </div>

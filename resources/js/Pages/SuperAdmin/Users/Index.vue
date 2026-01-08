@@ -21,24 +21,55 @@ const sortedUsers = computed(() => {
 
 // Add search functionality
 const searchQuery = ref('');
+const selectedYear = ref(''); // Filter tahun
 
-// Filter users based on search query
-const filteredUsers = computed(() => {
-    if (!searchQuery.value) return sortedUsers.value;
+// Get unique years from users
+const availableYears = computed(() => {
+    const years = sortedUsers.value.map(user => {
+        if (user.created_at) {
+            return new Date(user.created_at).getFullYear();
+        }
+        return null;
+    }).filter(year => year !== null);
     
-    const query = searchQuery.value.toLowerCase();
-    return sortedUsers.value.filter(user => {
-        return (
-            user.name?.toLowerCase().includes(query) ||
-            user.email?.toLowerCase().includes(query) ||
-            user.role?.toLowerCase().includes(query)
-        );
-    });
+    // Return unique years sorted descending
+    return [...new Set(years)].sort((a, b) => b - a);
+});
+
+// Filter users based on search query and year
+const filteredUsers = computed(() => {
+    let filtered = sortedUsers.value;
+    
+    // Filter by year
+    if (selectedYear.value) {
+        filtered = filtered.filter(user => {
+            if (user.created_at) {
+                const userYear = new Date(user.created_at).getFullYear();
+                return userYear === parseInt(selectedYear.value);
+            }
+            return false;
+        });
+    }
+    
+    // Filter by search query
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        filtered = filtered.filter(user => {
+            return (
+                user.name?.toLowerCase().includes(query) ||
+                user.email?.toLowerCase().includes(query) ||
+                user.role?.toLowerCase().includes(query)
+            );
+        });
+    }
+    
+    return filtered;
 });
 
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const itemsPerPageOptions = [10, 20, 50, 100];
 
 // Pagination computed properties
 const totalPages = computed(() => {
@@ -112,6 +143,12 @@ const resetPagination = () => {
     currentPage.value = 1;
 };
 
+// Method to change items per page
+const changeItemsPerPage = (value) => {
+    itemsPerPage.value = value;
+    resetPagination();
+};
+
 // Format date
 const formatDate = (dateString) => {
     if (!dateString) return '-';
@@ -150,6 +187,16 @@ const getRoleDisplayName = (role) => {
         default:
             return role;
     }
+};
+
+// Get status badge color
+const getStatusBadgeColor = (isActive) => {
+    return isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+};
+
+// Get status display text
+const getStatusDisplayText = (isActive) => {
+    return isActive ? 'Aktif' : 'Nonaktif';
 };
 
 // Edit functionality
@@ -358,6 +405,11 @@ const viewUserDetail = (user) => {
 watch(searchQuery, () => {
     resetPagination();
 });
+
+// Watch selected year to reset pagination
+watch(selectedYear, () => {
+    resetPagination();
+});
 </script>
 
 <template>
@@ -383,8 +435,9 @@ watch(searchQuery, () => {
             </div>
 
             <!-- Search Bar -->
-            <div class="mb-4">
-                <div class="relative w-full">
+            <div class="mb-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <!-- Search Input -->
+                <div class="relative w-full sm:flex-1">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
@@ -407,6 +460,36 @@ watch(searchQuery, () => {
                         </svg>
                     </button>
                 </div>
+
+                <!-- Items Per Page Selector -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <label for="itemsPerPage" class="text-sm text-gray-700 whitespace-nowrap">
+                        Tampilkan:
+                    </label>
+                    <select
+                        id="itemsPerPage"
+                        v-model="itemsPerPage"
+                        @change="changeItemsPerPage(itemsPerPage)"
+                        class="block w-full sm:w-auto py-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
+                            {{ option }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Year Filter -->
+                <div class="relative w-full sm:w-auto">
+                    <select 
+                        v-model="selectedYear"
+                        class="block w-full py-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">Semua Tahun</option>
+                        <option v-for="year in availableYears" :key="year" :value="year">
+                            {{ year }}
+                        </option>
+                    </select>
+                </div>
             </div>
 
             <!-- Users Table -->
@@ -421,6 +504,7 @@ watch(searchQuery, () => {
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Daftar</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                             </tr>
@@ -443,6 +527,11 @@ watch(searchQuery, () => {
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <span :class="['px-2 py-1 text-xs font-medium rounded-full', getRoleBadgeColor(user.role)]">
                                         {{ getRoleDisplayName(user.role) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span :class="['px-2 py-1 text-xs font-medium rounded-full', getStatusBadgeColor(user.is_active)]">
+                                        {{ getStatusDisplayText(user.is_active) }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
@@ -474,7 +563,7 @@ watch(searchQuery, () => {
                                 </td>
                             </tr>
                             <tr v-if="paginatedUsers.length === 0">
-                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="6" class="px-4 py-6 text-center text-gray-500">
                                     {{ searchQuery ? 'Tidak ada user yang sesuai dengan pencarian Anda.' : 'Belum ada data user.' }}
                                 </td>
                             </tr>

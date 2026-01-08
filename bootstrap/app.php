@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\CheckUserActive::class, // Cek user aktif di setiap request
         ]);
 
         // Nonaktifkan CSRF protection untuk route tertentu
@@ -32,6 +33,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         //
+    })
+    ->withSchedule(function ($schedule) {
+        // Jalankan command deactivate user setiap tanggal 1 Januari jam 00:00
+        $schedule->command('users:deactivate-old-year')
+            ->yearlyOn(1, 1, '00:00')
+            ->timezone('Asia/Jakarta');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

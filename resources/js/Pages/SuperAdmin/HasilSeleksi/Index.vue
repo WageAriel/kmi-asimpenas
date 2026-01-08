@@ -70,6 +70,7 @@ const filteredData = computed(() => {
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const itemsPerPageOptions = [10, 20, 50, 100];
 
 // Pagination computed properties
 const totalPages = computed(() => {
@@ -143,6 +144,12 @@ const prevPage = () => {
 watch([searchQuery, selectedYear], () => {
     currentPage.value = 1;
 });
+
+// Method to change items per page
+const changeItemsPerPage = (value) => {
+    itemsPerPage.value = value;
+    currentPage.value = 1;
+};
 
 // Format date helper
 const formatDate = (date) => {
@@ -280,7 +287,7 @@ onMounted(() => {
             </div>
 
             <!-- Search Bar and Year Filter -->
-            <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div class="mb-4 grid grid-cols-1 md:grid-cols-5 gap-3">
                 <!-- Search Input -->
                 <div class="relative md:col-span-3">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -304,6 +311,20 @@ onMounted(() => {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
+                </div>
+
+                <!-- Items Per Page Selector -->
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-700 whitespace-nowrap">Tampilkan:</label>
+                    <select 
+                        v-model="itemsPerPage"
+                        @change="changeItemsPerPage(itemsPerPage)"
+                        class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-orange-500"
+                    >
+                        <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
+                            {{ option }}
+                        </option>
+                    </select>
                 </div>
 
                 <!-- Year Filter -->

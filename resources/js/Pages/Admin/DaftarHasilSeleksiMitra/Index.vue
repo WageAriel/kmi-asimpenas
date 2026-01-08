@@ -334,7 +334,7 @@ onMounted(() => {
                 <div class="relative w-full sm:w-auto">
                     <select 
                         v-model="selectedYear"
-                        class="block w-full p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-orange-500"
+                        class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-orange-500"
                     >
                         <option value="">Semua Tahun</option>
                         <option v-for="year in availableYears" :key="year" :value="year">

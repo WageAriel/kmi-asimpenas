@@ -32,7 +32,23 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                // Custom validation: email harus unik untuk user yang aktif
+                function ($attribute, $value, $fail) {
+                    $existingActiveUser = User::where('email', $value)
+                        ->where('is_active', true)
+                        ->first();
+                    
+                    if ($existingActiveUser) {
+                        $fail('Email sudah terdaftar untuk akun yang aktif.');
+                    }
+                },
+            ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -41,6 +57,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'mitra',
+            'is_active' => true,
         ]);
 
         event(new Registered($user));

@@ -44,9 +44,22 @@ class LoginRequest extends FormRequest
         // Tentukan apakah input adalah email atau username
         $fieldType = filter_var($this->input('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
         
+        // Cek dulu apakah user ada dan cek status aktifnya
+        $user = \App\Models\User::where($fieldType, $this->input('email'))->first();
+        
+        if ($user && !$user->is_active) {
+            // User ada tapi tidak aktif
+            RateLimiter::hit($this->throttleKey());
+            
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda telah dinonaktifkan. Silakan melakukan registrasi ulang akun',
+            ]);
+        }
+        
         $credentials = [
             $fieldType => $this->input('email'),
-            'password' => $this->input('password')
+            'password' => $this->input('password'),
+            'is_active' => true, // Hanya user yang aktif bisa login
         ];
 
         if (! Auth::attempt($credentials, $this->boolean('remember'))) {

@@ -13,6 +13,7 @@ const props = defineProps({
 
 // Add search functionality
 const searchQuery = ref('');
+const selectedYear = ref(''); // Filter tahun
 
 // Sort state
 const sortBy = ref('created_at');
@@ -36,6 +37,17 @@ const toggleSort = (column) => {
 // Filter mitras based on search query
 const filteredMitras = computed(() => {
     let filtered = [...props.mitras];
+    
+    // Filter by year
+    if (selectedYear.value) {
+        filtered = filtered.filter(mitra => {
+            if (mitra.created_at) {
+                const mitraYear = new Date(mitra.created_at).getFullYear();
+                return mitraYear === parseInt(selectedYear.value);
+            }
+            return false;
+        });
+    }
     
     // Apply search filter
     if (searchQuery.value) {
@@ -76,6 +88,19 @@ const filteredMitras = computed(() => {
 // Pagination computed properties
 const totalPages = computed(() => {
     return Math.ceil(filteredMitras.value.length / itemsPerPage.value);
+});
+
+// Get unique years from mitras
+const availableYears = computed(() => {
+    const years = props.mitras.map(mitra => {
+        if (mitra.created_at) {
+            return new Date(mitra.created_at).getFullYear();
+        }
+        return null;
+    }).filter(year => year !== null);
+    
+    // Return unique years sorted descending
+    return [...new Set(years)].sort((a, b) => b - a);
 });
 
 const paginatedMitras = computed(() => {
@@ -643,6 +668,11 @@ const formatDate = (dateString) => {
 watch(searchQuery, () => {
     resetPagination();
 });
+
+// Watch selected year to reset pagination
+watch(selectedYear, () => {
+    resetPagination();
+});
 </script>
 
 <template>
@@ -733,6 +763,21 @@ watch(searchQuery, () => {
                         </select>
                     </div>
 
+                    <!-- Year Filter -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        
+                        <select
+                            id="yearFilterMitra"
+                            v-model="selectedYear"
+                            class="block w-full sm:w-auto py-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="">Semua Tahun</option>
+                            <option v-for="year in availableYears" :key="year" :value="year">
+                                {{ year }}
+                            </option>
+                        </select>
+                    </div>
+
                     <!-- Bulk Delete Button -->
                     <button
                         v-if="selectedIds.length > 0"
@@ -796,6 +841,7 @@ watch(searchQuery, () => {
                                         {{ sortOrder === 'desc' ? '▼' : '▲' }}
                                     </span>
                                 </th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tahun Menjadi Mitra</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                             </tr>
                         </thead>
@@ -819,6 +865,9 @@ watch(searchQuery, () => {
                                     <span :class="['px-2 py-1 text-xs font-medium rounded-full', getStatusClass(mitra.status_perusahaan)]">
                                         {{ mitra.status_perusahaan || 'Belum diatur' }}
                                     </span>
+                                </td>
+                                <td class="text-sm px-4 py-3 whitespace-nowrap text-center">
+                                    {{ mitra.created_at ? new Date(mitra.created_at).getFullYear() : '-' }}
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex space-x-2">
@@ -854,7 +903,7 @@ watch(searchQuery, () => {
                                 </td>
                             </tr>
                             <tr v-if="paginatedMitras.length === 0">
-                                <td colspan="9" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="10" class="px-4 py-6 text-center text-gray-500">
                                     {{ searchQuery ? 'Tidak ada mitra yang sesuai dengan pencarian Anda.' : 'Belum ada data mitra. Silakan tambahkan mitra baru.' }}
                                 </td>
                             </tr>

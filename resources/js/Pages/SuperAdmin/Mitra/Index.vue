@@ -21,6 +21,10 @@ const sortOrder = ref('desc');
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const itemsPerPageOptions = [10, 20, 50, 100];
+
+// Year filter
+const selectedYear = ref('');
 
 // Sort function
 const toggleSort = (column) => {
@@ -45,6 +49,14 @@ const filteredMitras = computed(() => {
                 mitra.badan_hukum_usaha?.toLowerCase().includes(query) ||
                 mitra.status_perusahaan?.toLowerCase().includes(query)
             );
+        });
+    }
+
+    // Apply year filter
+    if (selectedYear.value) {
+        filtered = filtered.filter(mitra => {
+            const createdYear = new Date(mitra.created_at).getFullYear();
+            return createdYear === parseInt(selectedYear.value);
         });
     }
 
@@ -81,6 +93,18 @@ const paginatedMitras = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
     return filteredMitras.value.slice(start, end);
+});
+
+// Get available years from mitras
+const availableYears = computed(() => {
+    const years = new Set();
+    props.mitras.forEach(mitra => {
+        if (mitra.created_at) {
+            const year = new Date(mitra.created_at).getFullYear();
+            years.add(year);
+        }
+    });
+    return Array.from(years).sort((a, b) => b - a);
 });
 
 const visiblePages = computed(() => {
@@ -142,6 +166,12 @@ const prevPage = () => {
 
 const resetPagination = () => {
     currentPage.value = 1;
+};
+
+// Function to change items per page
+const changeItemsPerPage = (value) => {
+    itemsPerPage.value = value;
+    resetPagination();
 };
 
 // Bulk delete functionality
@@ -238,6 +268,11 @@ const bulkDelete = async () => {
 watch(currentPage, () => {
     selectAll.value = false;
     selectedIds.value = [];
+});
+
+// Watch for year filter changes to reset pagination
+watch(selectedYear, () => {
+    resetPagination();
 });
 
 // For modal functionality
@@ -708,6 +743,40 @@ watch(searchQuery, () => {
                         </button>
                     </div>
 
+                    <!-- Items Per Page Selector -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label for="itemsPerPageMitra" class="text-sm text-gray-700 whitespace-nowrap">
+                            Tampilkan:
+                        </label>
+                        <select
+                            id="itemsPerPageMitra"
+                            v-model="itemsPerPage"
+                            @change="changeItemsPerPage(itemsPerPage)"
+                            class="block w-full sm:w-auto py-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
+                                {{ option }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Year Filter -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label for="yearFilterMitra" class="text-sm text-gray-700 whitespace-nowrap">
+                            Tahun:
+                        </label>
+                        <select
+                            id="yearFilterMitra"
+                            v-model="selectedYear"
+                            class="block w-full sm:w-auto py-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="">Semua Tahun</option>
+                            <option v-for="year in availableYears" :key="year" :value="year">
+                                {{ year }}
+                            </option>
+                        </select>
+                    </div>
+
                     <!-- Bulk Delete Button -->
                     <button
                         v-if="selectedIds.length > 0"
@@ -769,9 +838,10 @@ watch(searchQuery, () => {
                                 >
                                     Status
                                     <span v-if="sortBy === 'status'" class="ml-1">
-                                        {{ sortOrder === 'desc' ? 'â–¼' : 'â–²' }}
+                                        {{ sortOrder === 'desc' ? '▼' : '▲' }}
                                     </span>
                                 </th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tahun Menjadi Mitra</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                             </tr>
                         </thead>
@@ -795,6 +865,9 @@ watch(searchQuery, () => {
                                     <span :class="['px-2 py-1 text-xs font-medium rounded-full', getStatusClass(mitra.status_perusahaan)]">
                                         {{ mitra.status_perusahaan || 'Belum diatur' }}
                                     </span>
+                                </td>
+                                <td class="text-sm px-4 py-3 whitespace-nowrap text-center">
+                                    {{ mitra.created_at ? new Date(mitra.created_at).getFullYear() : '-' }}
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex space-x-2">
@@ -830,7 +903,7 @@ watch(searchQuery, () => {
                                 </td>
                             </tr>
                             <tr v-if="paginatedMitras.length === 0">
-                                <td colspan="9" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="10" class="px-4 py-6 text-center text-gray-500">
                                     {{ searchQuery ? 'Tidak ada mitra yang sesuai dengan pencarian Anda.' : 'Belum ada data mitra. Silakan tambahkan mitra baru.' }}
                                 </td>
                             </tr>
