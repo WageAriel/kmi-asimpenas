@@ -179,6 +179,7 @@ const showPdfModal = ref(false);
 const selectedItemForPdf = ref(null);
 const selectedPelaksana = ref('');
 const selectedPengetahui = ref('');
+const selectedTanggalCetak = ref(''); // Tanggal cetak untuk BA Hasil Seleksi
 const karyawanList = ref([]);
 const isGeneratingPdf = ref(false);
 
@@ -186,6 +187,13 @@ const isGeneratingPdf = ref(false);
 const viewDetail = async (item) => {
     selectedItemForPdf.value = item;
     showPdfModal.value = true;
+    // Set default tanggal cetak ke hari ini
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    selectedTanggalCetak.value = `${yyyy}-${mm}-${dd}`;
+    
     try {
         const response = await axios.get('/api/karyawan');
         karyawanList.value = response.data;
@@ -200,6 +208,11 @@ const generatePdf = async () => {
         alert('Silakan pilih kedua karyawan terlebih dahulu');
         return;
     }
+    
+    if (!selectedTanggalCetak.value) {
+        alert('Silakan pilih tanggal cetak terlebih dahulu');
+        return;
+    }
 
     isGeneratingPdf.value = true;
     try {
@@ -208,7 +221,8 @@ const generatePdf = async () => {
             {
                 params: { 
                     id_pelaksana: selectedPelaksana.value,
-                    id_pengetahui: selectedPengetahui.value
+                    id_pengetahui: selectedPengetahui.value,
+                    tanggal_cetak: selectedTanggalCetak.value
                 },
                 responseType: 'blob'
             }
@@ -231,6 +245,7 @@ const generatePdf = async () => {
         selectedItemForPdf.value = null;
         selectedPelaksana.value = '';
         selectedPengetahui.value = '';
+        selectedTanggalCetak.value = '';
     }
 };
 
@@ -488,6 +503,18 @@ onMounted(() => {
                 <h2 class="text-xl font-bold mb-6">Generate Berita Acara</h2>
 
                 <div class="space-y-6">
+                    <!-- Tanggal Cetak -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Tanggal Cetak
+                        </label>
+                        <input 
+                            type="date" 
+                            v-model="selectedTanggalCetak"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                        />
+                    </div>
+
                     <!-- Pelaksana Seleksi -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -534,7 +561,7 @@ onMounted(() => {
                     </button>
                     <button
                         @click="generatePdf"
-                        :disabled="!selectedPelaksana || !selectedPengetahui || isGeneratingPdf"
+                        :disabled="!selectedPelaksana || !selectedPengetahui || !selectedTanggalCetak || isGeneratingPdf"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                         <svg v-if="isGeneratingPdf" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

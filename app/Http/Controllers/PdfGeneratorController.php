@@ -242,7 +242,8 @@ class PdfGeneratorController extends Controller
             $seleksi = DataSeleksiMitra::with('mitra')->findOrFail($id);
             $karyawan = Karyawan::findOrFail($request->id_karyawan);
             
-            $today = now();
+            // Gunakan tanggal_cetak dari request, jika tidak ada gunakan hari ini
+            $tanggalCetak = $request->tanggal_cetak ? \Carbon\Carbon::parse($request->tanggal_cetak) : now();
             
             // Calculate sequential order number (urutan data seleksi keberapa di database)
             $urutanDataSeleksi = DataSeleksiMitra::where('id_seleksi_mitra', '<=', $id)
@@ -261,19 +262,20 @@ class PdfGeneratorController extends Controller
             // Ambil tahun dari seleksi
             $tahunSeleksi = $seleksi->created_at->year;
 
-            $bulanRomawi = $this->getRomanMonth(date('n'));
+            // Gunakan bulan dari tanggal_cetak
+            $bulanRomawi = $this->getRomanMonth($tanggalCetak->month);
             
             $data = [
                 'seleksi' => $seleksi,
                 'mitra' => $seleksi->mitra,
                 'karyawan' => $karyawan,
-                'hari' => \Carbon\Carbon::now()->locale('id')->isoFormat('dddd'),
+                'hari' => $tanggalCetak->locale('id')->isoFormat('dddd'),
                 'tanggal' => sprintf(
                     "%s bulan %s tahun %s (%s)",
-                    $this->terbilang($today->day),
-                    $this->bulanIndo($today->month),
-                    $this->tahunTerbilang($today->year),
-                    $today->format('d-m-Y')
+                    $this->terbilang($tanggalCetak->day),
+                    $this->bulanIndo($tanggalCetak->month),
+                    $this->tahunTerbilang($tanggalCetak->year),
+                    $tanggalCetak->format('d-m-Y')
                 ),
                 'nomor_surat' => sprintf(
                     "%02d/11030/SP/MITRAPANGAN/%s/%s",
@@ -342,7 +344,8 @@ class PdfGeneratorController extends Controller
             $pelaksana = Karyawan::findOrFail($request->id_pelaksana);
             $pengetahui = Karyawan::findOrFail($request->id_pengetahui);
             
-            $today = now();
+            // Gunakan tanggal_cetak dari request, jika tidak ada gunakan hari ini
+            $tanggalCetak = $request->tanggal_cetak ? \Carbon\Carbon::parse($request->tanggal_cetak) : now();
             
             // Hitung urutan hasil seleksi untuk mitra ini (hasil seleksi keberapa dari mitra tersebut)
             $urutanHasilSeleksi = HasilSeleksiMitra::where('id_mitra', $hasilSeleksi->id_mitra)
@@ -366,7 +369,8 @@ class PdfGeneratorController extends Controller
             // Konversi urutan hasil seleksi mitra ke angka romawi
             $urutanHasilSeleksiRomawi = $this->toRoman($urutanHasilSeleksi);
 
-            $bulanRomawi = $this->getRomanMonth(date('n'));
+            // Gunakan bulan dari tanggal_cetak
+            $bulanRomawi = $this->getRomanMonth($tanggalCetak->month);
             
             // Format nomor surat: {urutan_data}/11030/BA/SELEKSI/{urutan_hasil_seleksi_romawi}/{tahun}
             $nomorSurat = sprintf(
@@ -429,13 +433,13 @@ class PdfGeneratorController extends Controller
             $data = [
                 'nomor_surat' => $nomorSurat,
                 'tahun' => $tahunPengajuan,
-                'hari' => $today->locale('id')->isoFormat('dddd'),
+                'hari' => $tanggalCetak->locale('id')->isoFormat('dddd'),
                 'tanggal' => sprintf(
                     "%s bulan %s tahun %s (%s)",
-                    $this->terbilang($today->day),
-                    $this->bulanIndo($today->month),
-                    $this->tahunTerbilang($today->year),
-                    $today->format('d-m-Y')
+                    $this->terbilang($tanggalCetak->day),
+                    $this->bulanIndo($tanggalCetak->month),
+                    $this->tahunTerbilang($tanggalCetak->year),
+                    $tanggalCetak->format('d-m-Y')
                 ),
                 'nomor_urut_seleksi' => sprintf("%02d", $urutanDataSeleksi),
                 'tanggal_seleksi' => $hasilSeleksi->created_at->locale('id')->isoFormat('D MMMM Y'),
@@ -462,7 +466,7 @@ class PdfGeneratorController extends Controller
             $filename = sprintf(
                 'BA-SELEKSI-%s-%s.pdf',
                 str_replace(' ', '-', $hasilSeleksi->mitra->nama_perusahaan),
-                $today->format('dmY')
+                $tanggalCetak->format('dmY')
             );
 
             return $pdf->download($filename);
@@ -479,7 +483,8 @@ class PdfGeneratorController extends Controller
             $pelaksana = Karyawan::findOrFail($request->id_pelaksana);
             $pengetahui = Karyawan::findOrFail($request->id_pengetahui);
             
-            $today = now();
+            // Gunakan tanggal_cetak dari request, jika tidak ada gunakan hari ini
+            $tanggalCetak = $request->tanggal_cetak ? \Carbon\Carbon::parse($request->tanggal_cetak) : now();
             
             // Hitung urutan klasifikasi untuk mitra ini
             $urutanKlasifikasi = KlasifikasiMitra::where('id_mitra', $klasifikasi->id_mitra)
@@ -498,7 +503,8 @@ class PdfGeneratorController extends Controller
             // Konversi id_klasifikasi ke angka romawi
             $idKlasifikasiRomawi = $this->toRoman($klasifikasi->id_klasifikasi_mitra);
 
-            $bulanRomawi = $this->getRomanMonth(date('n'));
+            // Gunakan bulan dari tanggal_cetak
+            $bulanRomawi = $this->getRomanMonth($tanggalCetak->month);
             
             // Format nomor surat: {urutan_data}/11030/BA/KLASIFIKASI/{id_klasifikasi_romawi}/{tahun}
             $nomorSurat = sprintf(
@@ -540,13 +546,13 @@ class PdfGeneratorController extends Controller
             $data = [
                 'nomor_surat' => $nomorSurat,
                 'tahun' => $tahunPengajuan,
-                'hari' => $today->locale('id')->isoFormat('dddd'),
+                'hari' => $tanggalCetak->locale('id')->isoFormat('dddd'),
                 'tanggal' => sprintf(
                     "%s bulan %s tahun %s (%s)",
-                    $this->terbilang($today->day),
-                    $this->bulanIndo($today->month),
-                    $this->tahunTerbilang($today->year),
-                    $today->format('d-m-Y')
+                    $this->terbilang($tanggalCetak->day),
+                    $this->bulanIndo($tanggalCetak->month),
+                    $this->tahunTerbilang($tanggalCetak->year),
+                    $tanggalCetak->format('d-m-Y')
                 ),
                 'nomor_urut' => sprintf("%d", $urutanKlasifikasi),
                 'tanggal_klasifikasi' => $klasifikasi->created_at->locale('id')->isoFormat('D MMMM Y'),
@@ -569,7 +575,7 @@ class PdfGeneratorController extends Controller
             $filename = sprintf(
                 'BA-KLASIFIKASI-%s-%s.pdf',
                 str_replace(' ', '-', $klasifikasi->mitra->nama_perusahaan),
-                $today->format('dmY')
+                $tanggalCetak->format('dmY')
             );
 
             return $pdf->download($filename);
@@ -645,7 +651,8 @@ class PdfGeneratorController extends Controller
             $klasifikasi = KlasifikasiMitra::with('mitra')->findOrFail($id);
             $karyawan = Karyawan::findOrFail($request->id_karyawan);
             
-            $today = now();
+            // Gunakan tanggal_cetak dari request, jika tidak ada gunakan hari ini
+            $tanggalCetak = $request->tanggal_cetak ? \Carbon\Carbon::parse($request->tanggal_cetak) : now();
             
             // Calculate sequential order number (urutan data keberapa di database)
             $urutanDataKlasifikasi = KlasifikasiMitra::where('id_klasifikasi_mitra', '<=', $id)
@@ -655,29 +662,30 @@ class PdfGeneratorController extends Controller
             // Convert urutan to Roman numeral
             $urutanRoman = $this->toRoman($urutanDataKlasifikasi);
 
-            $bulanRomawi = $this->getRomanMonth(date('n'));
+            // Gunakan bulan dari tanggal_cetak
+            $bulanRomawi = $this->getRomanMonth($tanggalCetak->month);
             
             $data = [
                 'nomor_surat' => sprintf(
                     "%d/11030/SP/KLASIFIKASI/%s/%s",
                     $urutanDataKlasifikasi,
                     $bulanRomawi,
-                    $today->year
+                    $tanggalCetak->year
                 ),
-                'tahun' => $today->year,
-                'hari' => \Carbon\Carbon::now()->locale('id')->isoFormat('dddd'),
+                'tahun' => $tanggalCetak->year,
+                'hari' => $tanggalCetak->locale('id')->isoFormat('dddd'),
                 'tanggal' => sprintf(
                     "%s bulan %s tahun %s (%s)",
-                    $this->terbilang($today->day),
-                    $this->bulanIndo($today->month),
-                    $this->tahunTerbilang($today->year),
-                    $today->format('d-m-Y')
+                    $this->terbilang($tanggalCetak->day),
+                    $this->bulanIndo($tanggalCetak->month),
+                    $this->tahunTerbilang($tanggalCetak->year),
+                    $tanggalCetak->format('d-m-Y')
                 ),
                 'nomor_BA' => sprintf(
                     "%d/11030/BA/KLASIFIKASI/%s/%s",
                     $urutanDataKlasifikasi,
                     $bulanRomawi,
-                    $today->year
+                    $tanggalCetak->year
                 ),
                 'nama_perusahaan' => $klasifikasi->mitra->nama_perusahaan,
                 'badan_usaha' => $klasifikasi->mitra->badan_hukum_usaha,

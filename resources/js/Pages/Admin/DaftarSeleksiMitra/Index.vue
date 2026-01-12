@@ -450,11 +450,20 @@ const selectedItemForPdf = ref(null);
 const selectedKaryawan = ref('');
 const karyawanList = ref([]);
 const isGeneratingPdf = ref(false);
+const tanggalCetak = ref(''); // Tambahan: ref untuk tanggal cetak
 
 // Add new function to handle PDF modal
 const showPdfDownloadModal = async (item) => {
+    // Validasi: hanya bisa download jika status lolos
+    if (item.status_seleksi !== 'lolos') {
+        alert('Surat penetapan hanya dapat diunduh untuk seleksi mitra yang sudah lolos verifikasi.');
+        return;
+    }
+    
     selectedItemForPdf.value = item;
     showPdfModal.value = true;
+    // Set default tanggal cetak ke hari ini
+    tanggalCetak.value = new Date().toISOString().split('T')[0];
     try {
         const response = await axios.get('/api/karyawan');
         console.log(response.data); // Check data di console
@@ -471,12 +480,20 @@ const generatePdf = async () => {
         return;
     }
 
+    if (!tanggalCetak.value) {
+        alert('Silakan pilih tanggal cetak terlebih dahulu');
+        return;
+    }
+
     isGeneratingPdf.value = true;
     try {
         const response = await axios.get(
             `/admin/seleksi-mitra/${selectedItemForPdf.value.id_seleksi_mitra}/surat-penetapan`, // Tambahkan prefix /admin/
             {
-                params: { id_karyawan: selectedKaryawan.value },
+                params: { 
+                    id_karyawan: selectedKaryawan.value,
+                    tanggal_cetak: tanggalCetak.value 
+                },
                 responseType: 'blob'
             }
         );
@@ -498,6 +515,7 @@ const generatePdf = async () => {
         showPdfModal.value = false;
         selectedItemForPdf.value = null;
         selectedKaryawan.value = '';
+        tanggalCetak.value = '';
     }
 };
 
@@ -1137,8 +1155,14 @@ const deleteSingleItem = async () => {
                                 <div class="flex gap-2">
                                     <button
                                         @click="showPdfDownloadModal(item)"
-                                        class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
-                                        title="Download surat penetapan"
+                                        :disabled="item.status_seleksi !== 'lolos'"
+                                        :class="[
+                                            'inline-flex items-center px-2 py-1 border rounded transition-colors duration-200 text-xs',
+                                            item.status_seleksi === 'lolos'
+                                                ? 'text-blue-600 hover:text-white hover:bg-blue-600 border-blue-600 cursor-pointer'
+                                                : 'text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
+                                        ]"
+                                        :title="item.status_seleksi === 'lolos' ? 'Download surat penetapan' : 'Seleksi harus diverifikasi terlebih dahulu'"
                                     >
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -2121,6 +2145,17 @@ const deleteSingleItem = async () => {
                     </select>
                 </div>
 
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Tanggal Cetak Surat
+                    </label>
+                    <input 
+                        type="date"
+                        v-model="tanggalCetak"
+                        class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                    />
+                </div>
+
                 <div class="flex justify-end space-x-4">
                     <button 
                         @click="showPdfModal = false"
@@ -2130,7 +2165,7 @@ const deleteSingleItem = async () => {
                     </button>
                     <button
                         @click="generatePdf"
-                        :disabled="!selectedKaryawan || isGeneratingPdf"
+                        :disabled="!selectedKaryawan || !tanggalCetak || isGeneratingPdf"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                         <svg v-if="isGeneratingPdf" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

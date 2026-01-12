@@ -691,6 +691,7 @@ const confirmDelete = async () => {
 const showPdfModal = ref(false);
 const selectedItemForPdf = ref(null);
 const selectedKaryawan = ref('');
+const selectedTanggalCetak = ref(''); // Tanggal cetak untuk Surat Penetapan
 const karyawanList = ref([]);
 const isGeneratingPdf = ref(false);
 
@@ -699,12 +700,20 @@ const showBaPdfModal = ref(false);
 const selectedItemForBaPdf = ref(null);
 const selectedPelaksana = ref('');
 const selectedPengetahui = ref('');
+const selectedTanggalCetakBa = ref(''); // Tanggal cetak untuk BA Klasifikasi
 const isGeneratingBaPdf = ref(false);
 
 // Add new function to handle PDF modal
 const showPdfDownloadModal = async (item) => {
     selectedItemForPdf.value = item;
     showPdfModal.value = true;
+    // Set default tanggal cetak ke hari ini
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    selectedTanggalCetak.value = `${yyyy}-${mm}-${dd}`;
+    
     try {
         const response = await axios.get('/api/karyawan');
         karyawanList.value = response.data;
@@ -719,13 +728,21 @@ const generatePdf = async () => {
         alert('Silakan pilih karyawan terlebih dahulu');
         return;
     }
+    
+    if (!selectedTanggalCetak.value) {
+        alert('Silakan pilih tanggal cetak terlebih dahulu');
+        return;
+    }
 
     isGeneratingPdf.value = true;
     try {
         const response = await axios.get(
             `/super-admin/klasifikasi-mitra/${selectedItemForPdf.value.id_klasifikasi_mitra}/surat-penetapan`,
             {
-                params: { id_karyawan: selectedKaryawan.value },
+                params: { 
+                    id_karyawan: selectedKaryawan.value,
+                    tanggal_cetak: selectedTanggalCetak.value
+                },
                 responseType: 'blob'
             }
         );
@@ -746,6 +763,7 @@ const generatePdf = async () => {
         showPdfModal.value = false;
         selectedItemForPdf.value = null;
         selectedKaryawan.value = '';
+        selectedTanggalCetak.value = '';
     }
 };
 
@@ -753,6 +771,13 @@ const generatePdf = async () => {
 const showBaPdfDownloadModal = async (item) => {
     selectedItemForBaPdf.value = item;
     showBaPdfModal.value = true;
+    // Set default tanggal cetak ke hari ini
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    selectedTanggalCetakBa.value = `${yyyy}-${mm}-${dd}`;
+    
     try {
         const response = await axios.get('/api/karyawan');
         karyawanList.value = response.data;
@@ -767,6 +792,11 @@ const generateBaPdf = async () => {
         alert('Silakan pilih pelaksana dan pengetahui terlebih dahulu');
         return;
     }
+    
+    if (!selectedTanggalCetakBa.value) {
+        alert('Silakan pilih tanggal cetak terlebih dahulu');
+        return;
+    }
 
     isGeneratingBaPdf.value = true;
     try {
@@ -775,7 +805,8 @@ const generateBaPdf = async () => {
             {
                 params: { 
                     id_pelaksana: selectedPelaksana.value,
-                    id_pengetahui: selectedPengetahui.value
+                    id_pengetahui: selectedPengetahui.value,
+                    tanggal_cetak: selectedTanggalCetakBa.value
                 },
                 responseType: 'blob'
             }
@@ -798,6 +829,7 @@ const generateBaPdf = async () => {
         selectedItemForBaPdf.value = null;
         selectedPelaksana.value = '';
         selectedPengetahui.value = '';
+        selectedTanggalCetakBa.value = '';
     }
 };
 
@@ -1059,7 +1091,14 @@ const updateKlasifikasiMitra = async () => {
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <button
                                         @click="showBaPdfDownloadModal(item)"
-                                        class="inline-flex items-center px-2 py-1 text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 rounded transition-colors duration-200 text-xs"
+                                        :disabled="!item.hasil_klasifikasi"
+                                        :class="[
+                                            'inline-flex items-center px-2 py-1 border rounded transition-colors duration-200 text-xs',
+                                            item.hasil_klasifikasi 
+                                                ? 'text-blue-600 hover:text-white hover:bg-blue-600 border-blue-600 cursor-pointer' 
+                                                : 'text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
+                                        ]"
+                                        :title="!item.hasil_klasifikasi ? 'Hasil klasifikasi belum diverifikasi' : 'Download BA Klasifikasi'"
                                     >
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -1070,7 +1109,14 @@ const updateKlasifikasiMitra = async () => {
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <button
                                         @click="showPdfDownloadModal(item)"
-                                        class="inline-flex items-center px-2 py-1 text-green-600 hover:text-white hover:bg-green-600 border border-green-600 rounded transition-colors duration-200 text-xs"
+                                        :disabled="!item.hasil_klasifikasi"
+                                        :class="[
+                                            'inline-flex items-center px-2 py-1 border rounded transition-colors duration-200 text-xs',
+                                            item.hasil_klasifikasi 
+                                                ? 'text-green-600 hover:text-white hover:bg-green-600 border-green-600 cursor-pointer' 
+                                                : 'text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
+                                        ]"
+                                        :title="!item.hasil_klasifikasi ? 'Hasil klasifikasi belum diverifikasi' : 'Download Surat Penetapan'"
                                     >
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -1440,6 +1486,17 @@ const updateKlasifikasiMitra = async () => {
 
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Tanggal Cetak
+                    </label>
+                    <input 
+                        type="date"
+                        v-model="selectedTanggalCetak"
+                        class="mt-1 block w-full px-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border"
+                    />
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         Pilih Penandatangan
                     </label>
                     <select 
@@ -1464,7 +1521,7 @@ const updateKlasifikasiMitra = async () => {
                     </button>
                     <button
                         @click="generatePdf"
-                        :disabled="!selectedKaryawan || isGeneratingPdf"
+                        :disabled="!selectedKaryawan || !selectedTanggalCetak || isGeneratingPdf"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                         <svg v-if="isGeneratingPdf" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -1489,6 +1546,17 @@ const updateKlasifikasiMitra = async () => {
                 <h2 class="text-xl font-bold mb-6">Generate Berita Acara Klasifikasi</h2>
 
                 <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Tanggal Cetak
+                        </label>
+                        <input 
+                            type="date"
+                            v-model="selectedTanggalCetakBa"
+                            class="mt-1 block w-full px-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border"
+                        />
+                    </div>
+                    
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             Pelaksana Klasifikasi
@@ -1533,7 +1601,7 @@ const updateKlasifikasiMitra = async () => {
                     </button>
                     <button
                         @click="generateBaPdf"
-                        :disabled="!selectedPelaksana || !selectedPengetahui || isGeneratingBaPdf"
+                        :disabled="!selectedPelaksana || !selectedPengetahui || !selectedTanggalCetakBa || isGeneratingBaPdf"
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                     >
                         <svg v-if="isGeneratingBaPdf" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

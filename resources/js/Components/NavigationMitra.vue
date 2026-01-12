@@ -235,15 +235,60 @@ const menuItems = [
 
                 <!-- Mobile User Section -->
                 <div class="flex-shrink-0 flex border-t border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                            </svg>
+                    <div class="flex-shrink-0 w-full group block" ref="userDropdownRef">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-base font-medium text-gray-800 truncate">{{ user?.name || 'PT. Mitra Teknologi' }}</div>
+                                <div class="text-sm font-medium text-gray-500 truncate">{{ user?.email || 'admin@mitra.com' }}</div>
+                            </div>
+                            <button 
+                                @click="showingUserDropdown = !showingUserDropdown"
+                                class="ml-2 flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"/>
+                                </svg>
+                            </button>
                         </div>
-                        <div>
-                            <div class="text-base font-medium text-gray-800">{{ user?.name || 'PT. Mitra Teknologi' }}</div>
-                            <div class="text-sm font-medium text-gray-500">{{ user?.email || 'admin@mitra.com' }}</div>
+
+                        <!-- Mobile User Dropdown -->
+                        <div v-show="showingUserDropdown" 
+                             class="absolute bottom-16 left-4 right-4 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                            <!-- User Info -->
+                            <div class="px-4 py-3 border-b border-gray-200">
+                                <p class="text-sm font-medium text-gray-900">{{ user?.name || 'PT. Mitra Teknologi' }}</p>
+                                <p class="text-xs text-gray-500">{{ user?.email || 'admin@mitra.com' }}</p>
+                            </div>
+
+                            <!-- Menu Items -->
+                            <Link 
+                                :href="route('profile.edit')"
+                                class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                @click="showingUserDropdown = false; showingSidebar = false"
+                            >
+                                <svg class="w-4 h-4 mr-3 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+                                </svg>
+                                Pengaturan Akun
+                            </Link>
+
+                            <Link 
+                                :href="route('logout')" 
+                                method="post" 
+                                as="button"
+                                class="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                @click="showingUserDropdown = false; showingSidebar = false"
+                            >
+                                <svg class="w-4 h-4 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
+                                </svg>
+                                Keluar
+                            </Link>
                         </div>
                     </div>
                 </div>
