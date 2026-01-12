@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 import logoImg from '@/../../resources/assets/Images/bulog.png';
 
 const form = useForm({
@@ -7,6 +8,59 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+});
+
+const emailWarning = ref('');
+
+// Validasi email real-time
+watch(() => form.email, (newEmail) => {
+    emailWarning.value = '';
+    
+    if (!newEmail || !newEmail.includes('@')) {
+        return;
+    }
+
+    const domain = newEmail.split('@')[1]?.toLowerCase();
+    
+    if (!domain) {
+        return;
+    }
+
+    // Deteksi typo Gmail
+    const typoGmail = ['gamail.com', 'gmai.com', 'gmial.com', 'gmaill.com', 'gmil.com', 'gmal.com', 'gmaik.com', 'gnail.com', 'gamil.com'];
+    if (typoGmail.includes(domain)) {
+        emailWarning.value = '⚠️ Sepertinya Anda salah ketik. Maksud Anda "gmail.com"?';
+        return;
+    }
+
+    // Deteksi typo Yahoo
+    const typoYahoo = ['yaho.com', 'yahooo.com', 'yhoo.com', 'yahho.com', 'yaoo.com'];
+    if (typoYahoo.includes(domain)) {
+        emailWarning.value = '⚠️ Sepertinya Anda salah ketik. Maksud Anda "yahoo.com"?';
+        return;
+    }
+
+    // Deteksi typo Hotmail/Outlook
+    const typoHotmail = ['hotmal.com', 'hotmial.com', 'hotmil.com', 'htmail.com', 'homail.com'];
+    if (typoHotmail.includes(domain)) {
+        emailWarning.value = '⚠️ Sepertinya Anda salah ketik. Maksud Anda "hotmail.com"?';
+        return;
+    }
+
+    // List domain valid
+    const validDomains = [
+        'gmail.com', 'yahoo.com', 'yahoo.co.id', 'hotmail.com', 'outlook.com',
+        'live.com', 'icloud.com', 'mail.com', 'aol.com', 'protonmail.com',
+        'zoho.com', 'yandex.com', 'gmx.com', 'tutanota.com'
+    ];
+
+    // Cek domain Indonesia
+    const indonesianDomains = ['co.id', '.id', 'or.id', 'ac.id', 'go.id', 'net.id', 'web.id'];
+    const isIndonesianDomain = indonesianDomains.some(d => domain.endsWith(d));
+
+    if (!validDomains.includes(domain) && !isIndonesianDomain) {
+        emailWarning.value = `⚠️ Domain email "${domain}" mungkin tidak valid. Pastikan Anda mengetik dengan benar.`;
+    }
 });
 
 const submit = () => {
@@ -107,13 +161,23 @@ const submit = () => {
                             v-model="form.email"
                             required
                             autocomplete="username"
-                            placeholder="Masukkan email"
+                            placeholder="contoh@gmail.com"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                            :class="{ 'border-red-300': form.errors.email }"
+                            :class="{ 
+                                'border-red-300': form.errors.email,
+                                'border-yellow-300': emailWarning && !form.errors.email
+                            }"
                         />
+                        <!-- Warning real-time untuk typo -->
+                        <div v-if="emailWarning && !form.errors.email" class="mt-1 text-sm text-yellow-600 flex items-start">
+                            <span>{{ emailWarning }}</span>
+                        </div>
+                        <!-- Error dari server -->
                         <div v-if="form.errors.email" class="mt-1 text-sm text-red-600">
                             {{ form.errors.email }}
                         </div>
+                        <!-- Helper text -->
+                        <p class="mt-1 text-xs text-gray-500">Gunakan email yang valid seperti Gmail, Yahoo, atau email perusahaan</p>
                     </div>
 
                     <!-- Password -->

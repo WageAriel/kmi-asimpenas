@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\ValidEmailDomain;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,7 @@ class RegisteredUserController extends Controller
                 'lowercase',
                 'email',
                 'max:255',
+                new ValidEmailDomain(), // Validasi domain email
                 // Custom validation: email harus unik untuk user yang aktif
                 function ($attribute, $value, $fail) {
                     $existingActiveUser = User::where('email', $value)
