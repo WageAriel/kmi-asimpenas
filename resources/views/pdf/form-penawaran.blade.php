@@ -230,9 +230,10 @@
             $jenisKomoditiDenganKualitasList = $commodityUpper;
         }
         
-        // Gabungkan semua kuantum dengan pemisah /
-        $kuantumList = $purchaseOrder->items->pluck('kuantum')->map(function($k) {
-            return number_format($k, 0, ',', '.') . ' Kg';
+        // Gabungkan semua kuantum dengan pemisah / dan menggunakan satuan masing-masing
+        $kuantumList = $purchaseOrder->items->map(function($item) {
+            $satuan = $item->satuan ?? 'Kg';
+            return number_format($item->kuantum, 0, ',', '.') . ' ' . $satuan;
         })->implode(' / ');
     @endphp
 

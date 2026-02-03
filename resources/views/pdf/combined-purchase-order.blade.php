@@ -311,13 +311,18 @@
         Bersama ini kami <strong>{{ $namaPerusahaanLengkap }}</strong> bermohon untuk ikut serta dalam rangka pengadaan <strong>{{ strtoupper($purchaseOrder->jenis_komoditas_lengkap) }}</strong> dalam negeri tahun {{ date('Y') }} dengan mengajukan penawaran untuk menyediakan komoditas sebagai berikut :
     </div>
 
+    @php
+        // Ambil satuan dari item pertama untuk header tabel
+        $satuan = $purchaseOrder->items->first()->satuan ?? 'Kg';
+    @endphp
+
     <table>
         <thead>
             <tr>
                 <th style="width: 5%;">No</th>
                 <th style="width: 25%;">Jenis Komoditas</th>
-                <th style="width: 15%;">Harga (Rp/Kg)</th>
-                <th style="width: 15%;">Kuantum (Kg)</th>
+                <th style="width: 15%;">Harga (Rp/{{ $satuan }})</th>
+                <th style="width: 15%;">Kuantum ({{ $satuan }})</th>
                 <th style="width: 20%;">Nilai (Rp)</th>
                 <th style="width: 20%;">Komp. Pergud.</th>
             </tr>
@@ -447,8 +452,9 @@
 
     @php
         $kualitasList = $purchaseOrder->items->pluck('kualitas_lengkap')->unique()->filter()->implode(' / ');
-        $kuantumList = $purchaseOrder->items->pluck('kuantum')->map(function($k) {
-            return number_format($k, 0, ',', '.') . ' Kg';
+        $kuantumList = $purchaseOrder->items->map(function($item) {
+            $satuan = $item->satuan ?? 'Kg';
+            return number_format($item->kuantum, 0, ',', '.') . ' ' . $satuan;
         })->implode(' / ');
     @endphp
 

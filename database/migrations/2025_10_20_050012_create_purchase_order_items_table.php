@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('komplek_pergudangan_custom')->nullable();
             $table->string('kualitas');
             $table->string('kualitas_custom')->nullable();
+            $table->string('satuan')->default('Kg'); // Satuan (Kg/Liter)
             $table->timestamps();
         });
     }

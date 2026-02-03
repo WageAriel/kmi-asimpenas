@@ -225,6 +225,8 @@
         $totalKuantum = $purchaseOrder->items->sum('kuantum');
         // Ambil nama gudang dari item pertama (karena biasanya sama untuk satu komoditas)
         $namaGudang = $purchaseOrder->items->first()->komplek_pergudangan_lengkap ?? '';
+        // Ambil satuan dari item pertama untuk tampilan total
+        $satuan = $purchaseOrder->items->first()->satuan ?? 'Kg';
     @endphp
 
     <!-- Header -->
@@ -296,8 +298,8 @@
             <tr style="border:1px solid #000">
                 <th style="border:1px solid #000;width: 5%;">No</th>
                 <th style="border:1px solid #000;width: 25%;">Jenis Komoditas</th>
-                <th style="border:1px solid #000;width: 15%;">Harga (Rp/Kg)</th>
-                <th style="border:1px solid #000;width: 15%;">Kuantum (Kg)</th>
+                <th style="border:1px solid #000;width: 15%;">Harga (Rp/{{ $satuan }})</th>
+                <th style="border:1px solid #000;width: 15%;">Kuantum ({{ $satuan }})</th>
                 <th style="border:1px solid #000;width: 20%;">Nilai (Rp)</th>
                 <th style="border:1px solid #000;width: 20%;">Komplek Pergudangan</th>
             </tr>
@@ -340,7 +342,7 @@
         <table style="width:100%; border-collapse:collapse; margin:0;">
             <tr>
                 <td style="border-top:1px solid #000; border-bottom:1px solid #000; border-left:0; border-right:1px solid #000; padding:3px; font-size:9pt; font-weight:bold; width:50%; margin:0;">PERSETUJUAN</td>
-                <td style="border-top:1px solid #000; border-bottom:1px solid #000; border-left:0; border-right:0; padding:3px; font-size:9pt; text-align:center; margin:0;">{{ number_format($totalKuantum, 0, ',', '.') }} Kg</td>
+                <td style="border-top:1px solid #000; border-bottom:1px solid #000; border-left:0; border-right:0; padding:3px; font-size:9pt; text-align:center; margin:0;">{{ number_format($totalKuantum, 0, ',', '.') }} {{ $satuan }}</td>
             </tr>
             <tr>
                 <td style="border-top:0; border-bottom:1px solid #000; border-left:0; border-right:1px solid #000; padding:3px; font-size:9pt; font-weight:bold; margin:0;">GUDANG</td>

@@ -11,6 +11,10 @@ console.log('Purchase Order Data:', props.purchaseOrder);
 console.log('Total Harga:', props.purchaseOrder.total_harga, typeof props.purchaseOrder.total_harga);
 console.log('Total Kuantum:', props.purchaseOrder.total_kuantum, typeof props.purchaseOrder.total_kuantum);
 console.log('Total Nilai:', props.purchaseOrder.total_nilai, typeof props.purchaseOrder.total_nilai);
+console.log('Items:', props.purchaseOrder.items);
+if (props.purchaseOrder.items && props.purchaseOrder.items.length > 0) {
+    console.log('First item satuan:', props.purchaseOrder.items[0].satuan, typeof props.purchaseOrder.items[0].satuan);
+}
 
 const formatCurrency = (value) => {
     // Handle null, undefined, or NaN values
@@ -144,7 +148,7 @@ const getPoNumber = () => {
                             
                             <div class="bg-green-50 p-4 rounded-lg">
                                 <h3 class="text-sm font-medium text-green-600 uppercase tracking-wide">Total Kuantum</h3>
-                                <p class="mt-2 text-2xl font-bold text-green-900">{{ formatCurrency(purchaseOrder.total_kuantum || 0) }} <span class="text-lg">Kg</span></p>
+                                <p class="mt-2 text-2xl font-bold text-green-900">{{ formatCurrency(purchaseOrder.total_kuantum || 0) }} <span class="text-lg">{{ purchaseOrder.items[0]?.satuan || 'Kg' }}</span></p>
                             </div>
                             
                             <div class="bg-purple-50 p-4 rounded-lg">
@@ -176,13 +180,13 @@ const getPoNumber = () => {
                                     </div>
                                     
                                     <div>
-                                        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Harga/Kg</span>
+                                        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Harga/{{ item.satuan || 'Kg' }}</span>
                                         <p class="mt-1 text-sm font-semibold text-gray-900">Rp {{ formatCurrency(item.harga) }}</p>
                                     </div>
                                     
                                     <div>
                                         <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Kuantum</span>
-                                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ formatCurrency(item.kuantum) }} Kg</p>
+                                        <p class="mt-1 text-sm font-semibold text-gray-900">{{ formatCurrency(item.kuantum) }} {{ item.satuan || 'Kg' }}</p>
                                     </div>
                                     
                                     <div>
