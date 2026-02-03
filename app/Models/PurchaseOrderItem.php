@@ -17,7 +17,8 @@ class PurchaseOrderItem extends Model
         'komplek_pergudangan',
         'komplek_pergudangan_custom',
         'kualitas',
-        'kualitas_custom'
+        'kualitas_custom',
+        'satuan'
     ];
 
     protected $casts = [
@@ -56,9 +57,9 @@ class PurchaseOrderItem extends Model
         return $this->purchaseOrder->jenis_komoditas_lengkap;
     }
 
-    // Accessor untuk mendapatkan satuan (default Kg)
-    public function getSatuanAttribute()
+    // Accessor untuk mendapatkan satuan dengan fallback ke Kg
+    public function getSatuanAttribute($value)
     {
-        return 'Kg'; // Default satuan untuk semua item
+        return $value ?? 'Kg';
     }
 }

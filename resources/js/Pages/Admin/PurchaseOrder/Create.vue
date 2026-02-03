@@ -27,7 +27,8 @@ const form = useForm({
             komplek_pergudangan: '',
             komplek_pergudangan_custom: '',
             kualitas: '',
-            kualitas_custom: ''
+            kualitas_custom: '',
+            satuan: 'Kg'
         }
     ]
 });
@@ -35,9 +36,22 @@ const form = useForm({
 const kualitasOptions = ref([]);
 const showJenisKomoditasCustom = computed(() => form.jenis_komoditas === 'Lain-lain');
 
+// Helper function untuk menentukan satuan berdasarkan komoditas
+const getSatuanByKomoditas = (jenisKomoditas, customKomoditas) => {
+    const komoditas = jenisKomoditas === 'Lain-lain' ? customKomoditas : jenisKomoditas;
+    const komoditasLower = (komoditas || '').toLowerCase();
+    
+    if (komoditasLower.includes('minyak')) {
+        return 'Liter';
+    }
+    return 'Kg';
+};
+
 // Helper functions for managing quality items
 const addKualitasItem = () => {
     const newId = Math.max(...form.kualitas_items.map(item => item.id)) + 1;
+    // Auto-detect satuan berdasarkan jenis komoditas
+    const defaultSatuan = getSatuanByKomoditas(form.jenis_komoditas, form.jenis_komoditas_custom);
     form.kualitas_items.push({
         id: newId,
         harga: '',
@@ -45,7 +59,8 @@ const addKualitasItem = () => {
         komplek_pergudangan: '',
         komplek_pergudangan_custom: '',
         kualitas: '',
-        kualitas_custom: ''
+        kualitas_custom: '',
+        satuan: defaultSatuan
     });
 };
 
@@ -105,12 +120,16 @@ const handleKuantumInput = (event, item) => {
     event.target.value = formatNumber(value);
 };
 
-// Watch perubahan jenis komoditas untuk update kualitas
+// Watch perubahan jenis komoditas untuk update kualitas dan satuan
 watch(() => form.jenis_komoditas, (newValue) => {
-    // Reset kualitas items saat jenis komoditas berubah
+    // Auto-detect satuan berdasarkan jenis komoditas
+    const defaultSatuan = getSatuanByKomoditas(newValue, form.jenis_komoditas_custom);
+    
+    // Reset kualitas items dan update satuan saat jenis komoditas berubah
     form.kualitas_items.forEach(item => {
         item.kualitas = '';
         item.kualitas_custom = '';
+        item.satuan = defaultSatuan;
     });
     
     // Update opsi kualitas berdasarkan jenis komoditas
@@ -350,10 +369,10 @@ const submit = () => {
                                         </div>
                                     </div>
 
-                                    <!-- Harga dan Kuantum -->
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <!-- Harga, Kuantum, dan Satuan -->
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                         <div>
-                                            <InputLabel :for="`harga_${item.id}`" value="Harga (Rp/Kg)" />
+                                            <InputLabel :for="`harga_${item.id}`" :value="`Harga (Rp/${item.satuan})`" />
                                             <div class="mt-1 relative rounded-md shadow-sm">
                                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                     <span class="text-gray-500 sm:text-sm">Rp</span>
@@ -371,21 +390,37 @@ const submit = () => {
                                         </div>
 
                                         <div>
-                                            <InputLabel :for="`kuantum_${item.id}`" value="Kuantum (Kg)" />
+                                            <InputLabel :for="`kuantum_${item.id}`" :value="`Kuantum (${item.satuan})`" />
                                             <div class="mt-1 relative rounded-md shadow-sm">
                                                 <input
                                                     :id="`kuantum_${item.id}`"
                                                     type="text"
                                                     @input="(event) => handleKuantumInput(event, item)"
-                                                    class="block w-full pr-12 py-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                    class="block w-full pr-16 py-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                                     placeholder="0"
                                                     required
                                                 />
                                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                                    <span class="text-gray-500 sm:text-sm">Kg</span>
+                                                    <span class="text-gray-500 sm:text-sm">{{ item.satuan }}</span>
                                                 </div>
                                             </div>
                                             <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.kuantum`]" />
+                                        </div>
+
+                                        <div>
+                                            <InputLabel :for="`satuan_${item.id}`" value="Satuan" />
+                                            <select
+                                                :id="`satuan_${item.id}`"
+                                                v-model="item.satuan"
+                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required
+                                            >
+                                                <option value="Kg">Kg</option>
+                                                <option value="Liter">Liter</option>
+                                                <option value="Ton">Ton</option>
+                                                <option value="Kwintal">Kwintal</option>
+                                            </select>
+                                            <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.satuan`]" />
                                         </div>
                                     </div>
 

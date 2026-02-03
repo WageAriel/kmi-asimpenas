@@ -99,6 +99,7 @@ class PurchaseOrderController extends Controller
             'kualitas_items.*.komplek_pergudangan_custom' => 'nullable|string|max:255',
             'kualitas_items.*.kualitas' => 'required|string',
             'kualitas_items.*.kualitas_custom' => 'nullable|string|max:255',
+            'kualitas_items.*.satuan' => 'required|string|in:Kg,Liter,Ton,Kwintal',
         ]);
 
         $validated['created_by'] = auth()->user()->name ?? 'Admin';
@@ -176,6 +177,7 @@ class PurchaseOrderController extends Controller
                         'nilai' => $item->nilai, // Jangan cast ke int untuk angka besar
                         'komplek_pergudangan' => $item->komplek_pergudangan_lengkap,
                         'kualitas' => $item->kualitas_lengkap,
+                        'satuan' => $item->satuan,
                     ];
                 })
             ]
