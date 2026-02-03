@@ -19,6 +19,8 @@ class PurchaseOrderController extends Controller
     {
         $month = request('month');
         $year = request('year');
+        $sortBy = request('sort_by', 'created_at');
+        $sortOrder = request('sort_order', 'desc');
         
         $query = PurchaseOrder::with('items');
         
@@ -27,7 +29,17 @@ class PurchaseOrderController extends Controller
                   ->whereYear('created_at', $year);
         }
         
-        $purchaseOrders = $query->orderBy('created_at', 'desc')
+        // Apply sorting
+        if ($sortBy === 'jenis_komoditas') {
+            $query->orderBy('jenis_komoditas', $sortOrder)
+                  ->orderBy('jenis_komoditas_custom', $sortOrder);
+        } elseif ($sortBy === 'nama_perusahaan') {
+            $query->orderBy('nama_perusahaan', $sortOrder);
+        } else {
+            $query->orderBy($sortBy, $sortOrder);
+        }
+        
+        $purchaseOrders = $query
             ->paginate(10)
             ->through(fn ($po) => [
                 'id' => $po->id,
@@ -56,7 +68,9 @@ class PurchaseOrderController extends Controller
             'mitras' => $mitras,
             'filters' => [
                 'month' => $month,
-                'year' => $year
+                'year' => $year,
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder
             ]
         ]);
     }

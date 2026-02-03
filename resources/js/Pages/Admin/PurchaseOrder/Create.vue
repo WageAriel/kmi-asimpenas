@@ -33,6 +33,43 @@ const form = useForm({
     ]
 });
 
+// Search functionality for Nama Perusahaan
+const searchQuery = ref('');
+const isDropdownOpen = ref(false);
+const dropdownRef = ref(null);
+
+const filteredMitras = computed(() => {
+    if (!searchQuery.value) {
+        return props.mitras;
+    }
+    return props.mitras.filter(mitra => 
+        mitra.nama_perusahaan.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+});
+
+const selectMitra = (nama) => {
+    form.nama_perusahaan = nama;
+    searchQuery.value = nama;
+    isDropdownOpen.value = false;
+};
+
+const handleSearchFocus = () => {
+    isDropdownOpen.value = true;
+};
+
+const handleSearchBlur = () => {
+    setTimeout(() => {
+        isDropdownOpen.value = false;
+    }, 200);
+};
+
+// Update search query when form value changes
+watch(() => form.nama_perusahaan, (newValue) => {
+    if (newValue && !searchQuery.value) {
+        searchQuery.value = newValue;
+    }
+});
+
 const kualitasOptions = ref([]);
 const showJenisKomoditasCustom = computed(() => form.jenis_komoditas === 'Lain-lain');
 
@@ -224,17 +261,56 @@ const submit = () => {
                         <!-- Nama Perusahaan -->
                         <div>
                             <InputLabel for="nama_perusahaan" value="Nama Perusahaan" />
-                            <select
-                                id="nama_perusahaan"
-                                v-model="form.nama_perusahaan"
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                required
-                            >
-                                <option value="">Pilih Nama Perusahaan</option>
-                                <option v-for="mitra in mitras" :key="mitra.id" :value="mitra.nama_perusahaan">
-                                    {{ mitra.nama_perusahaan }}
-                                </option>
-                            </select>
+                            <div class="relative mt-1">
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        v-model="searchQuery"
+                                        @focus="handleSearchFocus"
+                                        @blur="handleSearchBlur"
+                                        @input="isDropdownOpen = true"
+                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        placeholder="Cari atau pilih nama perusahaan..."
+                                        required
+                                    />
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dropdown List -->
+                                <div 
+                                    v-if="isDropdownOpen && filteredMitras.length > 0"
+                                    class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+                                >
+                                    <div
+                                        v-for="mitra in filteredMitras"
+                                        :key="mitra.id"
+                                        @mousedown="selectMitra(mitra.nama_perusahaan)"
+                                        class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50 hover:text-indigo-900"
+                                        :class="{ 'bg-indigo-100': form.nama_perusahaan === mitra.nama_perusahaan }"
+                                    >
+                                        <span class="block truncate" :class="{ 'font-semibold': form.nama_perusahaan === mitra.nama_perusahaan }">
+                                            {{ mitra.nama_perusahaan }}
+                                        </span>
+                                        <span v-if="form.nama_perusahaan === mitra.nama_perusahaan" class="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
+                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- No Results -->
+                                <div 
+                                    v-if="isDropdownOpen && filteredMitras.length === 0 && searchQuery"
+                                    class="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-2 px-3 text-base ring-1 ring-black ring-opacity-5 sm:text-sm"
+                                >
+                                    <p class="text-gray-500 text-center">Tidak ada hasil ditemukan</p>
+                                </div>
+                            </div>
                             <InputError class="mt-2" :message="form.errors.nama_perusahaan" />
                         </div>
 

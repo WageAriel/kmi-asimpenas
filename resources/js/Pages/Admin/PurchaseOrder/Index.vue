@@ -15,6 +15,10 @@ const selectedPO = ref(null);
 const filterMonth = ref(props.filters?.month || '');
 const filterYear = ref(props.filters?.year || new Date().getFullYear());
 
+// Sort state
+const sortBy = ref(props.filters?.sort_by || 'created_at');
+const sortOrder = ref(props.filters?.sort_order || 'desc');
+
 // Generate month options
 const monthOptions = [
     { value: '', label: 'Semua Bulan' },
@@ -55,7 +59,28 @@ const deletePO = () => {
 const applyFilter = () => {
     router.get(route('admin.purchase-orders.index'), {
         month: filterMonth.value,
-        year: filterYear.value
+        year: filterYear.value,
+        sort_by: sortBy.value,
+        sort_order: sortOrder.value
+    }, {
+        preserveState: true,
+        preserveScroll: true
+    });
+};
+
+const toggleSort = (column) => {
+    if (sortBy.value === column) {
+        sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortBy.value = column;
+        sortOrder.value = 'asc';
+    }
+    
+    router.get(route('admin.purchase-orders.index'), {
+        month: filterMonth.value,
+        year: filterYear.value,
+        sort_by: sortBy.value,
+        sort_order: sortOrder.value
     }, {
         preserveState: true,
         preserveScroll: true
@@ -65,6 +90,8 @@ const applyFilter = () => {
 const resetFilter = () => {
     filterMonth.value = '';
     filterYear.value = currentYear;
+    sortBy.value = 'created_at';
+    sortOrder.value = 'desc';
     router.get(route('admin.purchase-orders.index'));
 };
 </script>
@@ -152,8 +179,30 @@ const resetFilter = () => {
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Perusahaan</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Komoditas</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <button @click="toggleSort('nama_perusahaan')" class="flex items-center space-x-1 hover:text-gray-700">
+                                            <span>Nama Perusahaan</span>
+                                            <svg v-if="sortBy === 'nama_perusahaan'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path v-if="sortOrder === 'asc'" fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L10 4.414 6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                                <path v-else fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L10 15.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <svg v-else class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M5 12a1 1 0 102 0V6.414l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L5 6.414V12zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z" />
+                                            </svg>
+                                        </button>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <button @click="toggleSort('jenis_komoditas')" class="flex items-center space-x-1 hover:text-gray-700">
+                                            <span>Komoditas</span>
+                                            <svg v-if="sortBy === 'jenis_komoditas'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path v-if="sortOrder === 'asc'" fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L10 4.414 6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                                <path v-else fill-rule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L10 15.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <svg v-else class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M5 12a1 1 0 102 0V6.414l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L5 6.414V12zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z" />
+                                            </svg>
+                                        </button>
+                                    </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Pengadaan</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Harga (Rp)</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Kuantum</th>
