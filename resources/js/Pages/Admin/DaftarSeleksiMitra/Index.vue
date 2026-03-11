@@ -1058,7 +1058,7 @@ const deleteSingleItem = async () => {
                                     class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                 />
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">{{ item.mitra?.nama_perusahaan || '-' }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap">{{ (item.mitra?.nama_perusahaan || '-').toUpperCase() }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <span :class="['px-2 py-1 rounded-full', getStatusBadge(item.surat_permohonan)]">
                                     {{ item.surat_permohonan === 'Ada' ? 'Ada' : 'Tidak Ada' }}

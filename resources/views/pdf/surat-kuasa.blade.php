@@ -89,7 +89,7 @@
                 <td>1.</td>
                 <td>Nama</td>
                 <td>:</td>
-                <td>{{ $nama_pemberi }}</td>
+                <td>{{ strtoupper($nama_pemberi) }}</td>
             </tr>
             <tr>
                 <td>2.</td>
@@ -101,13 +101,13 @@
                 <td>3.</td>
                 <td>Alamat</td>
                 <td>:</td>
-                <td>{{ $alamat_pemberi }}</td>
+                <td>{{ strtoupper($alamat_pemberi) }}</td>
             </tr>
             <tr>
                 <td>4.</td>
                 <td>Jabatan</td>
                 <td>:</td>
-                <td>{{ $jabatan_pemberi }}</td>
+                <td>{{ strtoupper($jabatan_pemberi) }}</td>
             </tr>
         </table>
     </div>
@@ -122,7 +122,7 @@
                 <td>1.</td>
                 <td>Nama</td>
                 <td>:</td>
-                <td>{{ $nama_penerima }}</td>
+                <td>{{ strtoupper($nama_penerima) }}</td>
             </tr>
             <tr>
                 <td>2.</td>
@@ -134,13 +134,13 @@
                 <td>3.</td>
                 <td>Alamat</td>
                 <td>:</td>
-                <td>{{ $alamat_penerima }}</td>
+                <td>{{ strtoupper($alamat_penerima) }}</td>
             </tr>
         </table>
     </div>
     
     <div class="content">
-        Untuk melaksanakan dan menandatangani semua dokumen yang berhubungan dengan kontrak atau PO Gabah/Beras termasuk pencairan dana yang diterbitkan oleh Perum BULOG Cabang Surakarta melalui Rekening BRI No <strong>{{ $no_rekening }}</strong> an <strong>{{ $nama_pemilik_rekening }}</strong>.
+        Untuk melaksanakan dan menandatangani semua dokumen yang berhubungan dengan kontrak atau PO Gabah/Beras termasuk pencairan dana yang diterbitkan oleh Perum BULOG Cabang Surakarta melalui Rekening BRI No <strong>{{ $no_rekening }}</strong> an <strong>{{ strtoupper($nama_pemilik_rekening) }}</strong>.
     </div>
     
     <div class="content">
@@ -169,12 +169,12 @@
                 <td>
                     <div>Yang Memberi Kuasa</div>
                     <div class="signature-space"></div>
-                    <div class="signature-name">{{ $nama_pemberi }}</div>
+                    <div class="signature-name">{{ strtoupper($nama_pemberi) }}</div>
                 </td>
                 <td>
                     <div>Yang diberi Kuasa</div>
                     <div class="signature-space"></div>
-                    <div class="signature-name">{{ $nama_penerima }}</div>
+                    <div class="signature-name">{{ strtoupper($nama_penerima) }}</div>
                 </td>
             </tr>
         </table>

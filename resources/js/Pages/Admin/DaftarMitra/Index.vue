@@ -855,15 +855,15 @@ watch(selectedYear, () => {
                                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
                                     />
                                 </td>
-                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.nama_perusahaan }}</td>
-                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.badan_hukum_usaha }}</td>
-                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.alamat_perusahaan }}</td>
-                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.nama_cp }}</td>
+                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ (mitra.nama_perusahaan || '').toUpperCase() }}</td>
+                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ (mitra.badan_hukum_usaha || '').toUpperCase() }}</td>
+                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ (mitra.alamat_perusahaan || '').toUpperCase() }}</td>
+                                <td class="text-sm px-4 py-3 whitespace-nowrap">{{ (mitra.nama_cp || '').toUpperCase() }}</td>
                                 <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.no_telp_perusahaan }}</td>
                                 <td class="text-sm px-4 py-3 whitespace-nowrap">{{ mitra.no_telp_cp }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <span :class="['px-2 py-1 text-xs font-medium rounded-full', getStatusClass(mitra.status_perusahaan)]">
-                                        {{ mitra.status_perusahaan || 'Belum diatur' }}
+                                        {{ (mitra.status_perusahaan || 'Belum diatur').toUpperCase() }}
                                     </span>
                                 </td>
                                 <td class="text-sm px-4 py-3 whitespace-nowrap text-center">
@@ -993,33 +993,33 @@ watch(selectedYear, () => {
                     
                     <div>
                         <span class="block text-sm text-gray-500">Nama Perusahaan</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.nama_perusahaan }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.nama_perusahaan?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
                         <span class="block text-sm text-gray-500">Badan Hukum</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.badan_hukum_usaha || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.badan_hukum_usaha?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
                         <span class="block text-sm text-gray-500">Alamat</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.alamat_perusahaan || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.alamat_perusahaan?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
                         <span class="block text-sm text-gray-500">Kota/Kabupaten</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.kota_kabupaten || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.kota_kabupaten?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
                         <span class="block text-sm text-gray-500">Provinsi</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.provinsi || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.provinsi?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
                         <span class="block text-sm text-gray-500">Status Perusahaan</span>
                         <span :class="['px-2 py-1 text-xs font-medium rounded-full', getStatusClass(selectedMitra.status_perusahaan)]">
-                            {{ selectedMitra.status_perusahaan || 'Belum diatur' }}
+                            {{ selectedMitra.status_perusahaan?.toUpperCase() || 'BELUM DIATUR' }}
                         </span>
                     </div>
                     
@@ -1039,7 +1039,7 @@ watch(selectedYear, () => {
                     
                     <div>
                         <span class="block text-sm text-gray-500">Nama CP</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.nama_cp || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.nama_cp?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
@@ -1049,7 +1049,7 @@ watch(selectedYear, () => {
                     
                     <div>
                         <span class="block text-sm text-gray-500">Tempat Lahir</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.tempat_lahir || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.tempat_lahir?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
@@ -1063,7 +1063,7 @@ watch(selectedYear, () => {
                     </div>
                     <div>
                         <span class="block text-sm text-gray-500">Jabatan</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.jabatan || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.jabatan?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div class="col-span-2 border-t border-gray-200 pt-4 mt-2">
@@ -1072,12 +1072,12 @@ watch(selectedYear, () => {
                     
                     <div>
                         <span class="block text-sm text-gray-500">Bank Korespondensi</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.bank_korespondensi || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.bank_korespondensi?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
                         <span class="block text-sm text-gray-500">Alamat Bank</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.alamat_bank || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.alamat_bank?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div>
@@ -1087,7 +1087,7 @@ watch(selectedYear, () => {
                     
                     <div>
                         <span class="block text-sm text-gray-500">Nama Pemilik Rekening</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.nama_pemilik_rekening || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.nama_pemilik_rekening?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div class="col-span-2 border-t border-gray-200 pt-4 mt-2">
@@ -1101,12 +1101,12 @@ watch(selectedYear, () => {
                     
                     <div>
                         <span class="block text-sm text-gray-500">PKP</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.pkp || '-' }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.pkp?.toUpperCase() || '-' }}</span>
                     </div>
 
                     <div v-if="selectedMitra.keterangan_pkp" class="col-span-2">
                         <span class="block text-sm text-gray-500">Keterangan PKP</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.keterangan_pkp }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.keterangan_pkp?.toUpperCase() || '-' }}</span>
                     </div>
                     
                     <div class="col-span-2 border-t border-gray-200 pt-4 mt-2">
@@ -1120,14 +1120,14 @@ watch(selectedYear, () => {
 
                     <div v-if="selectedMitra.keterangan_surat_kuasa" class="col-span-2">
                         <span class="block text-sm text-gray-500">Keterangan Surat Kuasa</span>
-                        <span class="font-medium text-gray-900">{{ selectedMitra.keterangan_surat_kuasa }}</span>
+                        <span class="font-medium text-gray-900">{{ selectedMitra.keterangan_surat_kuasa?.toUpperCase() || '-' }}</span>
                     </div>
 
                     <!-- Data Kuasa - Only show if surat_kuasa is 'Ada' -->
                     <template v-if="selectedMitra.surat_kuasa === 'Ada'">
                         <div>
                             <span class="block text-sm text-gray-500">Nama Yang Dikuasakan</span>
-                            <span class="font-medium text-gray-900">{{ selectedMitra.nama_yang_dikuasakan || '-' }}</span>
+                            <span class="font-medium text-gray-900">{{ selectedMitra.nama_yang_dikuasakan?.toUpperCase() || '-' }}</span>
                         </div>
 
                         <div>
@@ -1137,7 +1137,7 @@ watch(selectedYear, () => {
 
                         <div class="col-span-2">
                             <span class="block text-sm text-gray-500">Alamat Yang Dikuasakan</span>
-                            <span class="font-medium text-gray-900">{{ selectedMitra.alamat_yang_dikuasakan || '-' }}</span>
+                            <span class="font-medium text-gray-900">{{ selectedMitra.alamat_yang_dikuasakan?.toUpperCase() || '-' }}</span>
                         </div>
                     </template>
 

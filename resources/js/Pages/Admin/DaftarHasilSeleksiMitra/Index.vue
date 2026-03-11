@@ -386,7 +386,7 @@ onMounted(() => {
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr v-for="item in paginatedData" :key="item.id_hasil_seleksi_mitra" class="hover:bg-gray-50">
-                            <td class="text-xs px-6 py-4 whitespace-nowrap">{{ item.mitra?.nama_perusahaan || '-' }}</td>
+                            <td class="text-xs px-6 py-4 whitespace-nowrap">{{ item.mitra?.nama_perusahaan?.toUpperCase() || '-' }}</td>
                             <td class="text-xs px-6 py-4 whitespace-nowrap">{{ formatDate(item.created_at) }}</td>
                             <td class="text-xs px-6 py-4 whitespace-nowrap">
                                 <span :class="['px-2 py-1 text-xs rounded-full font-medium', getStatusBadge(item.kesimpulan_dokumen)]">

@@ -1074,7 +1074,7 @@ const updateKlasifikasiMitra = async () => {
                                         class="rounded border-gray-300 text-green-600 focus:ring-green-500"
                                     />
                                 </td>
-                                <td class="text-xs px-4 py-3 whitespace-nowrap">{{ item.mitra?.nama_perusahaan }}</td>
+                                <td class="text-xs px-4 py-3 whitespace-nowrap">{{ item.mitra?.nama_perusahaan?.toUpperCase() || '-' }}</td>
                                 <td class="text-xs px-4 py-3 whitespace-nowrap">{{ formatDate(item.created_at) }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <span :class="['px-2 py-1 text-xs font-medium rounded-full', getClassificationColor(item.hasil_klasifikasi)]">
@@ -1253,7 +1253,7 @@ const updateKlasifikasiMitra = async () => {
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <p class="text-sm text-gray-500">Nama Perusahaan</p>
-                                <p class="font-medium">{{ selectedKlasifikasi.mitra?.nama_perusahaan || '-' }}</p>
+                                <p class="font-medium">{{ selectedKlasifikasi.mitra?.nama_perusahaan?.toUpperCase() || '-' }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500">Tanggal Klasifikasi</p>

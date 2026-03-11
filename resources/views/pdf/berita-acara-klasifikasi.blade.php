@@ -162,22 +162,22 @@
             <tr>
                 <td>1. Nama Perusahaan</td>
                 <td>:</td>
-                <td>{{ $nama_perusahaan }}</td>
+                <td>{{ strtoupper($nama_perusahaan) }}</td>
             </tr>
             <tr>
                 <td>2. Badan Hukum/Usaha</td>
                 <td>:</td>
-                <td>{{ $badan_usaha }}</td>
+                <td>{{ strtoupper($badan_usaha) }}</td>
             </tr>
             <tr>
                 <td>3. Alamat Perusahaan</td>
                 <td>:</td>
-                <td>{{ $alamat }}</td>
+                <td>{{ strtoupper($alamat) }}</td>
             </tr>
             <tr>
                 <td>4. Status</td>
                 <td>:</td>
-                <td>{{ $status }}</td>
+                <td>{{ strtoupper($status) }}</td>
             </tr>
         </table>
     </div>
@@ -317,7 +317,7 @@
     </table>
 
     <div class="conclusion">
-        <p>Berdasarkan hasil tersebut, maka {{ $nama_perusahaan }} dinyatakan masuk dalam klasifikasi <strong>{{ $klasifikasi->hasil_klasifikasi ?? 'C' }}</strong></p>
+        <p>Berdasarkan hasil tersebut, maka {{ strtoupper($nama_perusahaan) }} dinyatakan masuk dalam klasifikasi <strong>{{ $klasifikasi->hasil_klasifikasi ?? 'C' }}</strong></p>
     </div>
 
     <div class="signatures">
@@ -333,8 +333,8 @@
                 <br>
                 <p class="signature-text">Mitra Pangan,</p>
                 <div class="signature-space"></div>
-                <p class="signature-text" style="font-weight: bold;"><u>{{ $namaPenandatangan }}</u></p>
-                <p class="signature-text">{{ $nama_perusahaan }}</p>
+                <p class="signature-text" style="font-weight: bold;"><u>{{ strtoupper($namaPenandatangan) }}</u></p>
+                <p class="signature-text">{{ strtoupper($nama_perusahaan) }}</p>
             </div>
 
             <!-- Right signature -->
@@ -342,8 +342,8 @@
                 <p class="signature-text">Perum BULOG Kantor Cabang {{ $unit_pelaksana }}</p>
                 <p class="signature-text">Pelaksana Klasifikasi,</p>
                 <div class="signature-space"></div>
-                <p class="signature-text" style="font-weight: bold;"><u>{{ $pelaksana->nama_karyawan }}</u></p>
-                <p class="signature-text">{{ $pelaksana->jabatan }}</p>
+                <p class="signature-text" style="font-weight: bold;"><u>{{ strtoupper($pelaksana->nama_karyawan) }}</u></p>
+                <p class="signature-text">{{ strtoupper($pelaksana->jabatan) }}</p>
             </div>
         </div>
 
@@ -351,8 +351,8 @@
         <div class="signature-center">
             <p class="signature-text">Mengetahui,</p>
             <div class="signature-space"></div>
-            <p class="signature-text" style="font-weight: bold;"><u>{{ $pengetahui->nama_karyawan }}</u></p>
-            <p class="signature-text">{{ $pengetahui->jabatan }}</p>
+            <p class="signature-text" style="font-weight: bold;"><u>{{ strtoupper($pengetahui->nama_karyawan) }}</u></p>
+            <p class="signature-text">{{ strtoupper($pengetahui->jabatan) }}</p>
         </div>
     </div>
 </body>

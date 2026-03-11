@@ -152,22 +152,22 @@
                 <tr>
                     <td>1. Nama Perusahaan</td>
                     <td>:</td>
-                    <td><strong>{{ $klasifikasi->mitra->nama_perusahaan }}</strong></td>
+                    <td><strong>{{ strtoupper($klasifikasi->mitra->nama_perusahaan) }}</strong></td>
                 </tr>
                 <tr>
                     <td>2. Badan Hukum/Usaha</td>
                     <td>:</td>
-                    <td><strong>{{ $klasifikasi->mitra->badan_hukum_usaha }}</strong></td>
+                    <td><strong>{{ strtoupper($klasifikasi->mitra->badan_hukum_usaha) }}</strong></td>
                 </tr>
                 <tr>
                     <td>3. Alamat Perusahaan</td>
                     <td>:</td>
-                    <td><strong>{{ $klasifikasi->mitra->alamat_perusahaan }}</strong></td>
+                    <td><strong>{{ strtoupper($klasifikasi->mitra->alamat_perusahaan) }}</strong></td>
                 </tr>
                 <tr>
                     <td>4. Status</td>
                     <td>:</td>
-                    <td><strong>{{ $klasifikasi->mitra->status_perusahaan ?? 'Penggilingan' }}</strong></td>
+                    <td><strong>{{ strtoupper($klasifikasi->mitra->status_perusahaan ?? 'Penggilingan') }}</strong></td>
                 </tr>
             </table>
         </div>
@@ -396,8 +396,8 @@
                 <div class="signature-box">
                     <p>Mitra Pangan,</p>
                     <div class="signature-space"></div>
-                    <p><u style="font-weight: bold;">{{ $namaPenandatangan }}</u><br>
-                    {{ $klasifikasi->mitra->nama_perusahaan }}</p>
+                    <p><u style="font-weight: bold;">{{ strtoupper($namaPenandatangan) }}</u><br>
+                    {{ strtoupper($klasifikasi->mitra->nama_perusahaan) }}</p>
                 </div>
             </div>
         </div>

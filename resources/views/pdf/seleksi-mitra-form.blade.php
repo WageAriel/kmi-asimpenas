@@ -144,7 +144,7 @@
             <tr>
                 <td width="200">1. Nama Perusahaan</td>
                 <td width="10">:</td>
-                <td>{{ $mitra->nama_perusahaan }}</td>
+                <td>{{ strtoupper($mitra->nama_perusahaan) }}</td>
             </tr>
         </table>
     </div>
@@ -153,7 +153,7 @@
             <tr>
                 <td width="200">2. Badan Hukum/Usaha</td>
                 <td width="10">:</td>
-                <td>{{ $mitra->badan_hukum_usaha }}</td>
+                <td>{{ strtoupper($mitra->badan_hukum_usaha) }}</td>
             </tr>
         </table>
     </div>
@@ -162,7 +162,7 @@
             <tr>
                 <td width="200">3. Alamat Perusahaan</td>
                 <td width="10">:</td>
-                <td>{{ $mitra->alamat_perusahaan }}</td>
+                <td>{{ strtoupper($mitra->alamat_perusahaan) }}</td>
             </tr>
         </table>
     </div>
@@ -180,7 +180,7 @@
             <tr>
                 <td width="200">5. Nama Contact Person</td>
                 <td width="10">:</td>
-                <td>{{ $mitra->nama_cp }}</td>
+                <td>{{ strtoupper($mitra->nama_cp) }}</td>
             </tr>
         </table>
     </div>
@@ -198,7 +198,7 @@
             <tr>
                 <td width="200">7. Nama Bank Koresponden</td>
                 <td width="10">:</td>
-                <td>{{ $mitra->bank_korespondensi }}</td>
+                <td>{{ strtoupper($mitra->bank_korespondensi) }}</td>
             </tr>
         </table>
     </div>
@@ -207,7 +207,7 @@
             <tr>
                 <td width="200">8. Alamat Bank Koresponden</td>
                 <td width="10">:</td>
-                <td>{{ $mitra->alamat_bank }}</td>
+                <td>{{ strtoupper($mitra->alamat_bank) }}</td>
             </tr>
         </table>
     </div>
@@ -225,7 +225,7 @@
             <tr>
                 <td width="200">10. Nama Pemilik Rekening</td>
                 <td width="10">:</td>
-                <td>{{ $mitra->nama_pemilik_rekening }}</td>
+                <td>{{ strtoupper($mitra->nama_pemilik_rekening) }}</td>
             </tr>
         </table>
     </div>
@@ -234,7 +234,7 @@
             <tr>
                 <td width="200">11. Status</td>
                 <td width="10">:</td>
-                <td>{{ $mitra->status_perusahaan }}</td>
+                <td>{{ strtoupper($mitra->status_perusahaan) }}</td>
             </tr>
         </table>
     </div>
@@ -414,11 +414,11 @@
                 <p>
                     <strong><u>
                         @if($seleksi->surat_kuasa === 'Ada' && !empty($mitra->nama_yang_dikuasakan))
-                            {{ $mitra->nama_yang_dikuasakan }}
+                            {{ strtoupper($mitra->nama_yang_dikuasakan) }}
                         @else
-                            {{ $mitra->nama_cp }}
+                            {{ strtoupper($mitra->nama_cp) }}
                         @endif
-                    </u></strong><br>{{ $mitra->nama_perusahaan }}
+                    </u></strong><br>{{ strtoupper($mitra->nama_perusahaan) }}
                 </p>
             </div>
             <div class="clear"></div>

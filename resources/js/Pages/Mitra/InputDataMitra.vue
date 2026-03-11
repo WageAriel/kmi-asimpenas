@@ -157,6 +157,10 @@ const getEmptyFields = () => {
   });
 };
 
+const handleUppercase = (field, event) => {
+  form.value[field] = event.target.value.toUpperCase();
+};
+
 onMounted(async () => {
   try {
     const response = await axios.get('/user')
@@ -459,6 +463,7 @@ const generatePaktaIntegritasPdf = async () => {
                 id="nama_perusahaan"
                 v-model="form.nama_perusahaan"
                 required
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.nama_perusahaan.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -476,6 +481,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="text"
                 id="badan_hukum_usaha"
                 v-model="form.badan_hukum_usaha"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.badan_hukum_usaha.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -492,6 +498,7 @@ const generatePaktaIntegritasPdf = async () => {
               <select
                 id="status_perusahaan"
                 v-model="form.status_perusahaan"
+                class="uppercase" 
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.status_perusahaan === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -512,6 +519,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="email"
                 id="email"
                 v-model="form.email"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.email.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -529,6 +537,7 @@ const generatePaktaIntegritasPdf = async () => {
                 id="alamat_perusahaan"
                 v-model="form.alamat_perusahaan"
                 rows="2"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors resize-none',
                   form.alamat_perusahaan.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -546,6 +555,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="text"
                 id="kota_kabupaten"
                 v-model="form.kota_kabupaten"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.kota_kabupaten.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -562,6 +572,7 @@ const generatePaktaIntegritasPdf = async () => {
               <select
                 id="provinsi"
                 v-model="form.provinsi"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.provinsi === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -624,6 +635,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="text"
                 id="nama_cp"
                 v-model="form.nama_cp"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.nama_cp.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -641,6 +653,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="text"
                 id="jabatan"
                 v-model="form.jabatan"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.jabatan.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -659,6 +672,7 @@ const generatePaktaIntegritasPdf = async () => {
                 id="nik"
                 v-model="form.nik"
                 maxlength="16"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.nik.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -676,6 +690,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="text"
                 id="tempat_lahir"
                 v-model="form.tempat_lahir"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.tempat_lahir.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -693,6 +708,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="date"
                 id="tanggal_lahir"
                 v-model="form.tanggal_lahir"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.tanggal_lahir === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -709,6 +725,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="tel"
                 id="no_telp_perusahaan"
                 v-model="form.no_telp_perusahaan"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.no_telp_perusahaan.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -726,6 +743,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="tel"
                 id="no_telp_cp"
                 v-model="form.no_telp_cp"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.no_telp_cp.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -749,6 +767,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="text"
                 id="bank_korespondensi"
                 v-model="form.bank_korespondensi"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.bank_korespondensi.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -766,6 +785,7 @@ const generatePaktaIntegritasPdf = async () => {
                 type="text"
                 id="no_rekening"
                 v-model="form.no_rekening"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.no_rekening.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -797,6 +817,7 @@ const generatePaktaIntegritasPdf = async () => {
                   id="nama_pemilik_rekening"
                   v-model="form.nama_pemilik_rekening"
                   :readonly="samaDenganCP"
+                  class="uppercase"
                   :class="[
                     'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none text-sm transition-colors',
                     samaDenganCP ? 'bg-gray-100 cursor-not-allowed' : 'focus:ring-blue-500 focus:border-blue-500',
@@ -816,6 +837,7 @@ const generatePaktaIntegritasPdf = async () => {
                 id="alamat_bank"
                 v-model="form.alamat_bank"
                 rows="2"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors resize-none',
                   form.alamat_bank.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -840,6 +862,7 @@ const generatePaktaIntegritasPdf = async () => {
                 id="npwp"
                 v-model="form.npwp"
                 maxlength="15"
+                class="uppercase"
                 :class="[
                   'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
                   form.npwp.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
@@ -920,7 +943,11 @@ const generatePaktaIntegritasPdf = async () => {
                   type="text"
                   id="nama_yang_dikuasakan"
                   v-model="form.nama_yang_dikuasakan"
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors"
+                  class="uppercase"
+                  :class="[
+                    'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
+                    form.nama_yang_dikuasakan.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  ]"
                   placeholder="Masukkan nama yang dikuasakan"
                 />
               </div>
@@ -934,8 +961,12 @@ const generatePaktaIntegritasPdf = async () => {
                   type="text"
                   id="nik_yang_dikuasakan"
                   v-model="form.nik_yang_dikuasakan"
+                  class="uppercase"
                   maxlength="16"
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors"
+                  :class="[
+                    'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors',
+                    form.nik_yang_dikuasakan.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  ]"
                   placeholder="Masukkan NIK (16 digit)"
                 />
               </div>
@@ -949,7 +980,11 @@ const generatePaktaIntegritasPdf = async () => {
                   id="alamat_yang_dikuasakan"
                   v-model="form.alamat_yang_dikuasakan"
                   rows="3"
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors resize-none"
+                  class="uppercase"
+                  :class="[
+                    'block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors resize-none',
+                    form.alamat_yang_dikuasakan.trim() === '' ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  ]"
                   placeholder="Masukkan alamat lengkap yang dikuasakan"
                 ></textarea>
               </div>

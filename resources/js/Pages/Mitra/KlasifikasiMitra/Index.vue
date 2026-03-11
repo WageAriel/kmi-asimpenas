@@ -265,7 +265,7 @@ const editClassification = (classification) => {
                                 class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="text-sm font-medium text-gray-900">{{
-                                        classification.nama_perusahaan}}</span>
+                                        classification.nama_perusahaan?.toUpperCase() || '-' }}</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="text-sm font-medium text-gray-900">{{ classification.year ||
@@ -390,7 +390,7 @@ const editClassification = (classification) => {
                     <div class="mb-4 grid grid-cols-2 gap-x-6 gap-y-2">
                         <div>
                             <span class="block text-sm text-gray-500">Nama Mitra</span>
-                            <span class="font-semibold text-gray-900">{{ selectedClassification.nama_perusahaan
+                            <span class="font-semibold text-gray-900">{{ selectedClassification.nama_perusahaan?.toUpperCase() || '-'
                                 }}</span>
                         </div>
                         <div>
@@ -400,7 +400,7 @@ const editClassification = (classification) => {
                         </div>
                         <div>
                             <span class="block text-sm text-gray-500">Status</span>
-                            <span class="font-semibold text-gray-900">{{ getStatusText(selectedClassification.status)
+                            <span class="font-semibold text-gray-900">{{ getStatusText(selectedClassification.status)?.toUpperCase() || '-'
                                 }}</span>
                         </div>
                         <!-- <div>

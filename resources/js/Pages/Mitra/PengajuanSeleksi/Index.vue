@@ -37,7 +37,7 @@ onMounted(async () => {
     const mapped = data.map((item) => ({
       ...item,
       id: item.id_seleksi_mitra,
-      nama_perusahaan: item.mitra?.nama_perusahaan ?? '-',
+      nama_perusahaan: item.mitra?.nama_perusahaan ? item.mitra.nama_perusahaan.toUpperCase() : '-',
       year: getYear(item),
       status_seleksi: item.status_seleksi ?? item.status ?? 'pending',
       // Pakai yang dari backend kalau Ada; jika tidak, akan diisi heuristik
@@ -414,7 +414,7 @@ const editSubmission = (submission) => {
           <div class="mb-4 grid grid-cols-2 gap-x-6 gap-y-2">
             <div>
               <span class="block text-sm text-gray-500">Nama Mitra</span>
-              <span class="font-semibold text-gray-900">{{ selectedSubmission.nama_perusahaan }}</span>
+              <span class="font-semibold text-gray-900">{{ selectedSubmission.nama_perusahaan.toUpperCase() }}</span>
             </div>
             <div>
               <span class="block text-sm text-gray-500">Tahun</span>
@@ -445,31 +445,31 @@ const editSubmission = (submission) => {
               <div class="mb-3 font-semibold text-blue-700 pb-1">Dokumen Perijinan</div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Surat Permohonan</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.surat_permohonan }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.surat_permohonan?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Akta Notaris</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.akta_notaris }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.akta_notaris?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">NIB</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.nib }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.nib?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">KTP</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.ktp }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.ktp?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">No Rekening</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.no_rekening }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.no_rekening?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">NPWP</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.npwp }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.npwp?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Surat Kuasa</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.surat_kuasa }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.surat_kuasa?.toUpperCase() || '-' }}</span>
               </div>
             </div>
             <!-- Kolom Kanan -->
@@ -477,28 +477,28 @@ const editSubmission = (submission) => {
               <div class="mb-3 font-semibold text-blue-700 pb-1">Sarana Pengeringan</div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Lantai Jemur</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.lantai_jemur }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.lantai_jemur?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Sarana Lainnya</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.sarana_lainnya }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.sarana_lainnya?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-3 font-semibold text-blue-700 pb-1">Sarana Penggilingan</div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Mesin Pemecah Kulit</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_memecah_kulit }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_memecah_kulit?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Mesin Pemisah Gabah</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_pemisah_gabah }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_pemisah_gabah?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Mesin Penyosoh</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_penyosoh }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.mesin_penyosoh?.toUpperCase() || '-' }}</span>
               </div>
               <div class="mb-2">
                 <span class="text-sm text-gray-500">Alat Pemisah Beras</span>
-                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.alat_pemisah_beras }}</span>
+                <span class="font-medium text-gray-900 block mt-1">{{ selectedSubmission.alat_pemisah_beras?.toUpperCase() || '-' }}</span>
               </div>
             </div>
           </div>

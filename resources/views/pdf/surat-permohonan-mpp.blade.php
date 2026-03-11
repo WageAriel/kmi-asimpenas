@@ -139,22 +139,22 @@
         <tr>
             <td class="label">Nama</td>
             <td class="colon">:</td>
-            <td class="value">{{ $nama_cp }}</td>
+            <td class="value">{{ strtoupper($nama_cp) }}</td>
         </tr>
         <tr>
             <td class="label">Perusahaan</td>
             <td class="colon">:</td>
-            <td class="value">{{ $nama_perusahaan }}</td>
+            <td class="value">{{ strtoupper($nama_perusahaan) }}</td>
         </tr>
         <tr>
             <td class="label">Alamat</td>
             <td class="colon">:</td>
-            <td class="value">{{ $alamat_perusahaan }}</td>
+            <td class="value">{{ strtoupper($alamat_perusahaan) }}</td>
         </tr>
         <tr>
             <td class="label">Jabatan</td>
             <td class="colon">:</td>
-            <td class="value">{{ $jabatan }}</td>
+            <td class="value">{{ strtoupper($jabatan) }}</td>
         </tr>
         <tr>
             <td class="label">No. Telp</td>
@@ -189,7 +189,7 @@
     <div class="signature">
         Hormat kami,
         <div class="signature-space"></div>
-        <span class="signature-name">{{ $nama_cp }}</span>
+        <span class="signature-name">{{ strtoupper($nama_cp) }}</span>
     </div>
 </body>
 </html>

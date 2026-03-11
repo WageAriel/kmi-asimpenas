@@ -31,10 +31,15 @@
             margin: 20px 0;
         }
         .data-table td:first-child {
-            width: 200px;
+            width: 220px;
+            vertical-align: top;
         }
         .data-table td:nth-child(2) {
             width: 20px;
+            vertical-align: top;
+        }
+        .data-table td:nth-child(3) {
+            vertical-align: top;
         }
         .signature-section {
         margin-top: 40px;
@@ -78,22 +83,22 @@
             <tr>
                 <td>1. Nama Perusahaan</td>
                 <td>:</td>
-                <td>{{ $mitra->nama_perusahaan }}</td>
+                <td>{{ strtoupper($mitra->nama_perusahaan) }}</td>
             </tr>
             <tr>
                 <td>2. Badan Hukum/Usaha</td>
                 <td>:</td>
-                <td>{{ $mitra->badan_hukum_usaha }}</td>
+                <td>{{ strtoupper($mitra->badan_hukum_usaha) }}</td>
             </tr>
             <tr>
                 <td>3. Alamat Perusahaan</td>
                 <td>:</td>
-                <td>{{ $mitra->alamat_perusahaan }}</td>
+                <td>{{ strtoupper($mitra->alamat_perusahaan) }}</td>
             </tr>
             <tr>
                 <td>4. Status</td>
                 <td>:</td>
-                <td>{{ $mitra->status_perusahaan ?? 'Penggilingan' }}</td>
+                <td>{{ strtoupper($mitra->status_perusahaan ?? 'Penggilingan') }}</td>
             </tr>
             <tr>
                 <td>5. Nomor Urut Seleksi</td>
@@ -118,18 +123,18 @@
             <div class="signature-space"></div>
             <p style="margin: 0; font-weight: bold;"><u>
                         @if($seleksi->surat_kuasa === 'Ada' && !empty($mitra->nama_yang_dikuasakan))
-                            {{ $mitra->nama_yang_dikuasakan }}
+                            {{ strtoupper($mitra->nama_yang_dikuasakan) }}
                         @else
-                            {{ $mitra->nama_cp }}
+                            {{ strtoupper($mitra->nama_cp) }}
                         @endif
                     </u></p>
-            <p style="margin: 0;">{{ $mitra->nama_perusahaan }}</p>
+            <p style="margin: 0;">{{ strtoupper($mitra->nama_perusahaan) }}</p>
         </div>
         <div class="signature-right">
             <p>Perum BULOG Kantor Cabang Surakarta</p>
             <div class="signature-space"></div>
-            <p style="margin: 0; font-weight: bold;"><u>{{ $karyawan->nama_karyawan }}</u></p>
-            <p style="margin: 0;">{{ $karyawan->jabatan }}</p>
+            <p style="margin: 0; font-weight: bold;"><u>{{ strtoupper($karyawan->nama_karyawan) }}</u></p>
+            <p style="margin: 0;">{{ strtoupper($karyawan->jabatan) }}</p>
         </div>
     </div>
 </body>

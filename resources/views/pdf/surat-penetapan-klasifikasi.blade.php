@@ -45,19 +45,21 @@
         .signature-section {
             margin-top: 40px;
             width: 100%;
-            position: relative;
+            display: table;
         }
         .signature-left {
-            position: absolute;
-            left: 0;
-            width: 45%;
+            display: table-cell;
+            width: 50%;
             text-align: center;
+            vertical-align: top;
+            padding-right: 10px;
         }
         .signature-right {
-            position: absolute;
-            right: 0;
-            width: 45%;
+            display: table-cell;
+            width: 50%;
             text-align: center;
+            vertical-align: top;
+            padding-left: 10px;
         }
         .signature-space {
             height: 80px;
@@ -80,22 +82,22 @@
             <tr>
                 <td>1. Nama Perusahaan</td>
                 <td>:</td>
-                <td>{{ $nama_perusahaan }}</td>
+                <td>{{ strtoupper($nama_perusahaan) }}</td>
             </tr>
             <tr>
                 <td>2. Badan Hukum/Usaha</td>
                 <td>:</td>
-                <td>{{ $badan_usaha }}</td>
+                <td>{{ strtoupper($badan_usaha) }}</td>
             </tr>
             <tr>
                 <td>3. Alamat Perusahaan</td>
                 <td>:</td>
-                <td>{{ $alamat_perusahaan }}</td>
+                <td>{{ strtoupper($alamat_perusahaan) }}</td>
             </tr>
             <tr>
                 <td>4. Status</td>
                 <td>:</td>
-                <td>{{ $status_mitra }}</td>
+                <td>{{ strtoupper($status_mitra) }}</td>
             </tr>
             <tr>
                 <td>5. Nomor Urut Klasifikasi</td>
@@ -118,14 +120,14 @@
         <div class="signature-left">
             <p>Mitra Pangan,</p>
             <div class="signature-space"></div>
-            <p style="margin: 0; font-weight: bold;"><u>{{ $nama_mitra }}</u></p>
-            <p style="margin: 0;">{{ $nama_perusahaan }}</p>
+            <p style="margin: 0; font-weight: bold;"><u>{{ strtoupper($nama_mitra) }}</u></p>
+            <p style="margin: 0;">{{ strtoupper($nama_perusahaan) }}</p>
         </div>
         <div class="signature-right">
             <p>Perum BULOG Kantor Cabang {{ $kantor_cabang }}</p>
             <div class="signature-space"></div>
-            <p style="margin: 0; font-weight: bold;"><u>{{ $nama_pejabat }}</u></p>
-            <p style="margin: 0;">{{ $jabatan_pejabat }}</p>
+            <p style="margin: 0; font-weight: bold;"><u>{{ strtoupper($nama_pejabat) }}</u></p>
+            <p style="margin: 0;">{{ strtoupper($jabatan_pejabat) }}</p>
         </div>
     </div>
 </body>
