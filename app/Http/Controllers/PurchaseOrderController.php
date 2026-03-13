@@ -41,6 +41,7 @@ class PurchaseOrderController extends Controller
         
         $purchaseOrders = $query
             ->paginate(10)
+            ->appends(request()->query())
             ->through(fn ($po) => [
                 'id' => $po->id,
                 'no_surat' => $po->no_surat,
@@ -113,7 +114,7 @@ class PurchaseOrderController extends Controller
             'kualitas_items.*.komplek_pergudangan_custom' => 'nullable|string|max:255',
             'kualitas_items.*.kualitas' => 'required|string',
             'kualitas_items.*.kualitas_custom' => 'nullable|string|max:255',
-            'kualitas_items.*.satuan' => 'required|string|in:Kg,Liter,Ton,Kwintal',
+            'kualitas_items.*.satuan' => 'required|string|in:Kg,Liter,Ton,Kwintal,Pcs,Karton,Box',
         ]);
 
         $validated['created_by'] = auth()->user()->name ?? 'Admin';
@@ -262,6 +263,7 @@ class PurchaseOrderController extends Controller
             'kualitas_items.*.komplek_pergudangan_custom' => 'nullable|string|max:255',
             'kualitas_items.*.kualitas' => 'required|string',
             'kualitas_items.*.kualitas_custom' => 'nullable|string|max:255',
+            'kualitas_items.*.satuan' => 'required|string|in:Kg,Liter,Ton,Kwintal,Pcs,Karton,Box',
             'agenda_no' => 'nullable|string|max:255',
             'tanggal_terima' => 'nullable|date',
             'paraf' => 'nullable|string',

@@ -494,6 +494,9 @@ const submit = () => {
                                                 <option value="Liter">Liter</option>
                                                 <option value="Ton">Ton</option>
                                                 <option value="Kwintal">Kwintal</option>
+                                                <option value="Pcs">Pcs</option>
+                                                <option value="Karton">Karton</option>
+                                                <option value="Box">Box</option>
                                             </select>
                                             <InputError class="mt-2" :message="form.errors[`kualitas_items.${index}.satuan`]" />
                                         </div>
